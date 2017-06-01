@@ -35,6 +35,22 @@ mk_nor_image() {
 		| tr '\000' '\377' > $image_dst
 }
 
+add_flash_pbl() {
+       # Hook for architechtures which have a primary bootloader, a bootloader
+       # which runs before U-Boot.
+       :
+}
+
+add_flash_uboot() {
+	dd if=${DEPLOY_DIR_IMAGE}/$uboot of=$dst bs=1k conv=notrunc seek=${FLASH_UBOOT_OFFSET}
+}
+
+add_flash_linux() {
+	dd if=${DEPLOY_DIR_IMAGE}/$kernel of=$dst bs=1k conv=notrunc seek=${FLASH_KERNEL_OFFSET}
+	dd if=$ddir/$rootfs of=$dst bs=1k conv=notrunc seek=${FLASH_ROFS_OFFSET}
+	dd if=${S}/$rwfs of=$dst bs=1k conv=notrunc seek=${FLASH_RWFS_OFFSET}
+}
+
 do_generate_flash() {
 	ddir="${IMGDEPLOYDIR}"
 	kernel="${FLASH_KERNEL_IMAGE}"
@@ -53,10 +69,10 @@ do_generate_flash() {
 	# Assemble the flash image
 	dst="$ddir/$flash"
 	mk_nor_image $dst ${FLASH_SIZE}
-	dd if=${DEPLOY_DIR_IMAGE}/$uboot of=$dst bs=1k conv=notrunc seek=${FLASH_UBOOT_OFFSET}
-	dd if=${DEPLOY_DIR_IMAGE}/$kernel of=$dst bs=1k conv=notrunc seek=${FLASH_KERNEL_OFFSET}
-	dd if=$ddir/$rootfs of=$dst bs=1k conv=notrunc seek=${FLASH_ROFS_OFFSET}
-	dd if=${S}/$rwfs of=$dst bs=1k conv=notrunc seek=${FLASH_RWFS_OFFSET}
+	add_flash_pbl
+	add_flash_uboot
+	add_flash_linux
+
 
 	cd ${IMGDEPLOYDIR}
 	ln -sf $flash ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.overlay
