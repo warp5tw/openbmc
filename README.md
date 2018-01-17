@@ -26,7 +26,7 @@ sudo dnf groupinstall "C Development Tools and Libraries"
 ```
 ### 2) Download the source ###
 ```
-git clone git@github.com:openbmc/openbmc.git
+git clone git@github.com:Nuvoton-Israel/openbmc.git -b npcm7xx_v1.99.5_cand1
 cd openbmc
 ```
 
@@ -40,15 +40,15 @@ can be found in the [OpenBMC Cheatsheet](https://github.com/openbmc/docs/blob/ma
 
 Machine | TEMPLATECONF
 --------|---------
-Palmetto | ```meta-openbmc-machines/meta-openpower/meta-ibm/meta-palmetto/conf```
+NPCM750 | ```meta-openbmc-machines/meta-evb/meta-evb-nuvoton/meta-evb-npcm750/conf```
 Barreleye | ```meta-openbmc-machines/meta-openpower/meta-rackspace/meta-barreleye/conf```
 Zaius| ```meta-openbmc-machines/meta-openpower/meta-ingrasys/meta-zaius/conf```
 Witherspoon| ```meta-openbmc-machines/meta-openpower/meta-ibm/meta-witherspoon/conf```
 
 
-As an example target Palmetto
+As an example target NPCM750
 ```
-export TEMPLATECONF=meta-openbmc-machines/meta-openpower/meta-ibm/meta-palmetto/conf
+export TEMPLATECONF=meta-openbmc-machines/meta-evb/meta-evb-nuvoton/meta-evb-npcm750/conf
 ```
 
 ### 3) Build ###
