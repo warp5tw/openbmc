@@ -77,19 +77,29 @@ For running OpenBMC on the EVB please do as follow
 In u-boot version 201510.6.2 add parameters as follow:
 
 setenv kernel_tftp_path uImage
+
 setenv romfs_tftp_path obmc-phosphor-image-evb-npcm750.cpio.lzma.u-boot
+
 setenv fdt_path uImage-nuvoton-npcm750-evb.dtb
 
 setenv create_images_openbmc 'setenv autostart no;setenv ethact ETH${eth_num};dhcp;tftp ${romaddr} ${openbmc_romfs};setenv romsize ${filesize};tftp ${uimage_addr} ${serverip}:${openbmc_image};tftp ${fdtaddr} ${openbmc_fdt};setenv autostart yes'
+
 setenv openbmc_bootargs 'run common_bootargs;setenv bootargs ${bootargs} root=/dev/ram rw ramdisk_size=48000'
+
 setenv ftp_openbmcboot 'run openbmc_bootargs;run create_images1; bootm ${uimage_addr} $(romaddr) ${fdtaddr}'
+
 setenv ftp_romboot 'run romsize_w_calc;run openbmc_bootargs;cp ${romfs_flash_addr} ${romaddr} ${romsize_w};cp ${fdt_flash_addr} ${fdtaddr} $(fdtsize_w);cp ${uimage_flash_addr} ${uimage_addr} ${kernel_wsize};bootm ${uimage_addr} $(romaddr) ${fdtaddr}'
+
 setenv sdload 'fatload mmc 0 ${uimage_addr} uImage;fatload mmc 0 ${romaddr} obmc-phosphor-image-evb-npcm750.cpio.lzma.u-boot;fatload mmc 0 ${fdtaddr} uImage-nuvoton-npcm750-evb.dtb'
+
 setenv sdboot 'run ${sdload};run openbmc_bootargs;bootm ${uimage_addr} $(romaddr) ${fdtaddr}'
+
 setenv usbload 'usb start;fatload usb 0 ${uimage_addr} uImage;fatload usb 0 ${romaddr} obmc-phosphor-image-evb-npcm750.cpio.lzma.u-boot;fatload usb 0 ${fdtaddr} uImage-nuvoton-npcm750-evb.dtb'
+
 setenv usbboot 'run ${usbload};run openbmc_bootargs;bootm ${uimage_addr} $(romaddr) ${fdtaddr}'
 
 setenv ftp_openbmc 'setenv ethact ETH${eth_num}; run ftp_openbmcboot'
+
 setenv rom_openbmc 'setenv ethact ETH${eth_num}; run ftp_romboot'
 
 setenv romsize 1000000
@@ -160,11 +170,15 @@ either "run sdboot" (for an SD card) or "run usbboot" (for USB storage). Press
    setenv bootcmd 'setenv ethact ETH${eth_num}; run rom_openbmc'
 7. Reset the EVB to run Linux.
 
-#### 3) OpenBMC user login ####
+#### 4) OpenBMC user login ####
 after the OpenBMC boot please enter the following login and password:
 
-OpenBMC login : root
-OpenBMC passowrd : 0penBmc (first letter zero and not capital o)
+```
+Phosphor OpenBMC (Phosphor OpenBMC Project Reference Distro) 0.1.0 evb-npcm750 ttyS3
+
+evb-npcm750 login: root
+Password: 0penBmc (first letter zero and not capital o)
+```
 
 ## Contact ##
 - Mail: tomer.maimon@nuvoton.com, avi.fishman@nuvoton.com
