@@ -67,7 +67,7 @@ After building finished the built Images will found at:
 The relvant Images to use to upload the OpenBMC on the EVB are:
 
 1. uImage - NPCM750 EVB kernel Image
-2. uImage-nuvoton-npcm750-evb.dtb - NPCM750 EVB device tree blob.
+2. uImage-npcm750.dtb - NPCM750 EVB device tree blob.
 3. obmc-phosphor-image-evb-npcm750.cpio.lzma.u-boot - NPCM750 EVB OpenBMC RootFS
 
 ### 5) running images  ###
@@ -80,7 +80,7 @@ setenv kernel_tftp_path uImage
 
 setenv romfs_tftp_path obmc-phosphor-image-evb-npcm750.cpio.lzma.u-boot
 
-setenv fdt_path uImage-nuvoton-npcm750-evb.dtb
+setenv fdt_path uImage-npcm750.dtb
 
 setenv create_images_openbmc 'setenv autostart no;setenv ethact ETH${eth_num};dhcp;tftp ${romaddr} ${openbmc_romfs};setenv romsize ${filesize};tftp ${uimage_addr} ${serverip}:${openbmc_image};tftp ${fdtaddr} ${openbmc_fdt};setenv autostart yes'
 
@@ -90,11 +90,11 @@ setenv ftp_openbmcboot 'run openbmc_bootargs;run create_images1; bootm ${uimage_
 
 setenv ftp_romboot 'run romsize_w_calc;run openbmc_bootargs;cp ${romfs_flash_addr} ${romaddr} ${romsize_w};cp ${fdt_flash_addr} ${fdtaddr} $(fdtsize_w);cp ${uimage_flash_addr} ${uimage_addr} ${kernel_wsize};bootm ${uimage_addr} $(romaddr) ${fdtaddr}'
 
-setenv sdload 'fatload mmc 0 ${uimage_addr} uImage;fatload mmc 0 ${romaddr} obmc-phosphor-image-evb-npcm750.cpio.lzma.u-boot;fatload mmc 0 ${fdtaddr} uImage-nuvoton-npcm750-evb.dtb'
+setenv sdload 'fatload mmc 0 ${uimage_addr} uImage;fatload mmc 0 ${romaddr} obmc-phosphor-image-evb-npcm750.cpio.lzma.u-boot;fatload mmc 0 ${fdtaddr} uImage-npcm750.dtb'
 
 setenv sdboot 'run ${sdload};run openbmc_bootargs;bootm ${uimage_addr} $(romaddr) ${fdtaddr}'
 
-setenv usbload 'usb start;fatload usb 0 ${uimage_addr} uImage;fatload usb 0 ${romaddr} obmc-phosphor-image-evb-npcm750.cpio.lzma.u-boot;fatload usb 0 ${fdtaddr} uImage-nuvoton-npcm750-evb.dtb'
+setenv usbload 'usb start;fatload usb 0 ${uimage_addr} uImage;fatload usb 0 ${romaddr} obmc-phosphor-image-evb-npcm750.cpio.lzma.u-boot;fatload usb 0 ${fdtaddr} uImage-npcm750.dtb'
 
 setenv usbboot 'run ${usbload};run openbmc_bootargs;bootm ${uimage_addr} $(romaddr) ${fdtaddr}'
 
@@ -118,7 +118,7 @@ automatically from the TFPT to EVB SDRAM and then are booted.
     - For Windows, use ‘Tftpd32’ or ‘Tftpd64’ from http://tftpd32.jounin.net
 	- For Linux, set up the tftp server environment.
 2. Copy the "/build/tmp/deploy/images/evb-npcm750" folder, which contains the "uImage", 
-   "obmc-phosphor-image-evb-npcm750.cpio.lzma.u-boot" and “uImage-nuvoton-npcm750-evb.dtb“ 
+   "obmc-phosphor-image-evb-npcm750.cpio.lzma.u-boot" and “uImage-npcm750.dtb“ 
    Linux kernel files, into the TFTP server root folder on the host machine.
 3. Power up the EVB and hit any key to stop at the U-Boot shell.
 4. Update the U-Boot environment according to your network settings and working method. 
@@ -153,7 +153,7 @@ Prepare the SD card or USB storage device with a FAT file system (FAT16 or FAT32
 verify that there is at least 32 MB of free space available for the Linux kernel files.
 
 1. Copy the "uImage", "obmc-phosphor-image-evb-npcm750.cpio.lzma.u-boot" and 
-    “uImage-nuvoton-npcm750-evb.dtb“ Linux kernel files into the root
+    “uImage-npcm750.dtb“ Linux kernel files into the root
     directory of either the SD card or USB storage device.
 2. Plug the SD card or USB storage device into the EVB.
 3. Power up the EVB and hit any key to stop at the U-Boot shell.
