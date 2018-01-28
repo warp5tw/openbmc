@@ -70,8 +70,7 @@ The relvant Images to use to upload the OpenBMC on the EVB are:
 2. uImage-npcm750.dtb - NPCM750 EVB device tree blob.
 3. obmc-phosphor-image-evb-npcm750.cpio.lzma.u-boot - NPCM750 EVB OpenBMC RootFS
 
-Note
----------
+### Note ###
 All the files above are Image links to the latest build images, 
 for copy the files to SD or USB storage device please make sure 
 you copying the Images and not the links
