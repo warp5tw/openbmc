@@ -70,6 +70,12 @@ The relvant Images to use to upload the OpenBMC on the EVB are:
 2. uImage-npcm750.dtb - NPCM750 EVB device tree blob.
 3. obmc-phosphor-image-evb-npcm750.cpio.lzma.u-boot - NPCM750 EVB OpenBMC RootFS
 
+Note
+---------
+All the files above are Image links to the latest build images, 
+for copy the files to SD or USB storage device please make sure 
+you copying the Images and not the links
+
 ### 5) running images  ###
 For running OpenBMC on the EVB please do as follow
 
@@ -90,13 +96,13 @@ setenv ftp_openbmcboot 'run openbmc_bootargs;run create_images1; bootm ${uimage_
 
 setenv ftp_romboot 'run romsize_w_calc;run openbmc_bootargs;cp ${romfs_flash_addr} ${romaddr} ${romsize_w};cp ${fdt_flash_addr} ${fdtaddr} $(fdtsize_w);cp ${uimage_flash_addr} ${uimage_addr} ${kernel_wsize};bootm ${uimage_addr} $(romaddr) ${fdtaddr}'
 
-setenv sdload 'fatload mmc 0 ${uimage_addr} uImage;fatload mmc 0 ${romaddr} obmc-phosphor-image-evb-npcm750.cpio.lzma.u-boot;fatload mmc 0 ${fdtaddr} uImage-npcm750.dtb'
+setenv sdload 'fatload mmc 0 ${uimage_addr} ${kernel_tftp_path};fatload mmc 0 ${romaddr} ${romfs_tftp_path};fatload mmc 0 ${fdtaddr} ${fdt_path}'
 
-setenv sdboot 'run ${sdload};run openbmc_bootargs;bootm ${uimage_addr} $(romaddr) ${fdtaddr}'
+setenv sdboot 'run sdload;run openbmc_bootargs;bootm ${uimage_addr} $(romaddr) ${fdtaddr}'
 
-setenv usbload 'usb start;fatload usb 0 ${uimage_addr} uImage;fatload usb 0 ${romaddr} obmc-phosphor-image-evb-npcm750.cpio.lzma.u-boot;fatload usb 0 ${fdtaddr} uImage-npcm750.dtb'
+setenv usbload 'usb start;fatload usb 0 ${uimage_addr} ${kernel_tftp_path};fatload usb 0 ${romaddr} ${romfs_tftp_path};fatload usb 0 ${fdtaddr} ${fdt_path}'
 
-setenv usbboot 'run ${usbload};run openbmc_bootargs;bootm ${uimage_addr} $(romaddr) ${fdtaddr}'
+setenv usbboot 'run usbload;run openbmc_bootargs;bootm ${uimage_addr} $(romaddr) ${fdtaddr}'
 
 setenv ftp_openbmc 'setenv ethact ETH${eth_num}; run ftp_openbmcboot'
 
