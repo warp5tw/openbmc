@@ -29,7 +29,7 @@ sudo dnf groupinstall "C Development Tools and Libraries"
 ```
 ### 2) Download the source
 ```
-git clone git@github.com:openbmc/openbmc.git
+git clone git@github.com:Nuvoton-Israel/openbmc.git
 cd openbmc
 ```
 
@@ -45,15 +45,15 @@ then move to the next step. Additional examples can be found in the
 
 Machine | TEMPLATECONF
 --------|---------
-Palmetto | ```meta-openbmc-machines/meta-openpower/meta-ibm/meta-palmetto/conf```
+EVB NPCM750 | ```meta-openbmc-machines/meta-evb/meta-evb-nuvoton/meta-evb-npcm750/conf```
 Barreleye | ```meta-openbmc-machines/meta-openpower/meta-rackspace/meta-barreleye/conf```
 Zaius| ```meta-openbmc-machines/meta-openpower/meta-ingrasys/meta-zaius/conf```
 Witherspoon| ```meta-openbmc-machines/meta-openpower/meta-ibm/meta-witherspoon/conf```
 
 
-As an example target Palmetto
+As an example target NPCM750 evaluation board
 ```
-export TEMPLATECONF=meta-openbmc-machines/meta-openpower/meta-ibm/meta-palmetto/conf
+export TEMPLATECONF=meta-openbmc-machines/meta-evb/meta-evb-nuvoton/meta-evb-npcm750/conf
 ```
 
 ### 4) Build
@@ -66,73 +66,129 @@ bitbake obmc-phosphor-image
 Additional details can be found in the [docs](https://github.com/openbmc/docs)
 repository.
 
-## Build Validation and Testing
-Commits submitted by members of the OpenBMC GitHub community are compiled and
-tested via our [Jenkins](https://openpower.xyz/) server.  Commits are run
-through two levels of testing.  At the repository level the makefile `make
-check` directive is run.  At the system level, the commit is built into a
-firmware image and run with an arm-softmmu QEMU model against a barrage of
-[CI tests](https://openpower.xyz/job/openbmc-test-qemu-ci/).
+### 4) build images
+After building finished the built Images will found at:
+<NPCM7xx folder>/build/tmp/deploy/images/evb-npcm750
+The relvant Images to use to upload the OpenBMC on the EVB are:
 
-Commits submitted by non-members do not automatically proceed through CI
-testing. After visual inspection of the commit, a CI run can be manually
-performed by the reviewer.
+1. uImage - NPCM750 EVB kernel Image
+2. uImage-npcm750.dtb - NPCM750 EVB device tree blob.
+3. obmc-phosphor-image-evb-npcm750.cpio.lzma.u-boot - NPCM750 EVB OpenBMC RootFS
 
-Automated testing against the QEMU model along with supported systems are
-performed.  The OpenBMC project uses the
-[Robot Framework](http://robotframework.org/) for all automation.  Our
-complete test repository can be found
-[here](https://github.com/openbmc/openbmc-test-automation).
+### Note
+All the files above are Image links to the latest build images, 
+for copy the files to SD or USB storage device please make sure 
+you copying the Images and not the links
 
-## Submitting Patches
-Support of additional hardware and software packages is always welcome.
-Please follow the [contributing guidelines](https://github.com/openbmc/docs/blob/master/contributing.md)
-when making a submission.  It is expected that contributions contain test
-cases.
+### 5) running images
+For running OpenBMC on the EVB please do as follow
 
-## Bug Reporting
-[Issues](https://github.com/openbmc/openbmc/issues) are managed on
-GitHub.  It is recommended you search through the issues before opening
-a new one.
+#### 1) add parameters to the u-boot
+In u-boot version 201510.6.2 add parameters as follow:
 
-## Features of OpenBMC
+setenv kernel_tftp_path uImage
 
-**Feature List**
-* REST Management
-* IPMI
-* SSH based SOL
-* Power and Cooling Management
-* Event Logs
-* Zeroconf discoverable
-* Sensors
-* Inventory
-* LED Management
-* Host Watchdog
-* Simulation
-* Code Update Support for multiple BMC/BIOS images
-* POWER On Chip Controller (OCC) Support
+setenv romfs_tftp_path obmc-phosphor-image-evb-npcm750.cpio.lzma.u-boot
 
-**Features In Progress**
-* Full IPMI 2.0 Compliance with DCMI
-* Verified Boot
-* HTML5 Java Script Web User Interface
-* BMC RAS
+setenv fdt_path uImage-npcm750.dtb
 
-**Features Requested but need help**
-* OpenCompute Redfish Compliance
-* OpenBMC performance monitoring
-* cgroup user management and policies
-* Remote KVM
-* Remote USB
-* OpenStack Ironic Integration
-* QEMU enhancements
+setenv create_images_openbmc 'setenv autostart no;setenv ethact ETH${eth_num};dhcp;tftp ${romaddr} ${openbmc_romfs};setenv romsize ${filesize};tftp ${uimage_addr} ${serverip}:${openbmc_image};tftp ${fdtaddr} ${openbmc_fdt};setenv autostart yes'
 
+setenv openbmc_bootargs 'run common_bootargs;setenv bootargs ${bootargs} root=/dev/ram rw ramdisk_size=48000'
 
-## Finding out more
-Dive deeper in to OpenBMC by opening the [docs](https://github.com/openbmc/docs)
-repository.
+setenv ftp_openbmcboot 'run openbmc_bootargs;run create_images1; bootm ${uimage_addr} $(romaddr) ${fdtaddr}'
+
+setenv ftp_romboot 'run romsize_w_calc;run openbmc_bootargs;cp ${romfs_flash_addr} ${romaddr} ${romsize_w};cp ${fdt_flash_addr} ${fdtaddr} $(fdtsize_w);cp ${uimage_flash_addr} ${uimage_addr} ${kernel_wsize};bootm ${uimage_addr} $(romaddr) ${fdtaddr}'
+
+setenv sdload 'fatload mmc 0 ${uimage_addr} ${kernel_tftp_path};fatload mmc 0 ${romaddr} ${romfs_tftp_path};fatload mmc 0 ${fdtaddr} ${fdt_path}'
+
+setenv sdboot 'run sdload;run openbmc_bootargs;bootm ${uimage_addr} $(romaddr) ${fdtaddr}'
+
+setenv usbload 'usb start;fatload usb 0 ${uimage_addr} ${kernel_tftp_path};fatload usb 0 ${romaddr} ${romfs_tftp_path};fatload usb 0 ${fdtaddr} ${fdt_path}'
+
+setenv usbboot 'run usbload;run openbmc_bootargs;bootm ${uimage_addr} $(romaddr) ${fdtaddr}'
+
+setenv ftp_openbmc 'setenv ethact ETH${eth_num}; run ftp_openbmcboot'
+
+setenv rom_openbmc 'setenv ethact ETH${eth_num}; run ftp_romboot'
+
+setenv romsize 1000000
+
+save the new parameters (saveenv)
+
+#### 2) PROGRAM THE LINUX KERNEL FROM THE HOST MACHINE THROUGH THE TFTP SERVER
+
+This section describes how to load and boot the Linux kernel from the TFTP server. This is
+very useful in the development stage when doing frequent builds.
+These steps below should be performed one time per EVB.
+After performing these steps, on each EVB reset, the Linux files are downloaded
+automatically from the TFPT to EVB SDRAM and then are booted.
+
+1. Install and set up the TFTP server on your host machine
+    - For Windows, use ‘Tftpd32’ or ‘Tftpd64’ from http://tftpd32.jounin.net
+	- For Linux, set up the tftp server environment.
+2. Copy the "/build/tmp/deploy/images/evb-npcm750" folder, which contains the "uImage", 
+   "obmc-phosphor-image-evb-npcm750.cpio.lzma.u-boot" and “uImage-npcm750.dtb“ 
+   Linux kernel files, into the TFTP server root folder on the host machine.
+3. Power up the EVB and hit any key to stop at the U-Boot shell.
+4. Update the U-Boot environment according to your network settings and working method. 
+   Pay attention to the following environment settings:
+	- Update the MAC address (ethaddr,eth1addr,eth2addr,eth3addr) as printed on your board.
+	- Change the Host IP address (gatewayip and serverip) according to your network
+	  parameters
+	- Change the EVB static IP address (ipaddr) in case the EVB uses static IP rather than
+	  dynamic IP.
+	- Change the Linux file location in the FTP (tftp_dir).
+	- Change the Ethernet connection (eth_num). The EVB supports an RMII-1 or RGMII-1
+	  Ethernet connection.
+5. Change the bootcmd environment to boot from the TFTP, as follows:
+   setenv bootcmd 'setenv ethact ETH${eth_num}; run ftp_openbmc'
+6. Connect an Ethernet cable between the EVB (RMII-1 or RGMII-1, according to the
+   eth_num configuration) and the host machine (the connection can be through your
+   work network).
+8. Type "run bootcmd" or reset the EVB, This loads the Linux kernel files from the host
+   machine through the TFTP server to EVB SDRAM, and performs the boot.
+   
+Note: To program the Linux to the flash, type "run create_images" and press <ENTER>.
+This loads the Linux kernel files from the TFTP to SDRAM and programs them into
+the flash device. Remember to update the bootcmd environment back to ‘run
+rom_openbmc' and save the environment to the SPI flash device in order to be able to boot
+from the flash device after an EVB reset.
+
+#### 3) PROGRAMMING THE LINUX KERNEL FROM SD CARD OR USB STORAGE DEVICE TO THE SPI FLASH
+
+This section desribes how to program the Linux kernel to the flash from eitheran SD card or
+a USB storage device.
+Prepare the SD card or USB storage device with a FAT file system (FAT16 or FAT32) and
+verify that there is at least 32 MB of free space available for the Linux kernel files.
+
+1. Copy the "uImage", "obmc-phosphor-image-evb-npcm750.cpio.lzma.u-boot" and 
+    “uImage-npcm750.dtb“ Linux kernel files into the root
+    directory of either the SD card or USB storage device.
+2. Plug the SD card or USB storage device into the EVB.
+3. Power up the EVB and hit any key to stop at the U-Boot shell.
+   
+Note: To skip flash programming and boot Linux from SDRAM, skip steps 4-7 and type
+either "run sdboot" (for an SD card) or "run usbboot" (for USB storage). Press
+<ENTER>. This loads Linux kernel files to SDRAM and boots it.
+
+4. Type either "run sdload" (for an SD card) or "run usbload" (for USB storage) and press
+   <ENTER>. This loads Linux kernel files to SDRAM.
+5. Type "run copy_image2flash" and press <ENTER>. This copies the Linux kernel from
+   SDRAM to the flash device.
+6. Change the bootcmd environment to boot from the TFTP, as follows:
+   setenv bootcmd 'setenv ethact ETH${eth_num}; run rom_openbmc'
+7. Reset the EVB to run Linux.
+
+#### 4) OpenBMC user login
+after the OpenBMC boot please enter the following login and password:
+
+```
+Phosphor OpenBMC (Phosphor OpenBMC Project Reference Distro) 0.1.0 evb-npcm750 ttyS3
+
+evb-npcm750 login: root
+Password: 0penBmc (first letter zero and not capital o)
+```
 
 ## Contact
-- Mail: openbmc@lists.ozlabs.org [https://lists.ozlabs.org/listinfo/openbmc](https://lists.ozlabs.org/listinfo/openbmc)
-- IRC: #openbmc on freenode.net
-- Riot: [#openbmc:matrix.org](https://riot.im/app/#/room/#openbmc:matrix.org)
+- Mail: tomer.maimon@nuvoton.com, avi.fishman@nuvoton.com
