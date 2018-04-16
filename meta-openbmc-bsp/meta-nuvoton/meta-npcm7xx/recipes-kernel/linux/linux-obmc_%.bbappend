@@ -1,7 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 KBRANCH = "Poleg-4.13.05-OpenBMC"
-SRCREV = "bf8e9e28fbc0f875a5ef05d0c01fb472d1a9460f"
+SRCREV = "c3f76e86c72007142bca5b965bb00b205f495330"
 
 KSRC = "git://github.com/Nuvoton-Israel/linux;protocol=git;branch=${KBRANCH};"
 SRC_URI += "file://defconfig"
