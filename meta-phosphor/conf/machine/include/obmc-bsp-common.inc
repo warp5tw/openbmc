@@ -10,7 +10,8 @@ UBOOT_SUFFIX ?= "bin"
 
 MACHINEOVERRIDES =. "openbmc:"
 
-IMAGE_FSTYPES += "${@bb.utils.contains('DISTRO_FEATURES', \
+IMAGE_FSTYPES += "cpio.${INITRAMFS_CTYPE}.u-boot"
+IMAGE_FSTYPES += "${@bb.utils.contains('MACHINE_FEATURES', \
         'obmc-ubi-fs', \
         'mtd-ubi mtd-ubi-tar', \
         'mtd-static mtd-static-tar mtd-static-alltar', d)}"
