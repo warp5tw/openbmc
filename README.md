@@ -30,7 +30,7 @@ sudo dnf groupinstall "C Development Tools and Libraries"
 ```
 ### 2) Download the source
 ```
-git clone git@github.com:Nuvoton-Israel/openbmc.git
+git clone https://github.com/Nuvoton-Israel/openbmc.git -b npcm7xx_v2.1
 cd openbmc
 ```
 
