@@ -5,16 +5,18 @@
 LICENSE = "CLOSED"
 LIC_FILES_CHKSUM = ""
 
-SRC_URI = "https://github.com/Nuvoton-Israel/npcm7xx-bootblock/releases/download/10.06.08/Poleg_bootblock.bin"
-SRC_URI[md5sum] = "23c98d36a3d03b96e9c98986b59fc432"
+SRC_URI = "https://github.com/oshalk/npcm7xx-bootblock/releases/download/10.08.04_DELL/Poleg_bootblock.bin"
+SRC_URI[md5sum] = "92691e23304df7c02820964fbdee1a03"
 
 SRCREV = "${AUTOREV}"
 
-FILES_${PN} += "${DEPLOY_DIR_IMAGE}/bootblock.bin"
+inherit deploy
 
-do_install () {
-       if [ ! -d ${DEPLOY_DIR_IMAGE} ]; then
-              mkdir -p ${DEPLOY_DIR_IMAGE}
-       fi
-       cp ../Poleg_bootblock.bin ${DEPLOY_DIR_IMAGE}/bootblock.bin
+BOOTBLOCK ?= "bootblock.bin"
+
+do_deploy () {
+	install -d ${DEPLOYDIR}
+	install -m 644 ${WORKDIR}/Poleg_bootblock.bin ${DEPLOYDIR}/${BOOTBLOCK}
 }
+
+addtask deploy before do_build after do_compile
