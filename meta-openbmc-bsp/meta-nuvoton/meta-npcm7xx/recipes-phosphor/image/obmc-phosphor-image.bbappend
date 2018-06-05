@@ -12,12 +12,18 @@ FLASH_RWFS_OFFSET = "30208"
 FLASH_UBI_RWFS_SIZE = "6144"
 FLASH_UBI_RWFS_TXT_SIZE = "6MiB"
 
+# EVB NPCM750 u-boot, contains bootblock and uboot
+UBOOT_IMAGE_NAME = "evb-npcm750.u-boot"
+
 add_flash_pbl() {
 	BOOTBLOCK="bootblock.bin"
 	FULLBOOTBLOCK="${BOOTBLOCK}.full"
 
 	create_image --bootblock ${DEPLOY_DIR_IMAGE}/${BOOTBLOCK} \
 		${IMGDEPLOYDIR}/${FULLBOOTBLOCK}
+	dd if=${IMGDEPLOYDIR}/${FULLBOOTBLOCK} \
+		of=${IMGDEPLOYDIR}/${UBOOT_IMAGE_NAME} \
+		bs=1k conv=notrunc seek=${FLASH_BOOTBLOCK_OFFSET}
 	dd if=${IMGDEPLOYDIR}/${FULLBOOTBLOCK} \
 		of=${IMGDEPLOYDIR}/${IMAGE_NAME}.static.mtd \
 		bs=1k conv=notrunc seek=${FLASH_BOOTBLOCK_OFFSET}
@@ -29,6 +35,9 @@ add_flash_uboot() {
 
 	create_image --uboot ${DEPLOY_DIR_IMAGE}/${UBOOT} \
 		${IMGDEPLOYDIR}/${FULLUBOOT}
+	dd if=${IMGDEPLOYDIR}/${FULLUBOOT} \
+		of=${IMGDEPLOYDIR}/${UBOOT_IMAGE_NAME} \
+		bs=1k conv=notrunc seek=${FLASH_UBOOT_OFFSET}
 	dd if=${IMGDEPLOYDIR}/${FULLUBOOT} \
 		of=${IMGDEPLOYDIR}/${IMAGE_NAME}.static.mtd \
 		bs=1k conv=notrunc seek=${FLASH_UBOOT_OFFSET}
@@ -64,7 +73,7 @@ do_generate_static() {
 	# Maintain non-standard legacy links
 	ln -sf ${IMAGE_NAME}.static.mtd ${IMGDEPLOYDIR}/flash-${MACHINE}
 	ln -sf ${IMAGE_NAME}.static.mtd ${IMGDEPLOYDIR}/image-bmc
-	ln -sf u-boot.${UBOOT_SUFFIX} ${IMGDEPLOYDIR}/image-u-boot
+	ln -sf ${UBOOT_IMAGE_NAME} ${IMGDEPLOYDIR}/image-u-boot
 	ln -sf ${FLASH_KERNEL_IMAGE} ${IMGDEPLOYDIR}/image-kernel
 	ln -sf ${IMAGE_LINK_NAME}.${IMAGE_BASETYPE} ${IMGDEPLOYDIR}/image-rofs
 	ln -sf rwfs.${OVERLAY_BASETYPE} ${IMGDEPLOYDIR}/image-rwfs
