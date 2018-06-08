@@ -1,5 +1,6 @@
 RDEPENDS += "npcm7xx-flashtool-native"
 DEPENDS += "npcm750-bootblock"
+DEPENDS += "npcm750-u-boot"
 
 FLASH_BOOTBLOCK_OFFSET = "0"
 FLASH_UBOOT_OFFSET = "52"
