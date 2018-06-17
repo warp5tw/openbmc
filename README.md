@@ -57,46 +57,56 @@ As an example target NPCM750 evaluation board
 export TEMPLATECONF=meta-openbmc-machines/meta-evb/meta-evb-nuvoton/meta-evb-npcm750/conf
 ```
 
-### 5) Build
+### 4) Build
 
 ```
 . openbmc-env
 bitbake obmc-phosphor-image
 ```
 
-Additional details can be found in the [docs](https://github.com/openbmc/docs)
+Additional details can be found in the [docs](docs)
 repository.
 
-### 6) build images
+### 5) build images
 After building finished the built Images will found at:
-<NPCM7xx folder>/build/tmp/deploy/images/evb-npcm750
+<OpenBMC_folder>/build/tmp/deploy/images/evb-npcm750
 The relvant Images to use to upload the OpenBMC on the EVB are:
 
-1. uImage - NPCM750 EVB kernel Image
-2. uImage-npcm750.dtb - NPCM750 EVB device tree blob.
-3. obmc-phosphor-image-evb-npcm750.cpio.lzma.u-boot - NPCM750 EVB OpenBMC RootFS
+1. image-bmc - The entire 32MB image including BootBlock, u-boot, linux kernel
+               and file system, can be programmed into the beginning of flash
+2. image-u-boot - Includes only BootBlock and u-boot and their headers can be
+                  programmed into the beginning of flash
+3. image-kernel - FIT image that includes linux kernel, device tree and an
+                  initial file system, can be loaded to the linux area in flash
+4. image-rofs - Main (and large) OpenBMC file system, can be loaded to the
+                rofs area in flash
 
 ### Note
 All the files above are Image links to the latest build images, 
 for copy the files to SD or USB storage device please make sure 
 you copying the Images and not the links
 
-#### 7) Running images
-For running OpenBMC on the EVB please follow the readme.txt in:
-ftp://ftp.nuvoton.co.il/outgoing/Eval_Board at the section:
-"Loading to Evaluation Board and running instructions".
-In order to get a password for the ftp please contact BMC_Marketing@Nuvoton.com
+#### 6) Programming the images
+For programming the OpenBMC to the EVB SPI flash go to:
+[npcm7xx-poleg/evaluation-board](https://github.com/Nuvoton-Israel/nuvoton-info/tree/master/npcm7xx-poleg/evaluation-board)
+See the [readme.txt](https://github.com/Nuvoton-Israel/nuvoton-info/blob/master/npcm7xx-poleg/evaluation-board/readme.txt)
+and follow the [NPCM7xx_OpenBMC_Programming.pdf](https://github.com/Nuvoton-Israel/nuvoton-info/blob/master/npcm7xx-poleg/evaluation-board/sw_deliverables/NPCM7xx_OpenBMC_Programming.pdf) instructions.
 
-#### 8) OpenBMC user login
+#### 7) OpenBMC user login
 after the OpenBMC boot please enter the following login and password:
 
 ```
-Phosphor OpenBMC (Phosphor OpenBMC Project Reference Distro) 0.1.0 evb-npcm750 ttyS3
+Phosphor OpenBMC (Phosphor OpenBMC Project Reference Distro) 0.1.0 evb-npcm750 ttyS0
 
 evb-npcm750 login: root
 Password: 0penBmc (first letter zero and not capital o)
 ```
 
+#### 8) More information
+For more info follow the readme.txt in:
+[ftp://ftp.nuvoton.co.il/outgoing/Eval_Board](ftp://ftp.nuvoton.co.il/outgoing/Eval_Board) at the section:
+"Loading to Evaluation Board and running instructions".
+In order to get a password for the ftp please contact BMC_Marketing@Nuvoton.com
 
 ## Contact
 - Mail: tomer.maimon@nuvoton.com,  avi.fishman@nuvoton.com or BMC_Marketing@Nuvoton.com
