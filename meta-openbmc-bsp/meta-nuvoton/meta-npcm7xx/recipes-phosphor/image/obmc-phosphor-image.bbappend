@@ -1,6 +1,5 @@
 do_generate_static[depends] += "npcm7xx-flashtool-native:do_populate_sysroot"
 do_generate_static[depends] += "npcm750-bootblock:do_deploy"
-do_generate_static[depends] += "npcm750-u-boot:do_deploy"
 
 FLASH_BOOTBLOCK_OFFSET = "0"
 FLASH_UBOOT_OFFSET = "52"
