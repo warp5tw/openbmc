@@ -15,6 +15,7 @@ PACKAGES = " \
         ${PN}-inventory \
         ${PN}-leds \
         ${PN}-logging \
+        ${PN}-remote-logging \
         ${PN}-sensors \
         ${PN}-software \
         ${PN}-host-check-mgmt \
@@ -39,6 +40,7 @@ RDEPENDS_${PN}-extras = " \
         phosphor-rest \
         phosphor-dbus-monitor \
         phosphor-systemd-policy \
+        dbus-broker \
         "
 
 SUMMARY_${PN}-extrasdev = "Development features"
@@ -82,7 +84,12 @@ RDEPENDS_${PN}-leds = " \
 SUMMARY_${PN}-logging = "Logging applications"
 RDEPENDS_${PN}-logging = " \
         phosphor-logging \
+        "
+
+SUMMARY_${PN}-remote-logging = "Remote logging applications"
+RDEPENDS_${PN}-remote-logging = " \
         rsyslog \
+        rsyslog-policy \
         phosphor-rsyslog-config \
         "
 
