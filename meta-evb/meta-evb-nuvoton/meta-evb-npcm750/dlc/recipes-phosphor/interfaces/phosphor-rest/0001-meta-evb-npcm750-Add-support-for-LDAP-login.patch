@@ -1,0 +1,41 @@
+From b6b428a223524eb3ed0c529640fd27713fbbe982 Mon Sep 17 00:00:00 2001
+From: kfting <kfting@nuvoton.com>
+Date: Mon, 3 Dec 2018 16:38:48 +0800
+Subject: [PATCH] meta-evb-npcm750: Add support for LDAP login
+
+---
+ obmc/wsgi/apps/rest_dbus.py | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/obmc/wsgi/apps/rest_dbus.py b/obmc/wsgi/apps/rest_dbus.py
+index 86a8933..33de1f6 100755
+--- a/obmc/wsgi/apps/rest_dbus.py
++++ b/obmc/wsgi/apps/rest_dbus.py
+@@ -31,6 +31,7 @@ import crypt
+ import tempfile
+ import re
+ import mimetypes
++import pamela
+ have_wsock = True
+ try:
+     from geventwebsocket import WebSocketError
+@@ -677,8 +678,14 @@ class SessionHandler(MethodHandler):
+     @staticmethod
+     def authenticate(username, clear):
+         try:
+-            encoded = spwd.getspnam(username)[1]
+-            return encoded == crypt.crypt(clear, encoded)
++            if username == 'root':
++                encoded = spwd.getspnam(username)[1]
++                return encoded == crypt.crypt(clear, encoded)
++            else:
++                retval = pamela.authenticate(username,clear)
++                if(retval):
++                  pamela.open_session(username)
++                  return pamela.close_session(username)
+         except KeyError:
+             return False
+ 
+-- 
+2.7.4
+

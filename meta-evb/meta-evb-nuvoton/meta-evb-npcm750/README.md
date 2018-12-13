@@ -49,6 +49,9 @@ Please submit any patches against the NPCM750 evaluation board layer to the main
   * [IPMI / DCMI](#ipmi--dcmi)
     + [SOL IPMI](#sol-ipmi)
     + [Message Bridging](#message-bridging)
+  * [LDAP for User Management ](#ldap-for-user-management)
+    + [LDAP Server Setup](#ldap-server-setup)
+    + [LDAP Server Test](#ldap-server-test)
   * [Features In Progressing](#features-in-progressing)
   * [Features Planned](#features-planned)
 - [IPMI Comamnds Verified](#ipmi-comamnds-verified)
@@ -989,6 +992,15 @@ It's verified with Nuvoton's NPCM750 solution (which is referred as Poleg here) 
 * Stanley Chu
 * Tyrone Ting
 
+## LDAP for User Management
+### LDAP Server Setup
+LDAP 
+### LDAP Server Test
+
+**Maintainer**
+
+* Tyrone Ting
+
 ## Features In Progressing
 * User management
 * Host power control/monitor
@@ -1196,3 +1208,4 @@ image-rwfs    |  0 MB  | middle layer of the overlayfs, rw files in this partiti
 * 2018.11.22 Enable firmware update support 
 * 2018.11.23 Update Sensor description about FAN How to use
 * 2018.11.29 Update Server power operations of Server control about How to use
+* 2018.12.13 Add LDAP server setup and test
