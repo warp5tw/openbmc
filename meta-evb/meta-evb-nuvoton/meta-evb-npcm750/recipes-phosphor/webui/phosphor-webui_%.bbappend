@@ -4,6 +4,7 @@ SRCREV = "d7557e5c0069d3a77de969fef444eb869cfb023e"
 
 SRC_URI += "file://0001-Implement-KVM-in-webui.patch"
 SRC_URI += "file://0002-Implement-VM-in-webui.patch"
+SRC_URI += "file://0001-meta-evb-npcm750-Modify-the-display-height-for-Super.patch"
 
 do_compile () {
 

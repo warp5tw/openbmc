@@ -1,0 +1,24 @@
+From a31de7c12f93a0df436a8f287c7113afd988893a Mon Sep 17 00:00:00 2001
+From: kfting <kfting@nuvoton.com>
+Date: Mon, 17 Dec 2018 11:01:04 +0800
+Subject: [PATCH] meta-evb-npcm750: Modify the display height for Supermicro
+ X9SCL-F-0 UEFI GUI output.
+
+---
+ app/server-control/styles/remote-console.scss | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/app/server-control/styles/remote-console.scss b/app/server-control/styles/remote-console.scss
+index d9aa40c..d85d2b2 100644
+--- a/app/server-control/styles/remote-console.scss
++++ b/app/server-control/styles/remote-console.scss
+@@ -42,5 +42,5 @@
+ }
+ 
+ #terminal{
+-  height:25em;
++  height:30em;
+ }
+-- 
+2.7.4
+
