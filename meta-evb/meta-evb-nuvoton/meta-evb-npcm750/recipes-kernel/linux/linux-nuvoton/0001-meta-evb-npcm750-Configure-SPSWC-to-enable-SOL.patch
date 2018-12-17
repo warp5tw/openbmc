@@ -1,0 +1,42 @@
+From d50f786497b1dd786183d0fe0618589ebf929118 Mon Sep 17 00:00:00 2001
+From: kfting <kfting@nuvoton.com>
+Date: Mon, 17 Dec 2018 10:55:46 +0800
+Subject: [PATCH] meta-evb-npcm750: Configure SPSWC to enable SOL
+
+1. Set to mode 3 to enable SOL.
+---
+ drivers/tty/serial/8250/8250_port.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/drivers/tty/serial/8250/8250_port.c b/drivers/tty/serial/8250/8250_port.c
+index 95833cb..1b15b6d 100644
+--- a/drivers/tty/serial/8250/8250_port.c
++++ b/drivers/tty/serial/8250/8250_port.c
+@@ -35,6 +35,9 @@
+ #include <linux/pm_runtime.h>
+ #include <linux/ktime.h>
+ 
++#include <linux/regmap.h>
++#include <linux/mfd/syscon.h>
++
+ #include <asm/io.h>
+ #include <asm/irq.h>
+ 
+@@ -2160,6 +2163,14 @@ int serial8250_do_startup(struct uart_port *port)
+ 		 * register). Enable it, and set TIOC (timeout interrupt
+ 		 * comparator) to be 0x20 for correct operation.
+ 		 */
++#define SPSWC_OFFSET  0x038
++		static struct regmap *gcr_regmap;
++		gcr_regmap = syscon_regmap_lookup_by_compatible("nuvoton,npcm750-gcr");
++		if(NULL != gcr_regmap)
++		{
++			regmap_update_bits(gcr_regmap, SPSWC_OFFSET, (0x1 << 1),
++				   (0x1 << 1));
++		}
+ 		serial_port_out(port, UART_NPCM_TOR, UART_NPCM_TOIE | 0x20);
+ 	}
+ 
+-- 
+2.7.4
+
