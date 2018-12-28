@@ -12,3 +12,5 @@ SRC_URI += "file://enable-configfs-hid.cfg"
 SRC_URI += "file://001-partitions.patch"
 SRC_URI += "file://enable-configfs-mstg.cfg"
 SRC_URI += "file://0002-nbd-fix-reconnect.patch"
+SRC_URI += "file://fragment.cfg"
+
