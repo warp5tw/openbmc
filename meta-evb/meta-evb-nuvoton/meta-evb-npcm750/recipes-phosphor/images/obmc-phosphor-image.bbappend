@@ -37,6 +37,7 @@ IMAGE_INSTALL_append = " bmcweb \
                          obmc-phosphor-buttons \
                          python-ldap \
                          openldap-bin \
+			 loadsvf \   
                        "
 
 # start generate mtd image only after scrits, tools and inputs are ready 
