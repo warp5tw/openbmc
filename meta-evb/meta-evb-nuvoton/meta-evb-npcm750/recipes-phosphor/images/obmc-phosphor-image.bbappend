@@ -35,6 +35,8 @@ IMAGE_INSTALL_append = " bmcweb \
                          evb-npcm750-config \
                          obmc-libobmc-intf \
                          obmc-phosphor-buttons \
+                         python-ldap \
+                         openldap-bin \
                        "
 
 # start generate mtd image only after scrits, tools and inputs are ready 
