@@ -616,7 +616,7 @@ int main(int argc, char *argv[])
     int r = -1;
     std::array<uint8_t, ipmbMaxFrameLength> buffer{};
 
-    const char *ipmbI2cSlave = "/sys/bus/i2c/devices/4-1010/slave-mqueue";
+    const char *ipmbI2cSlave = "/sys/bus/i2c/devices/4-1058/slave-mqueue";
     const char *ipmbI2cMaster = "/dev/i2c-4";
 
     sdbusplus::server::interface::interface ipmiInterface(

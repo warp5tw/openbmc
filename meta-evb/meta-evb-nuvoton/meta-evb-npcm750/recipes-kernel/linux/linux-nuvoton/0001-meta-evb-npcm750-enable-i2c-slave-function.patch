@@ -26,9 +26,9 @@ index 9efbd6c..7d6e3db 100644
 -				status = "disabled";
 +				status = "okay";
 +
-+				ipmb@40000010 {
++				ipmb@40000058 {
 +				    compatible = "slave-mqueue";
-+				    reg = <0x40000010>;
++				    reg = <0x40000058>;
 +				};
  			};
  

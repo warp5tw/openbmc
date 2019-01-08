@@ -27,7 +27,7 @@
  * @brief Ipmb addresses (8bit)
  */
 constexpr uint8_t ipmbBmcSlaveAddress = 0x20;
-constexpr uint8_t ipmbRqSlaveAddress = 0x58;
+constexpr uint8_t ipmbRqSlaveAddress = 0x10;
 
 /**
  * @brief Ipmb outstanding requests defines
