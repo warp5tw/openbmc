@@ -6,6 +6,7 @@ SRC_URI += "file://0001-generate_sel_event.patch"
 NAMES = " \
         i2c-bus@82000/tmp100@48 \
         i2c-bus@81000/lm75@48 \
+        i2c-bus@83000/nct7904@2d \
         "
 ITEMSFMT = "ahb/apb/{0}.conf"
 

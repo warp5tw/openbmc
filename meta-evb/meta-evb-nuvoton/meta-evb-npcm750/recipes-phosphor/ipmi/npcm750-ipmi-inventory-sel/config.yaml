@@ -23,3 +23,53 @@
   sensorType: 0x01
   eventReadingType: 0x01
   offset: 0x02
+/xyz/openbmc_project/sensors/temperature/temp3/critical_high:
+  sensorID: 0x04
+  sensorType: 0x01
+  eventReadingType: 0x01
+  offset: 0x09
+/xyz/openbmc_project/sensors/temperature/temp3/critical_low:
+  sensorID: 0x04
+  sensorType: 0x01
+  eventReadingType: 0x01
+  offset: 0x02
+/xyz/openbmc_project/sensors/temperature/temp4/critical_high:
+  sensorID: 0x05
+  sensorType: 0x01
+  eventReadingType: 0x01
+  offset: 0x09
+/xyz/openbmc_project/sensors/temperature/temp4/critical_low:
+  sensorID: 0x05
+  sensorType: 0x01
+  eventReadingType: 0x01
+  offset: 0x02
+/xyz/openbmc_project/sensors/temperature/temp5/critical_high:
+  sensorID: 0x06
+  sensorType: 0x01
+  eventReadingType: 0x01
+  offset: 0x09
+/xyz/openbmc_project/sensors/temperature/temp5/critical_low:
+  sensorID: 0x06
+  sensorType: 0x01
+  eventReadingType: 0x01
+  offset: 0x02
+/xyz/openbmc_project/sensors/temperature/temp6/critical_high:
+  sensorID: 0x07
+  sensorType: 0x01
+  eventReadingType: 0x01
+  offset: 0x09
+/xyz/openbmc_project/sensors/temperature/temp6/critical_low:
+  sensorID: 0x07
+  sensorType: 0x01
+  eventReadingType: 0x01
+  offset: 0x02
+/xyz/openbmc_project/sensors/temperature/temp7/critical_high:
+  sensorID: 0x08
+  sensorType: 0x01
+  eventReadingType: 0x01
+  offset: 0x09
+/xyz/openbmc_project/sensors/temperature/temp7/critical_low:
+  sensorID: 0x08
+  sensorType: 0x01
+  eventReadingType: 0x01
+  offset: 0x02
