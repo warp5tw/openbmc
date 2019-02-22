@@ -1,4 +1,4 @@
-From c37fbcd314b8159be87c070ec6ef6a585f5a886f Mon Sep 17 00:00:00 2001
+From a9313535ad1b3ac9b1dbfa0272073cbf83accbb8 Mon Sep 17 00:00:00 2001
 From: Medad <ctcchien@nuvoton.com>
 Date: Fri, 30 Nov 2018 09:22:24 +0800
 Subject: [PATCH 2/2] Implement VM in webui
@@ -20,10 +20,10 @@ Signed-off-by: Medad <ctcchien@nuvoton.com>
  create mode 100644 app/vm/index.js
 
 diff --git a/app/index.js b/app/index.js
-index 44d85e8..ab932d4 100644
+index 828d9bc..5488411 100644
 --- a/app/index.js
 +++ b/app/index.js
-@@ -88,6 +88,9 @@ import user_accounts_controller from './users/controllers/user-accounts-controll
+@@ -89,6 +89,9 @@ import user_accounts_controller from './users/controllers/user-accounts-controll
  import kvm_index from './kvm/index.js';
  import kvm_controller from './kvm/controllers/kvm-controller.js';
  
@@ -33,7 +33,7 @@ index 44d85e8..ab932d4 100644
  window.angular && (function(angular) {
    'use strict';
  
-@@ -104,7 +107,7 @@ window.angular && (function(angular) {
+@@ -105,7 +108,7 @@ window.angular && (function(angular) {
              // Model resources
              'app.login', 'app.overview', 'app.serverControl',
              'app.serverHealth', 'app.configuration', 'app.users', 'app.redfish',
