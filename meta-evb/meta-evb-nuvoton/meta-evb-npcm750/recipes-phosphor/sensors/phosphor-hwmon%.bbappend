@@ -1,11 +1,11 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-SRCREV = "af6227a3eb3fc918425d7588e001a75bd348232d"
-SRC_URI += "file://0001-generate_sel_event.patch"
+SRCREV = "99b95815550d2d84140d00032e341b8206fa9601"
+SRC_URI += "file://0001-add-sensor-log.patch"
 
 NAMES = " \
-        i2c-bus@82000/tmp100@48 \
-        i2c-bus@81000/lm75@48 \
+        i2c@82000/tmp100@48 \
+        i2c@81000/lm75@48 \
         "
 ITEMSFMT = "ahb/apb/{0}.conf"
 
