@@ -4,13 +4,7 @@ PR = "r1"
 
 FILESEXTRAPATHS_append := "${THISDIR}/${PN}:"
 
-SRCREV = "1e12112baf56f9a8ec6dbf7fb409c84f35fff1e8"
-SRC_URI += "file://0001-rmq.patch"
-SRC_URI += "file://0002-sel-add-reading.patch"
-SRC_URI += "file://xyz.openbmc_project.Control.Host.conf"
+SRCREV = "3342a8e0876909b34c076172727b8cac861f5277"
+SRC_URI += "file://0001-support-messaging-cmd.patch"
+SRC_URI += "file://0002-convert-sel-entry.patch"
 
-do_install_append() {
-        install -d ${D}${dbus_system_confdir}
-        install -m 0644 ${WORKDIR}/xyz.openbmc_project.Control.Host.conf \
-                ${D}${dbus_system_confdir}
-}

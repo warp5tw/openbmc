@@ -22,7 +22,6 @@ IMAGE_INSTALL_append = " bmcweb \
                          obmc-ikvm \
                          phosphor-webui \
                          phosphor-ipmi-host \
-                         phosphor-ipmi-ipmb-legacy \
                          lmsensors-fancontrol \
                          lmsensors-pwmconfig \
                          lmsensors-sensord \
