@@ -1,37 +1,20 @@
-From ec4dbc686a4840e3680d812269c7a8f5ac97c245 Mon Sep 17 00:00:00 2001
-From: Kuiying Wang <kuiying.wang@intel.com>
-Date: Tue, 23 Oct 2018 11:55:14 +0800
+From f6343aa229d07c739e0511d62c9858106a877cf6 Mon Sep 17 00:00:00 2001
+From: CH Li <chli30@nuvoton.com>
+Date: Tue, 19 Feb 2019 17:11:47 +0800
 Subject: [PATCH] Add power control interface
 
-methods:
-    setPowerState
-    getPowerState
-    forcePowerOff
-properties:
-    PGood
-    State
-
-Note:
-All the interfaces are  the low level interface to handle HW.
-And provides supporting the high level interface like state-manager.
-They are the common interfaces and all the platforms implement them all.
-
-Change-Id: I6d90439879f5a4940cad03fd588dd233f81f2802
-Signed-off-by: Kuiying Wang <kuiying.wang@intel.com>
 ---
- .../Chassis/Control/Power.interface.yaml           | 61 ++++++++++++++++++++++
- 1 file changed, 61 insertions(+)
- create mode 100644 xyz/openbmc_project/Chassis/Control/Power.interface.yaml
+ .../Chassis/Control/Power.interface.yaml      | 39 +++++++++++++++++--
+ 1 file changed, 36 insertions(+), 3 deletions(-)
 
 diff --git a/xyz/openbmc_project/Chassis/Control/Power.interface.yaml b/xyz/openbmc_project/Chassis/Control/Power.interface.yaml
-new file mode 100644
-index 0000000..740a1c0
---- /dev/null
+index 082586f..77a722d 100644
+--- a/xyz/openbmc_project/Chassis/Control/Power.interface.yaml
 +++ b/xyz/openbmc_project/Chassis/Control/Power.interface.yaml
-@@ -0,0 +1,61 @@
-+description: >
-+    Power control service
-+methods:
+@@ -1,12 +1,45 @@
+ description: >
+     Power control service
+ methods:
 +    - name: setPowerState
 +      description: >
 +        set host power state.
@@ -65,32 +48,27 @@ index 0000000..740a1c0
 +       - xyz.openbmc_project.Chassis.Common.Error.UnsupportedCommand
 +       - xyz.openbmc_project.Chassis.Common.Error.IOError
 +
-+    - name: forcePowerOff
-+      description: >
-+        Force power off the host.
-+      returns:
-+        - name: status
+     - name: forcePowerOff
+       description: >
+         Force power off the host.
+       returns:
+         - name: status
+-          type: boolean
 +          type: int32
-+          description: >
-+            The result of power off command.
-+      errors:
-+       - xyz.openbmc_project.Chassis.Common.Error.UnsupportedCommand
-+       - xyz.openbmc_project.Chassis.Common.Error.IOError
-+
-+properties:
-+    - name: PGood
+           description: >
+             The result of power off command.
+       errors:
+@@ -15,8 +48,8 @@ methods:
+ 
+ properties:
+     - name: PGood
+-      type: boolean
+-      default: false
 +      type: int32
 +      default: 0
-+      description: >
-+       PSU Power good property
-+    - name: State
-+      type: int32
-+      default: 0
-+      description: >
-+       System power status,
-+       0: power is off
-+       1: power is on
-\ No newline at end of file
+       description: >
+        PSU Power good property
+        It is a read-only property.
 -- 
-2.7.4
+2.17.1
 
