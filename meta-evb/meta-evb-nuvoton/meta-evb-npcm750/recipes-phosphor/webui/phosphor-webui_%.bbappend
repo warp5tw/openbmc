@@ -1,7 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-SRCREV = "d7557e5c0069d3a77de969fef444eb869cfb023e"
-
+SRCREV = "edf1ab46938b9bb022be98e331ced8deec04d7c6"
 SRC_URI += "file://0001-Implement-KVM-in-webui.patch"
 SRC_URI += "file://0002-Implement-VM-in-webui.patch"
 

@@ -1,49 +1,55 @@
-From f2de186327046d7d89c5a936476aec591409e4e5 Mon Sep 17 00:00:00 2001
+From 6ebf8bf3b9a1052e1d84abac97f6777992f43aee Mon Sep 17 00:00:00 2001
 From: Medad <ctcchien@nuvoton.com>
 Date: Fri, 30 Nov 2018 09:22:24 +0800
-Subject: [PATCH] [PATCH] Implement VM in webui 	1. vmws is websocket 	2.
- enablemstgws and disablemstgws are http request
+Subject: [PATCH 2/2] Implement VM in webui
 
+1. vmws is websocket 2. enablemstgws and disablemstgws are http request
+
+Change-Id: Ib9555c9cde45d9f6fa6ca434767f7fec2fff36d4
+Signed-off-by: Medad <ctcchien@nuvoton.com>
 ---
- app/index.js                          |   5 +-
- app/vm/controllers/nbd/nbd.js         | 360 ++++++++++++++++++++++++++++++++++
- app/vm/controllers/vm-controller.html |  25 +++
- app/vm/controllers/vm-controller.js   | 103 ++++++++++
- app/vm/index.js                       |  28 +++
- 5 files changed, 520 insertions(+), 1 deletion(-)
- create mode 100644 app/vm/controllers/nbd/nbd.js
- create mode 100644 app/vm/controllers/vm-controller.html
- create mode 100644 app/vm/controllers/vm-controller.js
- create mode 100644 app/vm/index.js
+ app/common/directives/app-navigation.html     |   2 +
+ app/index.js                                  |   1 +
+ app/server-control/controllers/nbd/nbd.js     | 360 ++++++++++++++++++
+ .../controllers/vm-controller.html            |  25 ++
+ .../controllers/vm-controller.js              | 103 +++++
+ app/server-control/index.js                   |   5 +
+ webpack.config.js                             |   2 +-
+ 7 files changed, 497 insertions(+), 1 deletion(-)
+ create mode 100644 app/server-control/controllers/nbd/nbd.js
+ create mode 100644 app/server-control/controllers/vm-controller.html
+ create mode 100644 app/server-control/controllers/vm-controller.js
 
+diff --git a/app/common/directives/app-navigation.html b/app/common/directives/app-navigation.html
+index 32e0252..8c20ff3 100644
+--- a/app/common/directives/app-navigation.html
++++ b/app/common/directives/app-navigation.html
+@@ -87,6 +87,8 @@
+       <a href="#/server-control/remote-console" tabindex="13" ng-click="closeSubnav()">Serial over LAN console</a></li>
+     <li ng-class="{'active': (path == '/server-control/kvm')}">
+       <a href="#/server-control/kvm" tabindex="14" ng-click="closeSubnav()">KVM</a></li>
++	<li ng-class="{'active': (path == '/server-control/vm')}">
++      <a href="#/server-control/vm" tabindex="14" ng-click="closeSubnav()">Virtual Media</a></li>
+   </ul>
+   <ul class="nav__second-level btn-firmware" ng-style="navStyle" ng-class="{opened: (showSubMenu && firstLevel == 'configuration')}">
+     <li ng-class="{'active': (path == '/configuration' || path == '/configuration/network')}">
 diff --git a/app/index.js b/app/index.js
-index 8a9dbae..b908dfb 100644
+index d6b4a08..1de0b20 100644
 --- a/app/index.js
 +++ b/app/index.js
-@@ -86,6 +86,9 @@ import phosphor_templates from './templates.js';
- import kvm_index from './kvm/index.js';
- import kvm_controller from './kvm/controllers/kvm-controller.js';
+@@ -70,6 +70,7 @@ import power_usage_controller from './server-control/controllers/power-usage-con
+ import remote_console_window_controller from './server-control/controllers/remote-console-window-controller.js';
+ import server_led_controller from './server-control/controllers/server-led-controller.js';
+ import kvm_controller from './server-control/controllers/kvm-controller.js';
++import vm_controller from './server-control/controllers/vm-controller.js';
  
-+import vm_index from './vm/index.js';
-+import vm_controller from './vm/controllers/vm-controller.js';
-+
- window.angular && (function(angular) {
-   'use strict';
- 
-@@ -102,7 +105,7 @@ window.angular && (function(angular) {
-             // Model resources
-             'app.login', 'app.overview', 'app.serverControl',
-             'app.serverHealth', 'app.configuration', 'app.users', 'app.redfish',
--            'app.kvm'
-+            'app.kvm', 'app.vm'
-           ])
-       // Route configuration
-       .config([
-diff --git a/app/vm/controllers/nbd/nbd.js b/app/vm/controllers/nbd/nbd.js
+ import server_health_index from './server-health/index.js';
+ import inventory_overview_controller from './server-health/controllers/inventory-overview-controller.js';
+diff --git a/app/server-control/controllers/nbd/nbd.js b/app/server-control/controllers/nbd/nbd.js
 new file mode 100644
-index 0000000..c5997c4
+index 0000000..618ea1f
 --- /dev/null
-+++ b/app/vm/controllers/nbd/nbd.js
++++ b/app/server-control/controllers/nbd/nbd.js
 @@ -0,0 +1,360 @@
 +/* Copyright 2018 IBM Corp.
 + *
@@ -341,7 +347,7 @@ index 0000000..c5997c4
 +        case NBD_CMD_TRIM:
 +            err = EPERM;
 +            break;
-+        
++
 +        default:
 +            this._log("invalid command 0x" + req.type.toString(16));
 +            err = EINVAL;
@@ -405,11 +411,11 @@ index 0000000..c5997c4
 +}
 +
 +
-diff --git a/app/vm/controllers/vm-controller.html b/app/vm/controllers/vm-controller.html
+diff --git a/app/server-control/controllers/vm-controller.html b/app/server-control/controllers/vm-controller.html
 new file mode 100644
 index 0000000..1a2eabf
 --- /dev/null
-+++ b/app/vm/controllers/vm-controller.html
++++ b/app/server-control/controllers/vm-controller.html
 @@ -0,0 +1,25 @@
 +<loader loading="loading"></loader>
 +<div class="row column">
@@ -437,11 +443,11 @@ index 0000000..1a2eabf
 +  </form>
 +</div>
 \ No newline at end of file
-diff --git a/app/vm/controllers/vm-controller.js b/app/vm/controllers/vm-controller.js
+diff --git a/app/server-control/controllers/vm-controller.js b/app/server-control/controllers/vm-controller.js
 new file mode 100644
-index 0000000..91387fa
+index 0000000..64f6237
 --- /dev/null
-+++ b/app/vm/controllers/vm-controller.js
++++ b/app/server-control/controllers/vm-controller.js
 @@ -0,0 +1,103 @@
 +/**
 + * Controller for vm
@@ -460,7 +466,7 @@ index 0000000..91387fa
 +window.angular && (function (angular) {
 +    'use strict';
 +
-+    angular.module('app.vm').controller('vmController', [
++    angular.module('app.serverControl').controller('vmController', [
 +        '$scope',
 +        '$location',
 +        '$window',
@@ -546,40 +552,35 @@ index 0000000..91387fa
 +    ]);
 +
 +})(angular);
-diff --git a/app/vm/index.js b/app/vm/index.js
-new file mode 100644
-index 0000000..c86dfc8
---- /dev/null
-+++ b/app/vm/index.js
-@@ -0,0 +1,28 @@
-+/**
-+ * A module for the VM
-+ *
-+ * @module app/vm/index
-+ * @exports app/vm/index
-+ * @version 0.0.1
-+ */
-+window.angular && (function (angular) {
-+    'use strict';
-+
-+    angular
-+        .module('app.vm', [
-+            'ngRoute',
-+            'app.common.services'
-+        ])
-+        // Route configuration
-+        .config(['$routeProvider', function ($routeProvider) {
-+            $routeProvider
-+                .when('/vm', {
-+                    'template': require('./controllers/vm-controller.html'),
-+                    'controller': 'vmController',
-+                    authenticated: true
-+                })
-+        }]);
-+
-+})(window.angular);
-+
-+
+diff --git a/app/server-control/index.js b/app/server-control/index.js
+index 1b8aad5..25f814a 100644
+--- a/app/server-control/index.js
++++ b/app/server-control/index.js
+@@ -53,6 +53,11 @@ window.angular && (function(angular) {
+                 'controller': 'kvmController',
+                 authenticated: true
+               })
++              .when('/server-control/vm', {
++                'template': require('./controllers/vm-controller.html'),
++                'controller': 'vmController',
++                authenticated: true
++              })
+               .when('/server-control', {
+                 'template':
+                     require('./controllers/power-operations-controller.html'),
+diff --git a/webpack.config.js b/webpack.config.js
+index 6c8667c..8e82e57 100644
+--- a/webpack.config.js
++++ b/webpack.config.js
+@@ -112,7 +112,7 @@ module.exports = (env, options) => {
+     new CSPWebpackPlugin({
+       'base-uri': '\'self\'',
+       'object-src': '\'none\'',
+-      'script-src': ['\'self\''],
++      //'script-src': ['\'self\''],
+       'style-src': ['\'self\''],
+       // KVM requires image buffers from data: payloads, so allow that in
+       // img-src
 -- 
-2.7.4
+2.17.1
 
