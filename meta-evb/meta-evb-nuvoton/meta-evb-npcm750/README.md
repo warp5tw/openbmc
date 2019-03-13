@@ -5,8 +5,8 @@ supports a large set of peripherals made by Nuvoton.
 More information about the NPCM7XX can be found
 [here](http://www.nuvoton.com/hq/products/cloud-computing/ibmc/?__locale=en).
 
-- Work with [openbmc master branch](https://github.com/openbmc/openbmc/tree/master "openbmc master branch")
-- Work with [NTIL linux 4.17.04 for Poleg](https://github.com/Nuvoton-Israel/linux/tree/Poleg-4.17.04-OpenBMC "NTIL")
+- Working with [openbmc master branch](https://github.com/openbmc/openbmc/tree/master "openbmc master branch")
+- Working with [NTIL linux 4.17.04 for Poleg](https://github.com/Nuvoton-Israel/linux/tree/Poleg-4.17.04-OpenBMC "NTIL")
 
 # Dependencies
 ![](https://cdn.rawgit.com/maxdog988/icons/61485d57/label_openbmc_ver_master.svg)
@@ -81,7 +81,6 @@ The VNC viewer also enabled in webui with below patches.
 **Source URL**
 
 * [https://github.com/Nuvoton-Israel/obmc-ikvm](https://github.com/Nuvoton-Israel/obmc-ikvm)
-* [https://github.com/Nuvoton-Israel/openbmc/blob/master/meta-evb/meta-evb-nuvoton/meta-evb-npcm750/recipes-phosphor/interfaces/bmcweb/0001-bmcweb-support-obmc-ikvm.patch](https://github.com/Nuvoton-Israel/openbmc/blob/master/meta-evb/meta-evb-nuvoton/meta-evb-npcm750/recipes-phosphor/interfaces/bmcweb/0001-bmcweb-support-obmc-ikvm.patch)
 * [https://github.com/Nuvoton-Israel/openbmc/blob/master/meta-evb/meta-evb-nuvoton/meta-evb-npcm750/recipes-phosphor/interfaces/phosphor-rest/0001-add-kvm-handler.patch](https://github.com/Nuvoton-Israel/openbmc/blob/master/meta-evb/meta-evb-nuvoton/meta-evb-npcm750/recipes-phosphor/interfaces/phosphor-rest/0001-add-kvm-handler.patch)
 
 **How to use**
@@ -98,36 +97,43 @@ The VNC viewer also enabled in webui with below patches.
 6. Make sure the network is connected with your workstation.
 7. Launch a browser in your workstation and you will see the entry page.
     ```
-    /* python web server */
+    /* Web Server */
     https://<poelg ip>
-    
-    /* bmcweb */
-    https://<poelg ip>:833
     ```
 8. Login to OpenBMC home page
     ```
     Username: root
     Password: 0penBmc
     ```
-9. Navigate to KVM viewer page
+9. Navigate to noVNC viewer
     ```
-    /* python web server */
-    https://<poelg ip>/#kvm
-    
-    /* bmcweb */
-    https://<poelg ip>:833/#kvm   
+    Server control -> KVM
     ```
 **Performance**
 
-* Performance tested by playing video
-* VNC viewer: [Real VNC viewer](https://www.realvnc.com/en/connect/download/viewer/)
+* Host OS: Windows Server 2012 R2
 
-Host Resolution    | FPS    |
-:-------------|:------- |
-800x600   |  30 fps |
-1024x768  |  23 fps   |
-1280x1024   |  16 fps |
-1600x1200   |  14 fps  |
+
+|Playing video: [AQUAMAN](https://www.youtube.com/watch?v=2wcj6SrX4zw)|[Real VNC viewer](https://www.realvnc.com/en/connect/download/viewer/) | noVNC viewer
+:-------------|:--------|:-----------|
+Host Resolution    | FPS    | FPS |
+1024x768  |  25    | 8 |
+1280x1024   |  20  | 4 |
+1600x1200   |  14   | 3 |
+
+|Scrolling bar: [Demo video](https://drive.google.com/file/d/1H71_H6yjO8NU4Qu_ZL4F59FQ0PQmEo2n/view)|[Real VNC viewer](https://www.realvnc.com/en/connect/download/viewer/) | noVNC viewer
+:-------------|:--------|:-----------|
+Host Resolution    | FPS    | FPS |
+1024x768  |  31    | 15 |
+1280x1024   |  24  | 12 |
+1600x1200   |  20   | 7 |
+
+**The preferred settings of RealVNC Viewer**
+```
+Picture quality: Custom
+ColorLevel: rgb565
+PreferredEncoding: Hextile
+```
 
 **Maintainer**
 
@@ -1480,13 +1486,11 @@ The motherboard on server might have CPLD or FPGA components that require downlo
 
 ## Features In Progressing
 * User management
-* Host power control/monitor
-* Verified Boot - Kernel/ROFS verification
-
-## Features Planned
 * Improve sensor/event framework
 * Host firmware update
 * FRU implementation
+
+## Features Planned
 * Boot control
 * Red fish
 
@@ -1658,9 +1662,9 @@ The motherboard on server might have CPLD or FPGA components that require downlo
 # Image Size
 Type          | Size    | Note                                                                                                     |
 :-------------|:------- |:-------------------------------------------------------------------------------------------------------- |
-image-uboot   |  457 KB | including bootblock for Poleg only                                                                       |
-image-kernel  |  4 MB   | linux 4.17 version                                                                                       |
-image-rofs    |  20 MB  | bottom layer of the overlayfs, read only                                                                 |
+image-uboot   |  468.5 KB | including bootblock for Poleg only                                                                       |
+image-kernel  |  4.5 MB   | linux 4.17.04 version                                                                                       |
+image-rofs    |  18.2 MB  | bottom layer of the overlayfs, read only                                                                 |
 image-rwfs    |  0 MB  | middle layer of the overlayfs, rw files in this partition will be created at runtime,<br /> with a maximum capacity of 1MB|
 
 # Modifications
