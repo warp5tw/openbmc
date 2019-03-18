@@ -375,8 +375,8 @@ index 0000000..63ff77f
 +#include <numeric>
 +#include <phosphor-logging/log.hpp>
 +#include <phosphor-logging/elog-errors.hpp>
-+#include <ipmid/api.h>
-+#include <ipmid-host/cmd.hpp>
++#include <host-ipmid/ipmid-api.h>
++#include <host-ipmid/ipmid-host-cmd.hpp>
 +#include "config.h"
 +#include "transporthandler.hpp"
 +#include "ipmb-msg-queue.hpp"
