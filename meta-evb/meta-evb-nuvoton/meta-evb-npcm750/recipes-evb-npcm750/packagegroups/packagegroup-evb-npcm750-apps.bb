@@ -43,4 +43,6 @@ RDEPENDS_${PN}-system = " \
         obmc-mgr-system \
         phosphor-webui \
         obmc-ikvm \
+		phosphor-image-signing \
+		openssl-bin \
         "
