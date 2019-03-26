@@ -45,4 +45,5 @@ RDEPENDS_${PN}-system = " \
         obmc-ikvm \
 		phosphor-image-signing \
 		openssl-bin \
+		iperf2 \
         "
