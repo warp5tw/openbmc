@@ -1,22 +1,35 @@
+From 0b43d1ea8c973653c15dda28cf2c8b3241a1b2be Mon Sep 17 00:00:00 2001
+From: kwliu <kwliu@nuvoton.com>
+Date: Mon, 8 Apr 2019 14:49:03 +0800
+Subject: [PATCH] support openbmc partition
+
+---
+ arch/arm/boot/dts/nuvoton-npcm750-evb.dts | 44 +++++++----------------
+ 1 file changed, 13 insertions(+), 31 deletions(-)
+
 diff --git a/arch/arm/boot/dts/nuvoton-npcm750-evb.dts b/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
-index 22e41066a753..1316d6a794d6 100644
+index b71f2d4a6ff7..819356851d05 100644
 --- a/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
 +++ b/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
-@@ -156,48 +156,26 @@
+@@ -182,48 +182,30 @@
  					compatible = "fixed-partitions";
  					#address-cells = <1>;
  					#size-cells = <1>;
 -					bbuboot1@0 {
 -						label = "bb-uboot-1";
-+					u-boot@0 {
-+						label = "u-boot";
- 						reg = <0x0000000 0x80000>;
+-						reg = <0x0000000 0x80000>;
 -						read-only;
--						};
++					bmc@0 {
++						label = "bmc";
++						reg = <0x0000000 0x2000000>;
+ 						};
 -					bbuboot2@80000 {
 -						label = "bb-uboot-2";
 -						reg = <0x0080000 0x80000>;
 -						read-only;
++					u-boot@0 {
++						label = "u-boot";
++						reg = <0x0000000 0x80000>;
  						};
  					envparam@100000 {
  						label = "env-param";
@@ -56,7 +69,10 @@ index 22e41066a753..1316d6a794d6 100644
 -						reg = <0x1300000 0x0>;
 +					rwfs@1e00000 {
 +						label = "rwfs";
-+						reg = <0x1e00000 0x100000>;
++						reg = <0x1e00000 0x200000>;
  					};
  				};
  			};
+-- 
+2.17.1
+

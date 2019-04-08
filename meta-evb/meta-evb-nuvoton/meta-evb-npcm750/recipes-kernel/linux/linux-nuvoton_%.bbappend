@@ -1,10 +1,10 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-nuvoton:"
 
-KBRANCH = "Poleg-4.17.04-OpenBMC"
-LINUX_VERSION = "4.17.4"
+KBRANCH = "Poleg-4.19.16-OpenBMC"
+LINUX_VERSION = "4.19.16"
 
 KSRC = "git://github.com/Nuvoton-Israel/linux;protocol=git;branch=${KBRANCH}"
-SRCREV = "7c9773b15faf6a1fbe42cec4a1213c2af464a374"
+SRCREV = "86dafeca0cd34a9f38f5cc53ab850597723c15d4"
 
 SRC_URI += "file://evb-npcm750.cfg"
 SRC_URI += "file://enable-vcd-ece.cfg"
@@ -12,3 +12,4 @@ SRC_URI += "file://enable-configfs-hid.cfg"
 SRC_URI += "file://001-partitions.patch"
 SRC_URI += "file://enable-configfs-mstg.cfg"
 SRC_URI += "file://0002-nbd-fix-reconnect.patch"
+SRC_URI += "file://0001-Revert-mtd-spi-nor-fix-options-for-mx66l51235f.patch"
