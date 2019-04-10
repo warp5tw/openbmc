@@ -1,5 +1,9 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-SRCREV = "51ee84bf1820de1ffcded329f181dabc15236263"
+DEPENDS += "bison-native"
 
-SRC_URI += "file://0001-libfdt-fix-libfdt-header-conflicts-between-UBoot-and.patch"
+LIC_FILES_CHKSUM = "file://Licenses/README;md5=30503fd321432fc713238f582193b78e"
+
+UBRANCH = "npcm7xx-v2019.01"
+SRC_URI = "git://github.com/Nuvoton-Israel/u-boot.git;branch=${UBRANCH}"
+SRCREV = "835c8f88e7c42a5b0b16c042f37266328b15813d"
