@@ -22,7 +22,7 @@ index 5eaffb7..25c1da7
 +    verbs = ['GET']
 +    # Naming the route kvm, because the numbering will help
 +    # on multi-bmc/multi-host systems.
-+    rules = ['/kvmws']
++    rules = ['/kvm/0']
 +
 +    def __init__(self, app, bus):
 +        super(HostKvmHandler, self).__init__(

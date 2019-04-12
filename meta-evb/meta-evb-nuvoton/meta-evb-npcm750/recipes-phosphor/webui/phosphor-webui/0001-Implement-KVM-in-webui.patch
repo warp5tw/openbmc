@@ -129,7 +129,7 @@ index 0000000..5d0717d
 +          angular.element(document.querySelector('#noVNC_container'))[0];
 +
 +      try {
-+        rfb = new RFB(target, 'wss://' + host + ':' + port + '/kvmws', {});
++        rfb = new RFB(target, 'wss://' + host + ':' + port + '/kvm/0', {});
 +
 +        rfb.addEventListener('connect', connected);
 +        rfb.addEventListener('disconnect', disconnected);
