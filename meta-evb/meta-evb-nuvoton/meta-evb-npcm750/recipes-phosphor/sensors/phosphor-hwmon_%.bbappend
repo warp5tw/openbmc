@@ -1,6 +1,5 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-SRCREV = "99b95815550d2d84140d00032e341b8206fa9601"
 SRC_URI += "file://0001-add-sensor-log.patch"
 
 NAMES = " \
