@@ -3,22 +3,16 @@ groups:
       description: Group of fan inventory objects for zone 0
       type: /xyz/openbmc_project/inventory
       members:
+          - /system/chassis/motherboard/fan0
           - /system/chassis/motherboard/fan1
-
+          - /system/chassis/motherboard/fan2
+          - /system/chassis/motherboard/fan3
     - name: zone0_ambient
       description: Group of core temperature sensors for zone 0
       type: /xyz/openbmc_project/sensors
       members:
-
-          - /temperature/temp1
-          - /temperature/temp2
-
-    - name: zone0_fan_tachs
-      description: Group of fan tach feedback speed inputs for zone 0
-      type: /xyz/openbmc_project/sensors
-      members:
-          - /fan_tach/fan1
-
+          - /temperature/lm75
+          - /temperature/tmp100
 matches:
     - name: propertiesChanged
       description: >
