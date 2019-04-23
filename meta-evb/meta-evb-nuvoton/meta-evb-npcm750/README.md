@@ -6,11 +6,11 @@ More information about the NPCM7XX can be found
 [here](http://www.nuvoton.com/hq/products/cloud-computing/ibmc/?__locale=en).
 
 - Working with [openbmc master branch](https://github.com/openbmc/openbmc/tree/master "openbmc master branch")
-- Working with [NTIL linux 4.17.04 for Poleg](https://github.com/Nuvoton-Israel/linux/tree/Poleg-4.17.04-OpenBMC "NTIL")
+- Working with [NTIL linux 4.19.16 for Poleg](https://github.com/Nuvoton-Israel/linux/tree/Poleg-4.19.16-OpenBMC "NTIL")
 
 # Dependencies
 ![](https://cdn.rawgit.com/maxdog988/icons/61485d57/label_openbmc_ver_master.svg)
-![](https://cdn.rawgit.com/maxdog988/icons/master/label_linux_ver_4.13.05.svg)
+![](https://cdn.rawgit.com/maxdog988/icons/master/label_linux_ver_4.19.16.svg)
 
 This layer depends on:
 
@@ -1692,3 +1692,4 @@ image-rwfs    |  0 MB  | middle layer of the overlayfs, rw files in this partiti
 * 2019.01.02 Add LDAP server setup and test
 * 2019.03.13 Modify Server power operation of Server control about How to use
 * 2019.03.19 Update IPMI Comamnds Verified Table
+* 2019.04.08 Update Kernel version to 4.19.16
