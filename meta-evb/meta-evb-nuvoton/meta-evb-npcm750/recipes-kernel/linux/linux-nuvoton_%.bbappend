@@ -4,7 +4,7 @@ KBRANCH = "Poleg-4.19.16-OpenBMC"
 LINUX_VERSION = "4.19.16"
 
 KSRC = "git://github.com/Nuvoton-Israel/linux;protocol=git;branch=${KBRANCH}"
-SRCREV = "6884abab8fa5c632e7b42532513e2ed8b06d35f9"
+SRCREV = "fcbd6d77e62a22673ea0936e267fd58b169e8698"
 
 SRC_URI += "file://evb-npcm750.cfg"
 SRC_URI += "file://enable-vcd-ece.cfg"
@@ -13,4 +13,3 @@ SRC_URI += "file://001-partitions.patch"
 SRC_URI += "file://enable-configfs-mstg.cfg"
 SRC_URI += "file://0002-nbd-fix-reconnect.patch"
 SRC_URI += "file://0001-Revert-mtd-spi-nor-fix-options-for-mx66l51235f.patch"
-SRC_URI += "file://enable-lpc-bpc.cfg"
