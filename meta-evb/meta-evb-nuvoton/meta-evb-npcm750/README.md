@@ -1645,15 +1645,13 @@ The motherboard on server might have CPLD or FPGA components that require downlo
 
 ## Features In Progressing
 * User management
+* Improve IPMI
 * Improve sensor/event framework
 * Host firmware update
-* FRU implementation
+* Redfish
 
 ## Features Planned
 * Boot control
-* Red fish
-
-
 
 # IPMI Comamnds Verified
 
@@ -1823,10 +1821,10 @@ The motherboard on server might have CPLD or FPGA components that require downlo
 # Image Size
 Type          | Size    | Note                                                                                                     |
 :-------------|:------- |:-------------------------------------------------------------------------------------------------------- |
-image-uboot   |  468.5 KB | including bootblock for Poleg only                                                                       |
-image-kernel  |  4.5 MB   | linux 4.17.04 version                                                                                       |
-image-rofs    |  18.2 MB  | bottom layer of the overlayfs, read only                                                                 |
-image-rwfs    |  0 MB  | middle layer of the overlayfs, rw files in this partition will be created at runtime,<br /> with a maximum capacity of 1MB|
+image-uboot   |  415 KB | u-boot 2019.01 + bootblock for Poleg only                                                                       |
+image-kernel  |  4.4 MB   | linux 4.19.16 version                                                                                       |
+image-rofs    |  19.2 MB  | bottom layer of the overlayfs, read only                                                                 |
+image-rwfs    |  0 MB  | middle layer of the overlayfs, rw files in this partition will be created at runtime,<br /> with a maximum capacity of 2MB|
 
 # Modifications
 
@@ -1843,8 +1841,8 @@ image-rwfs    |  0 MB  | middle layer of the overlayfs, rw files in this partiti
 * 2018.09.21 Add NTP screen snapshot for System/Time/SNTP
 * 2018.10.05 Update webui and  patch of webui and interface and vm-own.png
 * 2018.10.11 Add Sensor
-* 2018.11.16 Add obmc-ikvm support in bmcweb 
-* 2018.11.22 Enable firmware update support 
+* 2018.11.16 Add obmc-ikvm support in bmcweb
+* 2018.11.22 Enable firmware update support
 * 2018.11.23 Update Sensor description about FAN How to use
 * 2018.11.29 Update Server power operations of Server control about How to use
 * 2018.12.27 Add Chassis Buttons about How to use
@@ -1852,4 +1850,7 @@ image-rwfs    |  0 MB  | middle layer of the overlayfs, rw files in this partiti
 * 2019.03.13 Modify Server power operation of Server control about How to use
 * 2019.03.19 Update IPMI Comamnds Verified Table
 * 2019.04.08 Update Kernel version to 4.19.16
+* 2019.04.30 Add BIOS POST Code
+* 2019.05.05 Update u-boot to 2019.01
+* 2019.05.15 Add ADC config file
 * 2019.05.23 Add FRU for Server health
