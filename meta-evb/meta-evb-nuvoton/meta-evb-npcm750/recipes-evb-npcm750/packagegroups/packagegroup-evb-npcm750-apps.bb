@@ -28,7 +28,6 @@ RDEPENDS_${PN}-chassis = " \
         "
 SUMMARY_${PN}-fans = "evb-npcm750 Fans"
 RDEPENDS_${PN}-fans = " \
-        obmc-control-fan \
         "
 
 SUMMARY_${PN}-flash = "evb-npcm750 Flash"
@@ -48,4 +47,5 @@ RDEPENDS_${PN}-system = " \
 		bmcweb \
 		phosphor-host-postd \
 		phosphor-ipmi-ipmb \
+		iperf3 \
         "
