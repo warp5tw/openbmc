@@ -1163,10 +1163,10 @@ static void npcm_smb_read_from_fifo(struct npcm_i2c *bus, u8 bytes_in_fifo)
 #if IS_ENABLED(CONFIG_I2C_SLAVE)
         //@@
         //if(5 == bus->num)
-        if((3==bus->num) || (5 == bus->num))
-        {
-            printk("b:%d slv_rd_ind:%d data:0x%x\r\n", bus->num, bus->slv_rd_ind, data);
-        }
+        //if((3==bus->num) || (5 == bus->num))
+        //{
+        //    printk("b:%d slv_rd_ind:%d data:0x%x\r\n", bus->num, bus->slv_rd_ind, data);
+        //}
 				bus->slv_rd_buf[bus->slv_rd_ind % SMBUS_FIFO_SIZE] = data;
 				bus->slv_rd_ind++;
         
@@ -1392,10 +1392,10 @@ static int npcm_i2c_slave_get_wr_buf(struct npcm_i2c *bus)
 		i2c_slave_event(bus->slave, I2C_SLAVE_READ_REQUESTED, &value);
     //@@
     //if(5 == bus->num)
-    if((3==bus->num) || (5 == bus->num))
-    {
-		    printk("b:%d i:%d->   recv 0x%x\n", bus->num, i, value);
-    }
+    //if((3==bus->num) || (5 == bus->num))
+    //{
+		//    printk("b:%d i:%d->   recv 0x%x\n", bus->num, i, value);
+    //}
 		bus->slv_wr_buf[(bus->slv_wr_ind + bus->slv_wr_size) % SMBUS_FIFO_SIZE] = value;
 		bus->slv_wr_size++;
 		i2c_slave_event(bus->slave, I2C_SLAVE_READ_PROCESSED, &value);
@@ -1426,10 +1426,10 @@ static void npcm_i2c_slave_send_rd_buf(struct npcm_i2c *bus)
 #if 1
     //@@
     //if(5 == bus->num)
-    if((3==bus->num) || (5 == bus->num))
-    {
-		    printk("b:%d i:%d->   send 0x%x\n", bus->num, i, bus->slv_rd_buf[i]);
-    }
+    //if((3==bus->num) || (5 == bus->num))
+    //{
+		//    printk("b:%d i:%d->   send 0x%x\n", bus->num, i, bus->slv_rd_buf[i]);
+    //}
 #endif
 		i2c_slave_event(bus->slave, I2C_SLAVE_WRITE_RECEIVED, &bus->slv_rd_buf[i]);
 	}
@@ -1612,6 +1612,10 @@ static irqreturn_t npcm_smb_int_slave_handler(struct npcm_i2c *bus)
     //{
 	  //  printk("!!!s nack\r\n");
     //}
+    if( (3 == bus->num) || (5 == bus->num) )
+    {
+     printk("b:%d s nack smp_processor_id:0x%x\r\n", bus->num, smp_processor_id());
+    }
 		NPCM_I2C_EVENT_LOG(NPCM_I2C_EVENT_NACK);
 		bus->stop_ind = SMB_NACK_IND;
 //printk("s nack\r\n");
@@ -1649,7 +1653,10 @@ static irqreturn_t npcm_smb_int_slave_handler(struct npcm_i2c *bus)
 		npcm_smb_init_params(bus);
 //printk("s ber\r\n");
 		bus->state = SMB_IDLE;
-
+    if( (3 == bus->num) || (5 == bus->num) )
+    {
+     printk("b:%d s ber smp_processor_id:0x%x\r\n", bus->num, smp_processor_id());
+    }
 		// in BER case, we are not sure if SMBST.MASTER is accurate:
 		if (completion_done(&bus->cmd_complete) == false) {
 			bus->cmd_err = -EIO;
@@ -1857,7 +1864,10 @@ static irqreturn_t npcm_smb_int_slave_handler(struct npcm_i2c *bus)
 			// Slave got an address match with direction bit set so it
 			//	should transmit data
 			// Write till the master will NACK
-
+      if( (3 == bus->num) || (5 == bus->num) )
+      {
+          printk("b:%d s xmit smp_processor_id:0x%x\r\n", bus->num, smp_processor_id());
+      }
 			npcm_smb_slave_start_xmit(bus, bus->adap.quirks->max_write_len, bus->slv_wr_buf);
 		} else {
 
@@ -2242,10 +2252,10 @@ static irqreturn_t npcm_smb_int_master_handler(struct npcm_i2c *bus)
 		//npcm_smb_master_abort(bus);
 		iowrite8(NPCM_SMBST_NMATCH, bus->reg + NPCM_SMBST);
     //@@
-    printk("b:%d nack s-r", bus->num);
+    printk("b:%d m nack s-r", bus->num);
     npcm_smb_nack(bus);
     //@@
-    //npcm_smb_reset(bus);
+    npcm_smb_reset(bus);
 		bus->state = SMB_IDLE;
 		bus->stop_ind = SMB_BUS_ERR_IND;
 		npcm_smb_callback(bus, bus->stop_ind, npcm_smb_get_index(bus));
@@ -2267,7 +2277,10 @@ static irqreturn_t npcm_smb_int_master_handler(struct npcm_i2c *bus)
 		}
 
 		pdebug_lvl2(bus, "NACK");
-
+    if( (3 == bus->num) || (5 == bus->num) )
+    {
+     printk("b:%d m nack smp_processor_id:0x%x\r\n", bus->num, smp_processor_id());
+    }
 		// In master write operation, NACK is a problem
 		// number of bytes sent to master less than required
 		bus->stop_ind = SMB_NACK_IND;
@@ -2296,7 +2309,7 @@ static irqreturn_t npcm_smb_int_master_handler(struct npcm_i2c *bus)
     //@@
     if((3==bus->num) || (5 == bus->num))
     {
-	    printk("!!!b:%d BER\r\n", bus->num);
+	    printk("!!!b:%d m BER smp_processor_id:0x%x\r\n", bus->num, smp_processor_id());
     }
 		if (npcm_smb_is_master(bus)) {
 			// Only current master is allowed to issue stop
@@ -2330,7 +2343,7 @@ static irqreturn_t npcm_smb_int_master_handler(struct npcm_i2c *bus)
     //@@
     if((3==bus->num) || (5 == bus->num))
     {
-	    printk("!!!b:%d EOB\r\n", bus->num);
+	    printk("!!!b:%d m EOB smp_processor_id:0x%x\r\n", bus->num, smp_processor_id());
     }
 		pdebug_lvl2(bus, "EOB  ");
 		npcm_smb_eob_int(bus, false);
@@ -2343,7 +2356,10 @@ static irqreturn_t npcm_smb_int_master_handler(struct npcm_i2c *bus)
 	if (FIELD_GET(NPCM_SMBST_STASTR, ioread8(bus->reg + NPCM_SMBST))) {
 		pdebug_lvl2(bus, "stall");
 		NPCM_I2C_EVENT_LOG(NPCM_I2C_EVENT_STALL);
-
+    if( (3 == bus->num) || (5 == bus->num) )
+    {
+       printk("b:%d line:%d --\r\n", bus->num, __LINE__ );
+    }
 		// Check for Quick Command SMBus protocol
 		if (npcm_smb_is_quick(bus)) {
 			// Update status
@@ -2378,7 +2394,10 @@ static irqreturn_t npcm_smb_int_master_handler(struct npcm_i2c *bus)
 		if (bus->state == SMB_IDLE){
 			if (npcm_smb_is_master(bus)) {
 				bus->stop_ind = SMB_WAKE_UP_IND;
-
+        if( (3 == bus->num) || (5 == bus->num) )
+        {
+           printk("b:%d line:%d --\r\n", bus->num, __LINE__ );
+        }
 				bus->crc_data = 0;
 
 				// test stall on start
@@ -2437,10 +2456,18 @@ static irqreturn_t npcm_smb_int_master_handler(struct npcm_i2c *bus)
 		// SDA status is set - transmit or receive: Handle master mode
 		else {
 			if ((NPCM_SMBST_XMIT & ioread8(bus->reg + NPCM_SMBST)) == 0 ){
+         if((3==bus->num) || (5 == bus->num))
+         {
+	           printk("!!!b:%d m sda r smp_processor_id:0x%x\r\n", bus->num, smp_processor_id());
+         }
 				bus->operation = SMB_READ_OPER;
 				npcm_smb_int_master_handler_read(bus);
 			}
 			else {
+         if((3==bus->num) || (5 == bus->num))
+         {
+	           printk("!!!b:%d m sda w smp_processor_id:0x%x\r\n", bus->num, smp_processor_id());
+         }
 				bus->operation = SMB_WRITE_OPER;
 				npcm_smb_int_master_handler_write(bus);
 			}
@@ -2738,10 +2765,18 @@ static irqreturn_t npcm_i2c_bus_irq(int irq, void *dev_id)
 	struct npcm_i2c *bus = dev_id;
 
 	bus->int_cnt++;
+  if( (3 == bus->num) || (5 == bus->num) )
+  {
+     printk("b:%d irq smp_processor_id:0x%x\r\n", bus->num, smp_processor_id());
+  }
+
 
 	//spin_lock(&bus->lock);
 	spin_lock_irqsave(&bus->lock, flags);
-
+  if( (3 == bus->num) || (5 == bus->num) )
+  {
+     printk("b:%d smp_processor_id:0x%x ++\r\n", bus->num, smp_processor_id());
+  }
 	if(npcm_smb_is_master(bus))
 		bus->master_or_slave = SMB_MASTER;
 
@@ -2751,6 +2786,10 @@ static irqreturn_t npcm_i2c_bus_irq(int irq, void *dev_id)
 		if (ret == IRQ_HANDLED){
 			//spin_unlock(&bus->lock);
 	    spin_unlock_irqrestore(&bus->lock, flags);
+      if( (3 == bus->num) || (5 == bus->num) )
+      {
+         printk("b:%d line:%d --\r\n", bus->num, __LINE__);
+      }
 			return ret;
 		}
 	}
@@ -2761,6 +2800,10 @@ static irqreturn_t npcm_i2c_bus_irq(int irq, void *dev_id)
 		if (ret == IRQ_HANDLED){
 			//spin_unlock(&bus->lock);
 	    spin_unlock_irqrestore(&bus->lock, flags);
+      if( (3 == bus->num) || (5 == bus->num) )
+      {
+         printk("b:%d line:%d --\r\n", bus->num, __LINE__ );
+      }
 			return ret;
 		}
 	}
@@ -2768,7 +2811,10 @@ static irqreturn_t npcm_i2c_bus_irq(int irq, void *dev_id)
 
 	//spin_unlock(&bus->lock);
 	spin_unlock_irqrestore(&bus->lock, flags);
-
+  if( (3 == bus->num) || (5 == bus->num) )
+  {
+       printk("b:%d line:%d --\r\n", bus->num, __LINE__);
+  }
 	return IRQ_HANDLED;
 }
 
@@ -2874,7 +2920,7 @@ static int npcm_i2c_master_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs,
   //@@
   if( (3 == bus->num) || (5 == bus->num) )
   {
-     printk("b:%d start\r\n", bus->num);
+     printk("b:%d start smp_processor_id:0x%x\r\n", bus->num, smp_processor_id());
   }
 
 	if (num > 2 || num < 1) {
