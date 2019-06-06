@@ -285,7 +285,7 @@ Virtual Media (VM) is to emulate an USB drive on remote host PC via Network Bloc
     2.1 VM-WEB
     * Login to BMC and switch to webpage of VM on your browser
         ```
-        https://XXX.XXX.XXX.XXX/#/vm
+        https://XXX.XXX.XXX.XXX/#/server-control/vm
         ```
     *  Operations
         * After `Chose an Image File`, click `Start VM` to start VM network service (still not hook USB disk to host platform)
