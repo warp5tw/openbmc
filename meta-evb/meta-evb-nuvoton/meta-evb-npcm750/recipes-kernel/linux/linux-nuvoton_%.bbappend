@@ -4,7 +4,7 @@ KBRANCH = "Poleg-4.19.16-OpenBMC"
 LINUX_VERSION = "4.19.16"
 
 KSRC = "git://github.com/Nuvoton-Israel/linux;protocol=git;branch=${KBRANCH}"
-SRCREV = "8a1265d8adb5e6df1dc0092000325193c8bdeaab"
+SRCREV = "5334dca6ff3c4695c815abc2c3ba658ae155896d"
 
 SRC_URI += "file://evb-npcm750.cfg"
 SRC_URI += "file://enable-vcd-ece.cfg"
