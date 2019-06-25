@@ -1,0 +1,49 @@
+From 9d53515551b40bfc095cd41002fe602230c8a7a7 Mon Sep 17 00:00:00 2001
+From: Samuel Jiang <Samuel.Jiang@quantatw.com>
+Date: Thu, 7 Mar 2019 10:47:30 +0800
+Subject: [PATCH] bypass ocpv3 error fur area
+
+---
+ frup.cpp         | 2 +-
+ writefrudata.cpp | 8 ++++++--
+ 2 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/frup.cpp b/frup.cpp
+index 9ddb0f6..7aba886 100644
+--- a/frup.cpp
++++ b/frup.cpp
+@@ -48,7 +48,7 @@
+ #include <systemd/sd-bus.h>
+ #include <time.h>
+ #include <unistd.h>
+-
++#define IPMI_FRU_PARSER_DEBUG 1
+ #define TEXTSTR(a) #a
+ #define ASSERT(x)                                                              \
+     do                                                                         \
+diff --git a/writefrudata.cpp b/writefrudata.cpp
+index 114e4e9..f287536 100644
+--- a/writefrudata.cpp
++++ b/writefrudata.cpp
+@@ -22,7 +22,7 @@
+ 
+ using namespace ipmi::vpd;
+ using namespace phosphor::logging;
+-
++#define __IPMI_DEBUG__ 1
+ extern const FruMap frus;
+ extern const std::map<Path, InterfaceMap> extras;
+ 
+@@ -445,7 +445,11 @@ int ipmiPopulateFruAreas(uint8_t* fruData, const size_t dataLen,
+     for (uint8_t fruEntry = IPMI_FRU_INTERNAL_OFFSET;
+          fruEntry < (sizeof(struct common_header) - 2); fruEntry++)
+     {
+-        rc = -1;
++        if (fruEntry == IPMI_FRU_MULTI_OFFSET){
++            break;
++        }
++
++            rc = -1;
+         // Actual offset in the payload is the offset mentioned in common header
+         // multiplied by 8. Common header is always the first 8 bytes.
+         size_t areaOffset = fruData[fruEntry] * IPMI_EIGHT_BYTES;

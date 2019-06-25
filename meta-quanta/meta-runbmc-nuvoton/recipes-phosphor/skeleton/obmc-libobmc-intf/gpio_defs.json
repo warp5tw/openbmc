@@ -1,0 +1,24 @@
+{
+    "gpio_configs": {
+
+        "power_config": {
+            "power_good_in": "PGOOD",
+            "power_up_outs": [
+                {"name": "POWER_UP_PIN", "polarity": false}
+            ]
+        }
+    },
+
+    "gpio_definitions": [
+        {
+            "name": "PGOOD",
+            "num": 506,
+            "direction": "in"
+        },
+        {
+            "name": "POWER_UP_PIN",
+            "num": 505,
+            "direction": "out"
+        }
+    ]
+}
