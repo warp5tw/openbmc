@@ -1,9 +1,9 @@
-FILESEXTRAPATHS_prepend_gsj := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS_prepend_runbmc-nuvoton := "${THISDIR}/${PN}:"
 
-SRC_URI_append_gsj = " file://fw_env.config"
+SRC_URI_append_runbmc-nuvoton = " file://fw_env.config"
 
-do_install_append_gsj () {
+do_install_append_runbmc-nuvoton () {
     install -m 644 ${WORKDIR}/fw_env.config ${D}${sysconfdir}/fw_env.config
 }
 
-SRCREV = "98c5c6b825c165502f02e8b2ea846d190be21268"
+SRCREV = "4322a5410ebad6c51ee60dfe2b752540f9654944"
