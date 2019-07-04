@@ -1,12 +1,12 @@
-From 2b9bdf04cca12758ac3375d0f2d5be0fc19c1635 Mon Sep 17 00:00:00 2001
+From bd9bce4f07bf1e50239867ea6edd9a99a4c9a1b9 Mon Sep 17 00:00:00 2001
 From: kwliu <kwliu@nuvoton.com>
 Date: Tue, 25 Jun 2019 14:49:25 +0800
 Subject: [PATCH] runbmc dts
 
 ---
  .../boot/dts/nuvoton-npcm750-runbmc-gpio.dtsi |  517 ++++++++
- arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts  | 1094 +++++++++++++++++
- 2 files changed, 1611 insertions(+)
+ arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts  | 1121 +++++++++++++++++
+ 2 files changed, 1638 insertions(+)
  create mode 100644 arch/arm/boot/dts/nuvoton-npcm750-runbmc-gpio.dtsi
  create mode 100644 arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts
 
@@ -535,10 +535,10 @@ index 000000000000..18f320c14fe0
 +};
 diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts b/arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts
 new file mode 100644
-index 000000000000..5e2bf2247943
+index 000000000000..f170607895d0
 --- /dev/null
 +++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts
-@@ -0,0 +1,1094 @@
+@@ -0,0 +1,1121 @@
 +// SPDX-License-Identifier: GPL-2.0
 +// Copyright (c) 2019 Nuvoton Technology kwliu@nuvoton.com
 +// Copyright (c) 2019 Quanta Computer Inc. Samuel.Jiang@quantatw.com
@@ -1620,6 +1620,33 @@ index 000000000000..5e2bf2247943
 +			label = "led-green-arm";
 +			gpios = <&gpio3 14 GPIO_ACTIVE_HIGH>;
 +			linux,default-trigger = "heartbeat";
++		};
++	};
++	jtag {
++		compatible = "nuvoton,npcm750-jtag";
++		enable_pspi_jtag = <1>;
++		pspi-index = <2>;
++		tck {
++			label = "tck";
++			gpios = <&gpio0 19 0>; /* gpio19 */
++			regbase = <0xf0010000 0x1000>;
++		};
++
++		tdi {
++			label = "tdi";
++			gpios = <&gpio0 18 0>; /* gpio18 */
++			regbase = <0xf0010000 0x1000>;
++		};
++
++		tdo {
++			label = "tdo";
++			gpios = <&gpio0 17 0>; /* gpio17 */
++			regbase = <0xf0010000 0x1000>;
++		};
++		tms {
++			label = "tms";
++			gpios = <&gpio0 16 0>; /* gpio16 */
++			regbase = <0xf0010000 0x1000>;
 +		};
 +	};
 +};
