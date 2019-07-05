@@ -1,12 +1,12 @@
-From bd9bce4f07bf1e50239867ea6edd9a99a4c9a1b9 Mon Sep 17 00:00:00 2001
+From 355ce36c2fd7d2a1b873bb6e73a35341bcab69f7 Mon Sep 17 00:00:00 2001
 From: kwliu <kwliu@nuvoton.com>
 Date: Tue, 25 Jun 2019 14:49:25 +0800
 Subject: [PATCH] runbmc dts
 
 ---
  .../boot/dts/nuvoton-npcm750-runbmc-gpio.dtsi |  517 ++++++++
- arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts  | 1121 +++++++++++++++++
- 2 files changed, 1638 insertions(+)
+ arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts  | 1133 +++++++++++++++++
+ 2 files changed, 1650 insertions(+)
  create mode 100644 arch/arm/boot/dts/nuvoton-npcm750-runbmc-gpio.dtsi
  create mode 100644 arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts
 
@@ -535,10 +535,10 @@ index 000000000000..18f320c14fe0
 +};
 diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts b/arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts
 new file mode 100644
-index 000000000000..f170607895d0
+index 000000000000..5487070c43b6
 --- /dev/null
 +++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts
-@@ -0,0 +1,1121 @@
+@@ -0,0 +1,1133 @@
 +// SPDX-License-Identifier: GPL-2.0
 +// Copyright (c) 2019 Nuvoton Technology kwliu@nuvoton.com
 +// Copyright (c) 2019 Quanta Computer Inc. Samuel.Jiang@quantatw.com
@@ -1352,7 +1352,7 @@ index 000000000000..f170607895d0
 +					G2B_P0_4 {
 +						gpio-hog;
 +						gpios = <4 0>;
-+						output-low;
++						output-high;
 +						line-name = "PECI_MUX_SELECT";
 +					};
 +					G2B_P0_5 {
@@ -1485,6 +1485,18 @@ index 000000000000..f170607895d0
 +					reg = <0x07>;
 +					fan-tach-ch = /bits/ 8 <0x0E 0x0F>;
 +					cooling-levels = /bits/ 8 <127 255>;
++				};
++			};
++
++			peci: peci-bus@100000 {
++				cmd-timeout-ms = <1000>;
++				pull-down = <0>;
++				host-neg-bit-rate = <15>;
++				status = "okay";
++				intel-peci-dimmtemp@30 {
++					compatible = "intel,peci-client";
++					reg = <0x30>;
++					status = "okay";
 +				};
 +			};
 +
