@@ -1,12 +1,12 @@
-From 355ce36c2fd7d2a1b873bb6e73a35341bcab69f7 Mon Sep 17 00:00:00 2001
+From dc2dfa745119454c72be3947950d8377fe8a68a7 Mon Sep 17 00:00:00 2001
 From: kwliu <kwliu@nuvoton.com>
 Date: Tue, 25 Jun 2019 14:49:25 +0800
 Subject: [PATCH] runbmc dts
 
 ---
  .../boot/dts/nuvoton-npcm750-runbmc-gpio.dtsi |  517 ++++++++
- arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts  | 1133 +++++++++++++++++
- 2 files changed, 1650 insertions(+)
+ arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts  | 1149 +++++++++++++++++
+ 2 files changed, 1666 insertions(+)
  create mode 100644 arch/arm/boot/dts/nuvoton-npcm750-runbmc-gpio.dtsi
  create mode 100644 arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts
 
@@ -535,10 +535,10 @@ index 000000000000..18f320c14fe0
 +};
 diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts b/arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts
 new file mode 100644
-index 000000000000..5487070c43b6
+index 000000000000..18a8724c6747
 --- /dev/null
 +++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts
-@@ -0,0 +1,1133 @@
+@@ -0,0 +1,1149 @@
 +// SPDX-License-Identifier: GPL-2.0
 +// Copyright (c) 2019 Nuvoton Technology kwliu@nuvoton.com
 +// Copyright (c) 2019 Quanta Computer Inc. Samuel.Jiang@quantatw.com
@@ -960,6 +960,22 @@ index 000000000000..5487070c43b6
 +				#size-cells = <0>;
 +				bus-frequency = <100000>;
 +				status = "okay";
++				ina219@40 {
++					compatible = "ti,ina219";
++					reg = <0x40>;
++				};
++				ina219@41 {
++					compatible = "ti,ina219";
++					reg = <0x41>;
++				};
++				ina219@44 {
++					compatible = "ti,ina219";
++					reg = <0x44>;
++				};
++				ina219@45 {
++					compatible = "ti,ina219";
++					reg = <0x45>;
++				};
 +			};
 +
 +			i2c7: i2c@87000 {
