@@ -6,6 +6,7 @@ NAMES = " \
         i2c-bus@87000/tmp421@4c \
         i2c-bus@8d000/tmp75@4a  \
         "
+
 ITEMSFMT = "ahb/apb/{0}.conf"
 
 ITEMS += "${@compose_list(d, 'ITEMSFMT', 'NAMES')}"
