@@ -29,6 +29,7 @@ RDEPENDS_${PN}-chassis = " \
 
 SUMMARY_${PN}-fans = "RUNBMC NUVOTON Fans"
 RDEPENDS_${PN}-fans = " \
+        phosphor-pid-control \
         "
 
 SUMMARY_${PN}-flash = "RUNBMC NUVOTON Flash"
