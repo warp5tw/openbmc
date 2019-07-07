@@ -36,11 +36,14 @@ RDEPENDS_${PN}-flash = " \
         obmc-flash-bmc \
         obmc-mgr-download \
         obmc-control-bmc \
+        phosphor-ipmi-flash \
         "
 
 SUMMARY_${PN}-system = "RUNBMC NUVOTON System"
 RDEPENDS_${PN}-system = " \
-        phosphor-webui\
+        phosphor-webui \
         obmc-ikvm \
         obmc-console \
+        dhcpcd \
+        phosphor-ipmi-fru \
         "
