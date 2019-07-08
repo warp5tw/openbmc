@@ -2,9 +2,21 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 
 NAMES = " \
-        i2c-bus@82000/tmp421@4c \
-        i2c-bus@87000/tmp421@4c \
-        i2c-bus@8d000/tmp75@4a  \
+        i2c@82000/tmp421@4c \
+        i2c@86000/tps53679@60 \
+        i2c@86000/tps53659@62 \
+        i2c@86000/tps53659@64 \
+        i2c@86000/tps53679@70 \
+        i2c@86000/tps53659@72 \
+        i2c@86000/tps53659@74 \
+        i2c@86000/tps53622@67 \
+        i2c@86000/tps53622@77 \
+        i2c@86000/ina219@40 \
+        i2c@86000/ina219@41 \
+        i2c@86000/ina219@44 \
+        i2c@86000/ina219@45 \
+        i2c@87000/tmp421@4c \
+        i2c@8d000/tmp75@4a  \
         "
 
 ITEMSFMT = "ahb/apb/{0}.conf"
