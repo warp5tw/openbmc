@@ -1,12 +1,12 @@
-From 7bedae6f0c41d270853c2a3d04e0ce071c2b49dc Mon Sep 17 00:00:00 2001
+From 085f23ec0c2d05402a439353f7fd4247786e90b7 Mon Sep 17 00:00:00 2001
 From: kwliu <kwliu@nuvoton.com>
 Date: Tue, 25 Jun 2019 14:49:25 +0800
 Subject: [PATCH] runbmc dts
 
 ---
- .../boot/dts/nuvoton-npcm750-runbmc-gpio.dtsi |  517 ++++++++
- arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts  | 1157 +++++++++++++++++
- 2 files changed, 1674 insertions(+)
+ .../boot/dts/nuvoton-npcm750-runbmc-gpio.dtsi |  517 +++++++
+ arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts  | 1193 +++++++++++++++++
+ 2 files changed, 1710 insertions(+)
  create mode 100644 arch/arm/boot/dts/nuvoton-npcm750-runbmc-gpio.dtsi
  create mode 100644 arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts
 
@@ -535,10 +535,10 @@ index 000000000000..18f320c14fe0
 +};
 diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts b/arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts
 new file mode 100644
-index 000000000000..7157b41fb334
+index 000000000000..c04e40aee746
 --- /dev/null
 +++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc.dts
-@@ -0,0 +1,1157 @@
+@@ -0,0 +1,1193 @@
 +// SPDX-License-Identifier: GPL-2.0
 +// Copyright (c) 2019 Nuvoton Technology kwliu@nuvoton.com
 +// Copyright (c) 2019 Quanta Computer Inc. Samuel.Jiang@quantatw.com
@@ -983,6 +983,42 @@ index 000000000000..7157b41fb334
 +				ina219@45 {
 +					compatible = "ti,ina219";
 +					reg = <0x45>;
++				};
++				tps53679@60 {
++					compatible = "ti,tps53679";
++					reg = <0x60>;
++				};
++				tps53659@62 {
++					compatible = "ti,tps53659";
++					reg = <0x62>;
++				};
++				tps53659@64 {
++					compatible = "ti,tps53659";
++					reg = <0x64>;
++				};
++				tps53622@67 {
++					compatible = "ti,tps53622";
++					reg = <0x67>;
++				};
++				tps53622@69 {
++					compatible = "ti,tps53622";
++					reg = <0x69>;
++				};
++				tps53679@70 {
++					compatible = "ti,tps53679";
++					reg = <0x70>;
++				};
++				tps53659@72 {
++					compatible = "ti,tps53659";
++					reg = <0x72>;
++				};
++				tps53659@74 {
++					compatible = "ti,tps53659";
++					reg = <0x74>;
++				};
++				tps53622@77 {
++					compatible = "ti,tps53622";
++					reg = <0x77>;
 +				};
 +			};
 +
