@@ -46,4 +46,5 @@ RDEPENDS_${PN}-system = " \
         obmc-console \
         dhcpcd \
         phosphor-ipmi-fru \
+        phosphor-host-postd \
         "
