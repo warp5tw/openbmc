@@ -1,0 +1,24 @@
+From 9ede7c047dc83cc426cf8dd1c7629313b7746df8 Mon Sep 17 00:00:00 2001
+From: YSChu <yschu@nuvoton.com>
+Date: Thu, 11 Jul 2019 16:26:44 +0800
+Subject: [PATCH] clear ATN bit
+
+---
+ kcsbridged.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/kcsbridged.cpp b/kcsbridged.cpp
+index a37cf5f..0afe4ce 100644
+--- a/kcsbridged.cpp
++++ b/kcsbridged.cpp
+@@ -121,6 +121,7 @@ class SmsChannel
+                                [this]() { return clearAttention(); });
+         iface->register_method("forceAbort", [this]() { return forceAbort(); });
+         iface->initialize();
++        clearAttention();
+     }
+ 
+     bool initOK() const
+-- 
+2.17.1
+
