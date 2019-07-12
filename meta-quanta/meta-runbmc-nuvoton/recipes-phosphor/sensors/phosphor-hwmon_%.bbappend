@@ -3,6 +3,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 NAMES = " \
         i2c@82000/tmp421@4c \
+        i2c@82000/power-brick@58 \
         i2c@86000/tps53679@60 \
         i2c@86000/tps53659@62 \
         i2c@86000/tps53659@64 \
