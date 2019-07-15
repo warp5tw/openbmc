@@ -2,7 +2,7 @@ inherit obmc-phosphor-systemd
 
 FILESEXTRAPATHS_prepend_runbmc-nuvoton := "${THISDIR}/${PN}:"
 
-EEPROM_NAMES = "motherboard bmc niccard"
+EEPROM_NAMES = "motherboard bmc"
 
 EEPROMFMT = "system/chassis/{0}"
 EEPROM_ESCAPEDFMT = "system-chassis-{0}"
@@ -19,6 +19,3 @@ FMT = "../${TMPL}:${TGT}.wants/${INSTFMT}"
 
 SYSTEMD_LINK_${PN}_append_runbmc-nuvoton := " ${@compose_list(d, 'FMT', 'EEPROMS_ESCAPED')}"
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-
-SRC_URI += "file://0001-bypass-ocpv3-error-fur-area.patch"
-
