@@ -2,7 +2,7 @@ KBRANCH = "Poleg-4.19.16-OpenBMC"
 LINUX_VERSION = "4.19.16"
 
 KSRC = "git://github.com/Nuvoton-Israel/linux;protocol=git;branch=${KBRANCH}"
-SRCREV = "248c754c252db5323174c05501dc4de7a456f1d8"
+SRCREV = "6e837ea41cab8cdb20f502c6298f3d746f2e9a5b"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-nuvoton:"
 
