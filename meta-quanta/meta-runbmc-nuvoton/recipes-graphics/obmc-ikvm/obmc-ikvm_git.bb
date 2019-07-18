@@ -9,7 +9,7 @@ RDEPENDS_${PN} = "libvncserver"
 inherit obmc-phosphor-systemd
 
 SRC_URI = "git://github.com/Nuvoton-Israel/obmc-ikvm"
-SRCREV = "4165bc3a71ee9d3744cf25f8407880ea8121e036"
+SRCREV = "e5c37820ce01fd81a83800b7f4a73b47cd03f1a6"
 S = "${WORKDIR}/git"
 
 do_install() {
