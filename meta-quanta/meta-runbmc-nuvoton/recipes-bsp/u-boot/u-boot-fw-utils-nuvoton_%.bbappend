@@ -6,4 +6,4 @@ do_install_append_runbmc-nuvoton () {
     install -m 644 ${WORKDIR}/fw_env.config ${D}${sysconfdir}/fw_env.config
 }
 
-SRCREV = "6e289d885d18bfb9a541c92fbc10e841210bd9de"
+SRCREV = "e46e5bec586b95516e180804ba37c2b117fb9f01"
