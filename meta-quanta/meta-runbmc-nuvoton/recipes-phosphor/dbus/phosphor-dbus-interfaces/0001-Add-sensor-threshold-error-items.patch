@@ -1,0 +1,47 @@
+diff --git a/xyz/openbmc_project/Sensor/Threshold.errors.yaml b/xyz/openbmc_project/Sensor/Threshold.errors.yaml
+index 4b8e5c0..e6c10ac 100644
+--- a/xyz/openbmc_project/Sensor/Threshold.errors.yaml
++++ b/xyz/openbmc_project/Sensor/Threshold.errors.yaml
+@@ -5,3 +5,11 @@
+ # xyz.openbmc_project.Sensor.Threshold.CriticalLow
+ - name: CriticalLow
+   description: Sensor device has exceeded its lower bound.
++
++# xyz.openbmc_project.Sensor.Threshold.WarningHigh
++- name: WarningHigh
++  description: Sensor device has exceeded its non-critical upper bound.
++
++# xyz.openbmc_project.Sensor.Threshold.WarningLow
++- name: WarningLow
++  description: Sensor device has exceeded its non-critical lower bound.
+diff --git a/xyz/openbmc_project/Sensor/Threshold.metadata.yaml b/xyz/openbmc_project/Sensor/Threshold.metadata.yaml
+index 1ebaf51..f52c2c3 100644
+--- a/xyz/openbmc_project/Sensor/Threshold.metadata.yaml
++++ b/xyz/openbmc_project/Sensor/Threshold.metadata.yaml
+@@ -3,8 +3,26 @@
+   meta:
+     - str: "SENSOR_DATA=%s"
+       type: string
++    - str: "CALLOUT_INVENTORY_PATH=%s"
++      type: string
+ - name: CriticalLow
+   level: ERR
+   meta:
+     - str: "SENSOR_DATA=%s"
+       type: string
++    - str: "CALLOUT_INVENTORY_PATH=%s"
++      type: string
++- name: WarningHigh
++  level: ERR
++  meta:
++    - str: "SENSOR_DATA=%s"
++      type: string
++    - str: "CALLOUT_INVENTORY_PATH=%s"
++      type: string
++- name: WarningLow
++  level: ERR
++  meta:
++    - str: "SENSOR_DATA=%s"
++      type: string
++    - str: "CALLOUT_INVENTORY_PATH=%s"
++      type: string
