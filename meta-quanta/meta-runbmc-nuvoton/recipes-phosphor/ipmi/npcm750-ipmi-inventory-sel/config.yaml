@@ -1,0 +1,20 @@
+/xyz/openbmc_project/sensors/temperature/BMC_Module/critical_high:
+  sensorID: 0x01
+  sensorType: 0x01
+  eventReadingType: 0x01
+  offset: 0x09
+/xyz/openbmc_project/sensors/temperature/BMC_Module/critical_low:
+  sensorID: 0x01
+  sensorType: 0x01
+  eventReadingType: 0x01
+  offset: 0x02
+/xyz/openbmc_project/sensors/temperature/BMC_Module/warning_high:
+  sensorID: 0x01
+  sensorType: 0x01
+  eventReadingType: 0x01
+  offset: 0x01
+/xyz/openbmc_project/sensors/temperature/BMC_Module/warning_low:
+  sensorID: 0x01
+  sensorType: 0x01
+  eventReadingType: 0x01
+  offset: 0x00
