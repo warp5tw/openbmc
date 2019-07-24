@@ -29,8 +29,9 @@ SRC_URI += " \
         file://configure.ac \
         file://sel_logger.cpp \
         file://CMakeLists.txt \
-		file://cmake-format.json \
+        file://cmake-format.json \
         file://README.md \
+        file://xyz.openbmc_project.Logging.IPMI.service \
         "
 
 
