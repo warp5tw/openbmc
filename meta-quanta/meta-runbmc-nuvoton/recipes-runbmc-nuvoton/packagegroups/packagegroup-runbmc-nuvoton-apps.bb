@@ -53,4 +53,5 @@ RDEPENDS_${PN}-system = " \
         runbmc-powerctrl \
         ipmitool \
         phosphor-ipmi-sel-logger \
+        first-boot-set-mac \
         "
