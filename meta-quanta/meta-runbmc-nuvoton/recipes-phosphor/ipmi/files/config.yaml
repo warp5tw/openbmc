@@ -1,20 +1,31 @@
-0x01:
+1:
   /system:
-    entityID: 23
+    entityID: 200
     entityInstance: 1
     interfaces:
-      xyz.openbmc_project.Inventory.Item:
-        PrettyName:
-          IPMIFruProperty: Name
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
           IPMIFruSection: Product
+        Model:
+          IPMIFruProperty: Custom Field 1
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.System:
   /system/chassis:
-    entityID: 23
+    entityID: 7
     entityInstance: 1
     interfaces:
-      xyz.openbmc_project.Inventory.Item:
+     xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Product
+          IPMIFruSection: Chassis
   /system/chassis/motherboard:
     entityID: 7
     entityInstance: 1
@@ -40,29 +51,12 @@
         Version:
           IPMIFruProperty: FRU File ID
           IPMIFruSection: Board
-      xyz.openbmc_project.Inventory.Item.Board:
       xyz.openbmc_project.Inventory.Decorator.VendorInformation:
         CustomField1:
           IPMIFruProperty: Custom Field 1
           IPMIFruSection: Board
           IPMIFruValueDelimiter: 58
-0x02:
-  /system:
-    entityID: 23
-    entityInstance: 1
-    interfaces:
-      xyz.openbmc_project.Inventory.Item:
-        PrettyName:
-          IPMIFruProperty: Name
-          IPMIFruSection: Product
-  /system/chassis:
-    entityID: 23
-    entityInstance: 1
-    interfaces:
-      xyz.openbmc_project.Inventory.Item:
-        PrettyName:
-          IPMIFruProperty: Name
-          IPMIFruSection: Product
+2:
   /system/chassis/bmc:
     entityID: 7
     entityInstance: 1
@@ -88,9 +82,14 @@
         Version:
           IPMIFruProperty: FRU File ID
           IPMIFruSection: Board
-      xyz.openbmc_project.Inventory.Item.Board:
-      xyz.openbmc_project.Inventory.Decorator.VendorInformation:
-        CustomField1:
+      xyz.openbmc_project.Common.UUID:
+        UUID:
           IPMIFruProperty: Custom Field 1
           IPMIFruSection: Board
           IPMIFruValueDelimiter: 58
+      xyz.openbmc_project.Inventory.Item.Bmc:
+      xyz.openbmc_project.Inventory.Item.NetworkInterface:
+        MACAddress:
+          IPMIFruProperty: Custom Field 2
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Item.Ethernet:
