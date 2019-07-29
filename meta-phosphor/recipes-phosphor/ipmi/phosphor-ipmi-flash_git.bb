@@ -22,13 +22,26 @@ PACKAGECONFIG ?= "cleanup-delete"
 PACKAGECONFIG[cleanup-delete] = "--enable-cleanup-delete, --disable-cleanup-delete"
 # If using static-layout, reboot-update is a good option to handle updating.
 PACKAGECONFIG[reboot-update] = "--enable-reboot-update, --disable-reboot-update"
+
+# Default options for supporting various flash types:
+PACKAGECONFIG[static-bmc] = "--enable-static-layout, --disable-static-layout"
+PACKAGECONFIG[ubitar-bmc] = "--enable-tarball-ubi, --disable-tarball-ubi"
 PACKAGECONFIG[host-bios] = "--enable-host-bios, --disable-host-bios"
+
+# Hardware options to enable transmitting the data from the host.
+PACKAGECONFIG[aspeed-p2a] = "--enable-aspeed-p2a, --disable-aspeed-p2a"
+PACKAGECONFIG[aspeed-lpc] = "--enable-aspeed-lpc, --disable-aspeed-lpc"
+PACKAGECONFIG[nuvoton-lpc] = "--enable-nuvoton-lpc, --disable-nuvoton-lpc"
 
 EXTRA_OECONF = "--disable-tests --disable-build-host-tool"
 
+# Set this variable in your recipe to set it instead of using MAPPED_ADDRESS directly.
+IPMI_FLASH_BMC_ADDRESS ?= "0"
+EXTRA_OECONF_append = " MAPPED_ADDRESS=${IPMI_FLASH_BMC_ADDRESS}"
+
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-ipmi-flash"
-SRCREV = "c9792e75361c86da7f674976eacd03c761021d2f"
+SRCREV = "e3feacfa00823773ca5db363ffeb1d537f52e9a9"
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} += "phosphor-ipmi-flash-bmc-prepare.target \
