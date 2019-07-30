@@ -116,7 +116,7 @@
   entityID: 0x07
   entityInstance: 5
   sensorType: 0x02
-  path: /xyz/openbmc_project/sensors/voltage/MBO_Vout
+  path: /xyz/openbmc_project/sensors/voltage/MB0_Vout
   sensorReadingType: 0x01
   multiplierM: 8
   offsetB: 0
@@ -137,7 +137,7 @@
 0x07:
   entityID: 0x07
   entityInstance: 6
-  sensorType: 0x03
+  sensorType: 0x08
   path: /xyz/openbmc_project/sensors/power/MB0_Pin
   sensorReadingType: 0x01
   multiplierM: 310
@@ -160,7 +160,7 @@
   entityID: 0x07
   entityInstance: 7
   sensorType: 0x03
-  path: /xyz/openbmc_project/sensors/current/MBO_Iout
+  path: /xyz/openbmc_project/sensors/current/MB0_Iout
   sensorReadingType: 0x01
   multiplierM: 9
   offsetB: 0
@@ -1149,6 +1149,72 @@
   readingType: readingData
   sensorNamePattern: nameLeaf
   unit: xyz.openbmc_project.Sensor.Value.Unit.Watts
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: int64_t
+0x44:
+  entityID: 0x13
+  entityInstance: 4
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/P12V_BRIC_Temp
+  sensorReadingType: 0x01
+  multiplierM: 1
+  offsetB: 0
+  bExp: 0
+  rExp: 0
+  scale: -3
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: int64_t
+0x45:
+  entityID: 0x13
+  entityInstance: 22
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/P12V_BRIC_Vol
+  sensorReadingType: 0x01
+  multiplierM: 8
+  offsetB: 0
+  bExp: 0
+  rExp: -2
+  scale: -3
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: int64_t
+0x46:
+  entityID: 0x13
+  entityInstance: 23
+  sensorType: 0x03
+  path: /xyz/openbmc_project/sensors/current/P12V_BRIC_Curr
+  sensorReadingType: 0x01
+  multiplierM: 40
+  offsetB: 10
+  bExp: 0
+  rExp: -3
+  scale: -3
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Amperes
   interfaces:
     xyz.openbmc_project.Sensor.Value:
       Value:
