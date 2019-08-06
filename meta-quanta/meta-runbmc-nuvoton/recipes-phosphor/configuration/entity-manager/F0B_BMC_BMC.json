@@ -1,0 +1,99 @@
+{
+    "Exposes": [{
+            "Address": "0x30",
+            "Bus": 0,
+            "CpuID": 1,
+            "Name": "CPU 1",
+            "Thresholds": [{
+                    "Direction": "greater than",
+                    "Label": "DIMM",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 149
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "DIMM",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 129
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "DIMM",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 20
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "DIMM",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 15
+                }
+            ],
+            "Type": "XeonCPU"
+        },
+        {
+            "Address": "0x31",
+            "Bus": 0,
+            "CpuID": 2,
+            "Name": "CPU 2",
+            "Thresholds": [{
+                    "Direction": "greater than",
+                    "Label": "DIMM",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 149
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "DIMM",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 129
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "DIMM",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 20
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "DIMM",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 15
+                }
+            ],
+            "Type": "XeonCPU"
+        },
+        {
+            "Address": "0x4A",
+            "Bus": 13,
+            "Name": "BMC_Module",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 80
+                }
+            ],
+            "Type": "TMP75"
+        }
+    ],
+    "Name": "RunBMC Module",
+    "Probe": "xyz.openbmc_project.FruDevice({'BOARD_PRODUCT_NAME': 'F0B-BMC-BMC'})",
+    "ProductId": 123,
+    "Type": "Board",
+    "xyz.openbmc_project.Inventory.Decorator.Asset": {
+        "Manufacturer": "$BOARD_MANUFACTURER",
+        "Model": "$BOARD_PRODUCT_NAME",
+        "PartNumber": "$BOARD_PART_NUMBER",
+        "SerialNumber": "$BOARD_SERIAL_NUMBER"
+    }
+}
