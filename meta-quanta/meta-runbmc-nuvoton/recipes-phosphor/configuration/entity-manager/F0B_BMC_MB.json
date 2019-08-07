@@ -150,7 +150,7 @@
             "Index": 6,
             "Name": "P12V_STBY_SCALED",
             "PowerState": "On",
-            "ScaleFactor": 0.122,
+            "ScaleFactor": 0.112,
             "Thresholds": [
                 {
                     "Direction": "greater than",
