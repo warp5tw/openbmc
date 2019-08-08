@@ -259,6 +259,20 @@
             "Type": "XeonCPU"
         },
         {
+            "Name": "BMC Fan connector 1",
+            "Pwm": 0,
+            "Status": "enabled",
+            "Tachs": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+            ],
+            "Type": "NuvotonFanConnector"
+        },
+        {
             "Address": "0x4C",
             "Bus": 2,
             "Name": "Inlet Temp",
