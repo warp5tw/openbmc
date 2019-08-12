@@ -1,6 +1,4 @@
 FILESEXTRAPATHS_append := "${THISDIR}/${PN}:"
-SRC_URI = "git://github.com/Nuvoton-Israel/entity-manager.git"
-SRCREV = "${AUTOREV}"
 SRC_URI += " \
            file://F0B_BMC_MB.json \
            file://F0B_chassis.json \
@@ -10,9 +8,6 @@ SRC_URI += " \
 FILES_${PN} += " ${datadir}/entity-manager/F0B_BMC_MB.json \
                  $(datadir}/entity-manager/F0B_chassis.json \
                "
-
-EXTRA_OECMAKE += " -DUSE_16BIT_ADDR=1"
-
 do_install_append() {
     install -d ${D}${datadir}/entity-manager
     install -m 0644 -D ${WORKDIR}/F0B_BMC_MB.json \
