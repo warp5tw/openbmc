@@ -1,5 +1,113 @@
 {
     "Exposes": [
+    {
+            "Address": "0x60",
+            "Bus": 6,
+            "Name": "TPS53679 0x60",
+            "Labels": ["iou1", "iou2", "vin", "vout1", "vout2", "pout1","pout2","temp1","temp2"],
+            "Type": "pmbus"
+    },
+    {
+            "Address": "0x70",
+            "Bus": 6,
+            "Name": "TPS53679 0x70",
+            "Labels": ["iou1", "iou2", "vin", "vout1","vout2", "pout1","pout2","temp1","temp2"],
+            "Type": "pmbus"
+    },
+    {
+            "Address": "0x62",
+            "Bus": 6,
+            "Name": "TPS53659 0x62",
+            "Labels": ["iou1", "iou2", "vin", "vout1", "vout2", "pin", "pout1", "pout2", "temp1", "temp2"],
+            "Type": "pmbus"
+    },
+    {
+            "Address": "0x64",
+            "Bus": 6,
+            "Name": "TPS53659 0x64",
+            "Labels": ["iou1", "iou2", "vin", "vout1", "vout2", "pin", "pout1", "pout2", "temp1", "temp2"],
+            "Type": "pmbus"
+    },
+    {
+            "Address": "0x72",
+            "Bus": 6,
+            "Name": "TPS53659 0x72",
+            "Labels": ["iou1", "iou2", "vin", "vout1", "vout2", "pin", "pout1", "pout2", "temp1", "temp2"],
+            "Type": "pmbus"
+    },
+    {
+            "Address": "0x74",
+            "Bus": 6,
+            "Name": "TPS53659 0x74",
+            "Labels": ["iou1", "iou2", "vin", "vout1", "vout2", "pin", "pout1", "pout2", "temp1", "temp2"],
+            "Type": "pmbus"
+    },
+    {
+            "Address": "0x67",
+            "Bus": 6,
+            "Name": "TPS53622 0x67",
+            "Labels": ["iou1", "iou2", "vin", "vout1", "vout2", "pin", "pout1", "pout2", "temp1", "temp2"],
+            "Type": "pmbus"
+    },
+    {
+            "Address": "0x69",
+            "Bus": 6,
+            "Name": "TPS53622 0x69",
+            "Labels": ["iou1", "iou2", "vin", "vout1", "vout2", "pin", "pout1", "pout2", "temp1", "temp2"],
+            "Type": "pmbus"
+    },
+    {
+            "Address": "0x77",
+            "Bus": 6,
+            "Name": "TPS53622 0x77",
+            "Labels": ["iou1", "iou2", "vin", "vout1", "vout2", "pin", "pout1", "pout2", "temp1", "temp2"],
+            "Type": "pmbus"
+    },
+    {
+            "Address": "0x40",
+            "Bus": 6,
+            "Name": "INA219 0x40",
+            "Labels": ["in1", "curr1", "power1"],
+            "Type": "pmbus"
+    },
+    {
+            "Address": "0x41",
+            "Bus": 6,
+            "Name": "INA219 0x41",
+            "Labels": ["in1", "curr1", "power1"],
+            "Type": "pmbus"
+    },
+    {
+            "Address": "0x44",
+            "Bus": 6,
+            "Name": "INA219 0x44",
+            "Labels": ["in1", "curr1", "power1"],
+            "Type": "pmbus"
+    },
+    {
+            "Address": "0x45",
+            "Bus": 6,
+            "Name": "INA219 0x45",
+            "Labels": ["in1", "curr1", "power1"],
+            "Type": "pmbus"
+    },
+    {
+            "Address": "0x58",
+            "Bus": "2",
+            "Name": "PSU",
+            "Labels": [
+                "pin",
+                "pout1",
+                "vin",
+                "vout1",
+                "iin",
+                "iout1",
+                "temp1",
+                "fan1",
+                "fan2"
+            ],
+            "Type": "pmbus"
+     },
      {
             "Index": 0,
             "Name": "P3V3_SCALED",
@@ -148,9 +256,6 @@
         },
         {
             "Index": 6,
-            "Name": "P12V_STBY_SCALED",
-            "PowerState": "On",
-            "ScaleFactor": 0.112,
             "Thresholds": [
                 {
                     "Direction": "greater than",
@@ -177,6 +282,9 @@
                     "Value": 11.5
                 }
             ],
+            "Name": "P12V_STBY_SCALED",
+            "PowerState": "On",
+            "ScaleFactor": 0.112,
             "Type": "ADC"
         },
         {
