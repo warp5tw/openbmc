@@ -118,25 +118,25 @@
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 3.5
+                    "Value": 3500
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 3.4
+                    "Value": 3400
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 3.1
+                    "Value": 3100
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 3.0
+                    "Value": 3000
                 }
             ],
             "Type": "ADC"
@@ -151,25 +151,25 @@
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 5.7
+                    "Value": 5700
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 5.5
+                    "Value": 5500
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 4.5
+                    "Value": 4000
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 4.0
+                    "Value": 4000
                 }
             ],
             "Type": "ADC"
@@ -184,25 +184,25 @@
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 3.5
+                    "Value": 3500
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 3.4
+                    "Value": 3400
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 3.1
+                    "Value": 3100
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 3.0
+                    "Value": 3000
                 }
             ],
             "Type": "ADC"
@@ -217,25 +217,25 @@
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 5.7
+                    "Value": 5700
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 5.5
+                    "Value": 5500
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 4.5
+                    "Value": 4500
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 4.0
+                    "Value": 4000
                 }
             ],
             "Type": "ADC"
@@ -261,25 +261,25 @@
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 12.6
+                    "Value": 12600
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 12.4
+                    "Value": 12400
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 12.0
+                    "Value": 12000
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 11.5
+                    "Value": 11500
                 }
             ],
             "Name": "P12V_STBY_SCALED",
@@ -304,28 +304,28 @@
                     "Label": "DIMM",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 149
+                    "Value": 149000
                 },
                 {
                     "Direction": "greater than",
                     "Label": "DIMM",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 129
+                    "Value": 129000
                 },
                 {
                     "Direction": "less than",
                     "Label": "DIMM",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 20
+                    "Value": 20000
                 },
                 {
                     "Direction": "less than",
                     "Label": "DIMM",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 15
+                    "Value": 15000
                 }
             ],
             "Type": "XeonCPU"
@@ -340,28 +340,28 @@
                     "Label": "DIMM",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 149
+                    "Value": 149000
                 },
                 {
                     "Direction": "greater than",
                     "Label": "DIMM",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 129
+                    "Value": 129000
                 },
                 {
                     "Direction": "less than",
                     "Label": "DIMM",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 20
+                    "Value": 20000
                 },
                 {
                     "Direction": "less than",
                     "Label": "DIMM",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 15
+                    "Value": 15000
                 }
             ],
             "Type": "XeonCPU"
@@ -389,19 +389,19 @@
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 115
+                    "Value": 115000
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 110
+                    "Value": 110000
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 5
+                    "Value": 5000
                 },
                 {
                     "Direction": "less than",
@@ -421,19 +421,19 @@
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 115
+                    "Value": 115000
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 110
+                    "Value": 110000
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 5
+                    "Value": 5000
                 },
                 {
                     "Direction": "less than",
@@ -453,19 +453,19 @@
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 115
+                    "Value": 115000
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 110
+                    "Value": 110000
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 5
+                    "Value": 5000
                 },
                 {
                     "Direction": "less than",
