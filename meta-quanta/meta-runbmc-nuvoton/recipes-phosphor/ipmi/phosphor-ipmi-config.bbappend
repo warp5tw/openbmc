@@ -13,12 +13,15 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 # is "0041".
 inherit image_version
 
-SRC_URI = " \
+SRC_URI += " \
     file://channel_config.json \
+	file://dev_id.json \
     "
 do_install_append() {
     install -m 0644 -D ${WORKDIR}/channel_config.json \
         ${D}${datadir}/ipmi-providers/channel_config.json
+	install -m 0644 -D ${WORKDIR}/dev_id.json \
+        ${D}${datadir}/ipmi-providers/dev_id.json
 }
 
 unset do_patch[noexec]
