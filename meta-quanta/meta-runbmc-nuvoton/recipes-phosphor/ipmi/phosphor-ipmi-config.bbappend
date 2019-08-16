@@ -13,6 +13,14 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 # is "0041".
 inherit image_version
 
+SRC_URI = " \
+    file://channel_config.json \
+    "
+do_install_append() {
+    install -m 0644 -D ${WORKDIR}/channel_access.json \
+        ${D}${datadir}/ipmi-providers/channel_access.json
+}
+
 unset do_patch[noexec]
 do_patch[depends] = "os-release:do_populate_sysroot"
 
