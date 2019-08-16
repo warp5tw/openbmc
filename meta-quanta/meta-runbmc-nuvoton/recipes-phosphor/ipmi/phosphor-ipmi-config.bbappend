@@ -17,8 +17,8 @@ SRC_URI = " \
     file://channel_config.json \
     "
 do_install_append() {
-    install -m 0644 -D ${WORKDIR}/channel_access.json \
-        ${D}${datadir}/ipmi-providers/channel_access.json
+    install -m 0644 -D ${WORKDIR}/channel_config.json \
+        ${D}${datadir}/ipmi-providers/channel_config.json
 }
 
 unset do_patch[noexec]
