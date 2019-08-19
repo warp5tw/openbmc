@@ -50,4 +50,5 @@ RDEPENDS_${PN}-system = " \
         ipmitool \
         phosphor-ipmi-sel-logger \
         first-boot-set-mac \
+        dbus-sensors \
         "
