@@ -1,94 +1,123 @@
 {
     "Exposes": [
     {
+            "BindConnector": "BMC Fan connector 1",
+            "Index": 0,
+            "Name": "Fan 1",
+            "Type": "NuvotonFan"
+    },
+    {
+            "BindConnector": "BMC Fan connector 1",
+            "Index": 1,
+            "Name": "Fan 2",
+            "Type": "NuvotonFan"
+    },
+    {
+            "BindConnector": "BMC Fan connector 1",
+            "Index": 2,
+            "Name": "Fan 3",
+            "Type": "NuvotonFan"
+    },
+    {
+            "BindConnector": "BMC Fan connector 1",
+            "Index": 3,
+            "Name": "Fan 4",
+            "Type": "NuvotonFan"
+    },
+    {
+            "BindConnector": "BMC Fan connector 1",
+            "Index": 4,
+            "Name": "Fan 5",
+            "Type": "NuvotonFan"
+    },
+    {
+            "BindConnector": "BMC Fan connector 1",
+            "Index": 5,
+            "Name": "Fan 6",
+            "Type": "NuvotonFan"
+    },
+    {
             "Address": "0x60",
             "Bus": 6,
-            "Name": "TPS53679 0x60",
-            "Labels": ["iou1", "iou2", "vin", "vout1", "vout2", "pout1","pout2","temp1","temp2"],
+            "Name": "CPU0_VCCIN_VR",
+            "Labels": ["iout1", "vout1", "pout1", "temp1"],
             "Type": "pmbus"
-    },
+	},
     {
             "Address": "0x70",
             "Bus": 6,
-            "Name": "TPS53679 0x70",
-            "Labels": ["iou1", "iou2", "vin", "vout1","vout2", "pout1","pout2","temp1","temp2"],
+            "Name": "CPU1_VCCIN_VR",
+            "Labels": ["iout1", "vout1", "pout1", "temp1"],
             "Type": "pmbus"
     },
     {
             "Address": "0x62",
             "Bus": 6,
-            "Name": "TPS53659 0x62",
-            "Labels": ["iou1", "iou2", "vin", "vout1", "vout2", "pin", "pout1", "pout2", "temp1", "temp2"],
+            "Name": "CPU0_DIMM_VR0",
+            "Labels": ["iout1", "vout1", "pout1", "temp1"],
             "Type": "pmbus"
     },
     {
             "Address": "0x64",
             "Bus": 6,
-            "Name": "TPS53659 0x64",
-            "Labels": ["iou1", "iou2", "vin", "vout1", "vout2", "pin", "pout1", "pout2", "temp1", "temp2"],
+            "Name": "CPU0_DIMM_VR1",
+            "Labels": ["iout1", "vout1", "pout1", "temp1"],
             "Type": "pmbus"
     },
     {
             "Address": "0x72",
             "Bus": 6,
-            "Name": "TPS53659 0x72",
-            "Labels": ["iou1", "iou2", "vin", "vout1", "vout2", "pin", "pout1", "pout2", "temp1", "temp2"],
+            "Name": "CPU1_DIMM_VR0",
+            "Labels": ["iout1", "vout1", "pout1", "temp1"],
             "Type": "pmbus"
     },
     {
             "Address": "0x74",
             "Bus": 6,
-            "Name": "TPS53659 0x74",
-            "Labels": ["iou1", "iou2", "vin", "vout1", "vout2", "pin", "pout1", "pout2", "temp1", "temp2"],
+            "Name": "CPU1_DIMM_VR1",
+            "Labels": ["iout1", "vout1", "pout1", "temp1"],
             "Type": "pmbus"
     },
     {
             "Address": "0x67",
             "Bus": 6,
-            "Name": "TPS53622 0x67",
-            "Labels": ["iou1", "iou2", "vin", "vout1", "vout2", "pin", "pout1", "pout2", "temp1", "temp2"],
-            "Type": "pmbus"
-    },
-    {
-            "Address": "0x69",
-            "Bus": 6,
-            "Name": "TPS53622 0x69",
-            "Labels": ["iou1", "iou2", "vin", "vout1", "vout2", "pin", "pout1", "pout2", "temp1", "temp2"],
+            "Name": "CPU0_VCCIO_VR",
+            "Labels": ["iout1", "vout1", "pout1", "temp1"],
             "Type": "pmbus"
     },
     {
             "Address": "0x77",
             "Bus": 6,
-            "Name": "TPS53622 0x77",
-            "Labels": ["iou1", "iou2", "vin", "vout1", "vout2", "pin", "pout1", "pout2", "temp1", "temp2"],
+            "Name": "CPU1_VCCIO_VR",
+            "Labels": ["iout1", "vout1", "pout1", "temp1"],
             "Type": "pmbus"
     },
     {
             "Address": "0x40",
             "Bus": 6,
-            "Name": "INA219 0x40",
-            "Labels": ["in1", "curr1", "power1"],
+            "Name": "CPU0_DIMM_VR0_lin",
+            "Labels": ["curr1"],
             "Type": "pmbus"
     },
     {
             "Address": "0x41",
             "Bus": 6,
-            "Name": "INA219 0x41",
-            "Labels": ["in1", "curr1", "power1"],
+            "Name": "CPU0_DIMM_VR1_lin",
+            "Labels": ["curr1"],
             "Type": "pmbus"
     },
     {
             "Address": "0x44",
             "Bus": 6,
-            "Name": "INA219 0x44",
-            "Labels": ["in1", "curr1", "power1"],
+            "Name": "CPU1_DIMM_VR0_lin",
+            "Labels": ["curr1"],
             "Type": "pmbus"
     },
     {
             "Address": "0x45",
             "Bus": 6,
-            "Name": "INA219 0x45",
-            "Labels": ["in1", "curr1", "power1"],
+            "Name": "CPU1_DIMM_VR1_lin",
+            "Labels": ["curr1"],
             "Type": "pmbus"
     },
     {
@@ -102,15 +131,13 @@
                 "vout1",
                 "iin",
                 "iout1",
-                "temp1",
-                "fan1",
-                "fan2"
+                "temp1"
             ],
             "Type": "pmbus"
      },
      {
             "Index": 0,
-            "Name": "P3V3_SCALED",
+            "Name": "P3V3",
             "PowerState": "On",
             "ScaleFactor": 0.4107,
             "Thresholds": [
@@ -118,32 +145,32 @@
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 3500
+                    "Value": 3647
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 3400
+                    "Value": 3541
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 3100
+                    "Value": 3066
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 3000
+                    "Value": 2974
                 }
             ],
             "Type": "ADC"
         },
         {
             "Index": 1,
-            "Name": "P5V_SCALED",
+            "Name": "P5V",
             "PowerState": "On",
             "ScaleFactor": 0.2717,
             "Thresholds": [
@@ -176,7 +203,7 @@
         },
         {
             "Index": 2,
-            "Name": "P3V3_STBY_SCALED",
+            "Name": "P3V3_STBY",
             "PowerState": "On",
             "ScaleFactor": 0.4107,
             "Thresholds": [
@@ -209,7 +236,7 @@
         },
         {
             "Index": 3,
-            "Name": "P5V_STBY_SCALED",
+            "Name": "P5V_STBY",
             "PowerState": "On",
             "ScaleFactor": 0.2717,
             "Thresholds": [
@@ -242,128 +269,149 @@
         },
         {
             "Index": 4,
-            "Name": "P3V_BAT_SCALED",
-            "PowerState": "On",
+            "Name": "P3V_BAT",
             "ScaleFactor": 0.333,
-            "Type": "ADC"
-        },
-        {
-            "Index": 5,
-            "Name": "PVNN_STBY_PCH_SENSOR",
-            "PowerState": "On",
-            "ScaleFactor": 1,
-            "Type": "ADC"
-        },
-        {
-            "Index": 6,
             "Thresholds": [
                 {
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 12600
+                    "Value": 3296
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 12400
+                    "Value": 3263
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 12000
+                    "Value": 2457
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 11500
+                    "Value": 2138
                 }
             ],
-            "Name": "P12V_STBY_SCALED",
+            "Type": "ADC"
+        },
+        {
+            "Index": 5,
+            "Name": "PVNN_PCH_SENSOR",
             "PowerState": "On",
-            "ScaleFactor": 0.112,
+            "ScaleFactor": 1,
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 1139
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 1106
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 995
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 966
+                }
+            ],
+            "Type": "ADC"
+        },
+        {
+            "Index": 6,
+            "Name": "P12V_STBY",
+            "PowerState": "On",
+            "ScaleFactor": 0.1124,
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 13494
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 13101
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 10945
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 10616
+                }
+            ],
             "Type": "ADC"
         },
         {
             "Index": 7,
-            "Name": "P1V05_STBY_PCH_SENSOR",
+            "Name": "P1V05_STBY_PCH",
             "PowerState": "On",
             "ScaleFactor": 1,
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 1139
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 1106
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 995
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 966
+                }
+            ],
             "Type": "ADC"
         },
         {
             "Address": "0x30",
             "Bus": 0,
             "CpuID": 1,
+            "DtsCritOffset": -2.0,
             "Name": "CPU 1",
-            "Thresholds": [{
-                    "Direction": "greater than",
-                    "Label": "DIMM",
-                    "Name": "upper critical",
-                    "Severity": 1,
-                    "Value": 149000
-                },
-                {
-                    "Direction": "greater than",
-                    "Label": "DIMM",
-                    "Name": "upper non critical",
-                    "Severity": 0,
-                    "Value": 129000
-                },
-                {
-                    "Direction": "less than",
-                    "Label": "DIMM",
-                    "Name": "lower non critical",
-                    "Severity": 0,
-                    "Value": 20000
-                },
-                {
-                    "Direction": "less than",
-                    "Label": "DIMM",
-                    "Name": "lower critical",
-                    "Severity": 1,
-                    "Value": 15000
-                }
-            ],
             "Type": "XeonCPU"
         },
         {
             "Address": "0x31",
             "Bus": 0,
             "CpuID": 2,
+            "DtsCritOffset": -2.0,
             "Name": "CPU 2",
-            "Thresholds": [{
-                    "Direction": "greater than",
-                    "Label": "DIMM",
-                    "Name": "upper critical",
-                    "Severity": 1,
-                    "Value": 149000
-                },
-                {
-                    "Direction": "greater than",
-                    "Label": "DIMM",
-                    "Name": "upper non critical",
-                    "Severity": 0,
-                    "Value": 129000
-                },
-                {
-                    "Direction": "less than",
-                    "Label": "DIMM",
-                    "Name": "lower non critical",
-                    "Severity": 0,
-                    "Value": 20000
-                },
-                {
-                    "Direction": "less than",
-                    "Label": "DIMM",
-                    "Name": "lower critical",
-                    "Severity": 1,
-                    "Value": 15000
-                }
-            ],
             "Type": "XeonCPU"
         },
         {
