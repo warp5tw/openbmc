@@ -1,8 +1,8 @@
-0x01:
-  entityID: 0x06
+1:
+  entityID: 0x07
   entityInstance: 1
   sensorType: 0x01
-  path: /xyz/openbmc_project/sensors/temperature/BMC_Module
+  path: /xyz/openbmc_project/sensors/temperature/bmc_card
   sensorReadingType: 0x01
   multiplierM: 1
   offsetB: 0
@@ -21,9 +21,9 @@
           0xFF:
             type: int64_t
 
-0x02:
+2:
   entityID: 0x07
-  entityInstance: 1
+  entityInstance: 2
   sensorType: 0x01
   path: /xyz/openbmc_project/sensors/temperature/inlet
   sensorReadingType: 0x01
@@ -44,9 +44,9 @@
           0xFF:
             type: int64_t
 
-0x03:
+3:
   entityID: 0x07
-  entityInstance: 2
+  entityInstance: 3
   sensorType: 0x02
   path: /xyz/openbmc_project/sensors/temperature/outlet
   sensorReadingType: 0x01
@@ -67,9 +67,9 @@
           0xFF:
             type: int64_t
 
-0x04:
+4:
   entityID: 0x07
-  entityInstance: 3
+  entityInstance: 4
   sensorType: 0x0
   path: /xyz/openbmc_project/sensors/temperature/MB0_Temp
   sensorReadingType: 0x01
@@ -89,9 +89,9 @@
         Offsets:
           0xFF:
             type: int64_t
-0x05:
+5:
   entityID: 0x07
-  entityInstance: 4
+  entityInstance: 5
   sensorType: 0x02
   path: /xyz/openbmc_project/sensors/voltage/MB0_Vin
   sensorReadingType: 0x01
@@ -112,9 +112,9 @@
           0xFF:
             type: int64_t
 
-0x06:
+6:
   entityID: 0x07
-  entityInstance: 5
+  entityInstance: 6
   sensorType: 0x02
   path: /xyz/openbmc_project/sensors/voltage/MB0_Vout
   sensorReadingType: 0x01
@@ -134,9 +134,9 @@
         Offsets:
           0xFF:
             type: int64_t
-0x07:
+7:
   entityID: 0x07
-  entityInstance: 6
+  entityInstance: 7
   sensorType: 0x08
   path: /xyz/openbmc_project/sensors/power/MB0_Pin
   sensorReadingType: 0x01
@@ -156,9 +156,9 @@
         Offsets:
           0xFF:
             type: int64_t
-0x08:
+8:
   entityID: 0x07
-  entityInstance: 7
+  entityInstance: 8
   sensorType: 0x03
   path: /xyz/openbmc_project/sensors/current/MB0_Iout
   sensorReadingType: 0x01
@@ -179,7 +179,7 @@
           0xFF:
             type: int64_t
 
-0x10:
+9:
   entityID: 0x20
   entityInstance: 1
   sensorType: 0x01
@@ -202,7 +202,7 @@
           0xFF:
             type: int64_t
 
-0x11:
+10:
   entityID: 0x20
   entityInstance: 2
   sensorType: 0x01
@@ -224,7 +224,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x12:
+11:
   entityID: 0x20
   entityInstance: 3
   sensorType: 0x01
@@ -246,7 +246,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x13:
+12:
   entityID: 0x20
   entityInstance: 4
   sensorType: 0x01
@@ -268,7 +268,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x14:
+13:
   entityID: 0x20
   entityInstance: 5
   sensorType: 0x02
@@ -290,7 +290,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x15:
+14:
   entityID: 0x20
   entityInstance: 6
   sensorType: 0x02
@@ -312,7 +312,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x16:
+15:
   entityID: 0x20
   entityInstance: 7
   sensorType: 0x02
@@ -334,7 +334,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x17:
+16:
   entityID: 0x20
   entityInstance: 8
   sensorType: 0x02
@@ -357,7 +357,7 @@
           0xFF:
             type: int64_t
 
-0x18:
+17:
   entityID: 0x20
   entityInstance: 9
   sensorType: 0x08
@@ -379,7 +379,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x19:
+18:
   entityID: 0x20
   entityInstance: 10
   sensorType: 0x08
@@ -401,7 +401,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x1A:
+19:
   entityID: 0x20
   entityInstance: 11
   sensorType: 0x08
@@ -423,7 +423,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x1B:
+20:
   entityID: 0x20
   entityInstance: 12
   sensorType: 0x08
@@ -445,7 +445,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x1C:
+21:
   entityID: 0x20
   entityInstance: 13
   sensorType: 0x08
@@ -467,7 +467,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x1D:
+22:
   entityID: 0x20
   entityInstance: 14
   sensorType: 0x08
@@ -489,7 +489,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x1E:
+23:
   entityID: 0x20
   entityInstance: 15
   sensorType: 0x08
@@ -511,7 +511,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x1F:
+24:
   entityID: 0x20
   entityInstance: 16
   sensorType: 0x08
@@ -534,7 +534,7 @@
           0xFF:
             type: int64_t
 
-0x20:
+25:
   entityID: 0x20
   entityInstance: 17
   sensorType: 0x03
@@ -556,7 +556,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x21:
+26:
   entityID: 0x20
   entityInstance: 18
   sensorType: 0x03
@@ -578,7 +578,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x22:
+27:
   entityID: 0x20
   entityInstance: 19
   sensorType: 0x03
@@ -600,7 +600,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x23:
+28:
   entityID: 0x20
   entityInstance: 20
   sensorType: 0x03
@@ -622,7 +622,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x24:
+29:
   entityID: 0x20
   entityInstance: 21
   sensorType: 0x03
@@ -644,7 +644,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x25:
+30:
   entityID: 0x20
   entityInstance: 22
   sensorType: 0x03
@@ -666,7 +666,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x26:
+31:
   entityID: 0x20
   entityInstance: 23
   sensorType: 0x03
@@ -688,7 +688,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x27:
+32:
   entityID: 0x20
   entityInstance: 24
   sensorType: 0x03
@@ -710,7 +710,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x30:
+33:
   entityID: 0x13
   entityInstance: 1
   sensorType: 0x01
@@ -732,7 +732,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x31:
+34:
   entityID: 0x13
   entityInstance: 2
   sensorType: 0x01
@@ -754,7 +754,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x32:
+35:
   entityID: 0x13
   entityInstance: 3
   sensorType: 0x01
@@ -776,7 +776,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x33:
+36:
   entityID: 0x13
   entityInstance: 4
   sensorType: 0x01
@@ -799,7 +799,7 @@
           0xFF:
             type: int64_t
 
-0x34:
+37:
   entityID: 0x13
   entityInstance: 5
   sensorType: 0x02
@@ -822,7 +822,7 @@
           0xFF:
             type: int64_t
 
-0x35:
+38:
   entityID: 0x13
   entityInstance: 6
   sensorType: 0x02
@@ -845,7 +845,7 @@
           0xFF:
             type: int64_t
 
-0x36:
+39:
   entityID: 0x13
   entityInstance: 7
   sensorType: 0x02
@@ -868,7 +868,7 @@
           0xFF:
             type: int64_t
 
-0x37:
+40:
   entityID: 0x13
   entityInstance: 8
   sensorType: 0x02
@@ -890,7 +890,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x38:
+41:
   entityID: 0x13
   entityInstance: 9
   sensorType: 0x03
@@ -912,7 +912,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x39:
+42:
   entityID: 0x13
   entityInstance: 10
   sensorType: 0x03
@@ -934,7 +934,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x3A:
+43:
   entityID: 0x13
   entityInstance: 11
   sensorType: 0x03
@@ -956,7 +956,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x3B:
+44:
   entityID: 0x13
   entityInstance: 12
   sensorType: 0x03
@@ -978,8 +978,7 @@
         Offsets:
           0xFF:
             type: int64_t
-
-0x3C:
+45:
   entityID: 0x13
   entityInstance: 13
   sensorType: 0x08
@@ -1001,7 +1000,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x3D:
+46:
   entityID: 0x13
   entityInstance: 14
   sensorType: 0x08
@@ -1023,7 +1022,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x3E:
+47:
   entityID: 0x13
   entityInstance: 15
   sensorType: 0x08
@@ -1045,7 +1044,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x3F:
+48:
   entityID: 0x13
   entityInstance: 16
   sensorType: 0x08
@@ -1067,7 +1066,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x40:
+49:
   entityID: 0x13
   entityInstance: 17
   sensorType: 0x08
@@ -1089,7 +1088,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x41:
+50:
   entityID: 0x13
   entityInstance: 18
   sensorType: 0x08
@@ -1111,7 +1110,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x42:
+51:
   entityID: 0x13
   entityInstance: 19
   sensorType: 0x08
@@ -1133,7 +1132,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x43:
+52:
   entityID: 0x13
   entityInstance: 20
   sensorType: 0x08
@@ -1155,11 +1154,11 @@
         Offsets:
           0xFF:
             type: int64_t
-0x44:
+53:
   entityID: 0x13
   entityInstance: 21
   sensorType: 0x01
-  path: /xyz/openbmc_project/sensors/temperature/PSU_temp
+  path: /xyz/openbmc_project/sensors/temperature/ps0_tempture
   sensorReadingType: 0x01
   multiplierM: 1
   offsetB: 0
@@ -1177,16 +1176,16 @@
         Offsets:
           0xFF:
             type: int64_t
-0x45:
+54:
   entityID: 0x13
   entityInstance: 22
   sensorType: 0x02
-  path: /xyz/openbmc_project/sensors/voltage/PSU_vin
+  path: /xyz/openbmc_project/sensors/voltage/ps0_input_voltage
   sensorReadingType: 0x01
-  multiplierM: 8
+  multiplierM: 2
   offsetB: 0
   bExp: 0
-  rExp: -2
+  rExp: 0
   scale: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1199,11 +1198,11 @@
         Offsets:
           0xFF:
             type: int64_t
-0x46:
+55:
   entityID: 0x13
   entityInstance: 23
   sensorType: 0x02
-  path: /xyz/openbmc_project/sensors/voltage/PSU_vout
+  path: /xyz/openbmc_project/sensors/voltage/ps0_output_voltage
   sensorReadingType: 0x01
   multiplierM: 8
   offsetB: 0
@@ -1221,11 +1220,11 @@
         Offsets:
           0xFF:
             type: int64_t
-0x47:
+56:
   entityID: 0x13
   entityInstance: 24
   sensorType: 0x03
-  path: /xyz/openbmc_project/sensors/current/PSU_iin
+  path: /xyz/openbmc_project/sensors/current/ps0_input_current
   sensorReadingType: 0x01
   multiplierM: 40
   offsetB: 10
@@ -1243,11 +1242,11 @@
         Offsets:
           0xFF:
             type: int64_t
-0x48:
+57:
   entityID: 0x13
   entityInstance: 25
   sensorType: 0x03
-  path: /xyz/openbmc_project/sensors/current/PSU_iout
+  path: /xyz/openbmc_project/sensors/current/ps0_output_current
   sensorReadingType: 0x01
   multiplierM: 40
   offsetB: 10
@@ -1265,11 +1264,11 @@
         Offsets:
           0xFF:
             type: int64_t
-0x49:
+58:
   entityID: 0x13
   entityInstance: 26
   sensorType: 0x08
-  path: /xyz/openbmc_project/sensors/power/PSU_input_power
+  path: /xyz/openbmc_project/sensors/power/ps0_input_power
   sensorReadingType: 0x01
   multiplierM: 6
   offsetB: 0
@@ -1287,7 +1286,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x4a:
+59:
   entityID: 0x13
   entityInstance: 27
   sensorType: 0x08
@@ -1309,11 +1308,11 @@
         Offsets:
           0xFF:
             type: int64_t
-0x4b:
+60:
   entityID: 0x13
   entityInstance: 28
   sensorType: 0x04
-  path: /xyz/openbmc_project/sensors/fan_tach/PSU_fan1
+  path: /xyz/openbmc_project/sensors/fan_tach/ps0_fan1
   sensorReadingType: 0x01
   multiplierM: 100
   offsetB: 0
@@ -1330,11 +1329,11 @@
         Offsets:
           0xFF:
             type: int64_t
-0x4c:
+61:
   entityID: 0x13
   entityInstance: 29
   sensorType: 0x04
-  path: /xyz/openbmc_project/sensors/fan_tach/PSU_fan2
+  path: /xyz/openbmc_project/sensors/fan_tach/ps0_fan2
   sensorReadingType: 0x01
   multiplierM: 100
   offsetB: 0
@@ -1351,7 +1350,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x60:
+62:
   entityID: 0x1D
   entityInstance: 1
   sensorType: 0x04
@@ -1372,7 +1371,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x61:
+63:
   entityID: 0x1D
   entityInstance: 2
   sensorType: 0x04
@@ -1393,7 +1392,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x62:
+64:
   entityID: 0x1D
   entityInstance: 3
   sensorType: 0x04
@@ -1414,7 +1413,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x63:
+65:
   entityID: 0x1D
   entityInstance: 4
   sensorType: 0x04
@@ -1435,7 +1434,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x64:
+66:
   entityID: 0x1D
   entityInstance: 5
   sensorType: 0x04
@@ -1456,7 +1455,7 @@
         Offsets:
           0xFF:
             type: int64_t
-0x65:
+67:
   entityID: 0x1D
   entityInstance: 6
   sensorType: 0x04
@@ -1477,13 +1476,11 @@
         Offsets:
           0xFF:
             type: int64_t
-
-
-0x50:
+68:
   entityID: 0x02
   entityInstance: 1
   sensorType: 0x02
-  path: /xyz/openbmc_project/sensors/voltage/P12V_STBY_SCALED
+  path: /xyz/openbmc_project/sensors/voltage/P12V_STBY
   sensorReadingType: 0x01
   multiplierM: 8
   offsetB: 0
@@ -1501,11 +1498,11 @@
         Offsets:
           0xFF:
             type: int64_t
-0x51:
+69:
   entityID: 0x02
   entityInstance: 2
   sensorType: 0x02
-  path: /xyz/openbmc_project/sensors/voltage/P1V05_STBY_PCH_SENSOR
+  path: /xyz/openbmc_project/sensors/voltage/P1V05_STBY_PCH
   sensorReadingType: 0x01
   multiplierM: 8
   offsetB: 0
@@ -1523,11 +1520,11 @@
         Offsets:
           0xFF:
             type: int64_t
-0x52:
+70:
   entityID: 0x02
   entityInstance: 3
   sensorType: 0x02
-  path: /xyz/openbmc_project/sensors/voltage/P3V3_SCALED
+  path: /xyz/openbmc_project/sensors/voltage/P3V3
   sensorReadingType: 0x01
   multiplierM: 8
   offsetB: 0
@@ -1545,11 +1542,11 @@
         Offsets:
           0xFF:
             type: int64_t
-0x53:
+71:
   entityID: 0x02
   entityInstance: 4
   sensorType: 0x02
-  path: /xyz/openbmc_project/sensors/voltage/P3V3_STBY_SCALED
+  path: /xyz/openbmc_project/sensors/voltage/P3V3_STBY
   sensorReadingType: 0x01
   multiplierM: 8
   offsetB: 0
@@ -1567,11 +1564,11 @@
         Offsets:
           0xFF:
             type: int64_t
-0x54:
+72:
   entityID: 0x02
   entityInstance: 5
   sensorType: 0x02
-  path: /xyz/openbmc_project/sensors/voltage/P3V_BAT_SCALED
+  path: /xyz/openbmc_project/sensors/voltage/P3V_BAT
   sensorReadingType: 0x01
   multiplierM: 8
   offsetB: 0
@@ -1589,11 +1586,11 @@
         Offsets:
           0xFF:
             type: int64_t
-0x55:
+73:
   entityID: 0x02
   entityInstance: 6
   sensorType: 0x02
-  path: /xyz/openbmc_project/sensors/voltage/P5V_SCALED
+  path: /xyz/openbmc_project/sensors/voltage/P5V
   sensorReadingType: 0x01
   multiplierM: 8
   offsetB: 0
@@ -1611,11 +1608,11 @@
         Offsets:
           0xFF:
             type: int64_t
-0x56:
+74:
   entityID: 0x02
   entityInstance: 7
   sensorType: 0x02
-  path: /xyz/openbmc_project/sensors/voltage/P5V_STBY_SCALED
+  path: /xyz/openbmc_project/sensors/voltage/P5V_STBY
   sensorReadingType: 0x01
   multiplierM: 8
   offsetB: 0
@@ -1633,11 +1630,11 @@
         Offsets:
           0xFF:
             type: int64_t
-0x57:
+75:
   entityID: 0x02
   entityInstance: 8
   sensorType: 0x02
-  path: /xyz/openbmc_project/sensors/voltage/PVNN_STBY_PCH_SENSOR
+  path: /xyz/openbmc_project/sensors/voltage/PVNN_STBY_PCH
   sensorReadingType: 0x01
   multiplierM: 8
   offsetB: 0
@@ -1655,5 +1652,355 @@
         Offsets:
           0xFF:
             type: int64_t
+76:
+  entityID: 0x06
+  entityInstance: 1
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/Core_0_CPU0
+  sensorReadingType: 0x01
+  multiplierM: 1
+  offsetB: -127
+  offsetB: 0
+  bExp: 0
+  rExp: 0
+  scale: -3
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
 
+77:
+  entityID: 0x06
+  entityInstance: 2
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/Core_1_CPU0
+  sensorReadingType: 0x01
+  multiplierM: 1
+  offsetB: -127
+  bExp: 0
+  rExp: 0
+  scale: -3
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
 
+78:
+  entityID: 0x06
+  entityInstance: 3
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/Core_2_CPU0
+  sensorReadingType: 0x01
+  multiplierM: 1
+  offsetB: -127
+  bExp: 0
+  rExp: 0
+  scale: -3
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+79:
+  entityID: 0x06
+  entityInstance: 4
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/Core_3_CPU0
+  sensorReadingType: 0x01
+  multiplierM: 1
+  offsetB: -127
+  bExp: 0
+  rExp: 0
+  scale: -3
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+80:
+  entityID: 0x06
+  entityInstance: 5
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/Core_4_CPU0
+  sensorReadingType: 0x01
+  multiplierM: 1
+  offsetB: -127
+  bExp: 0
+  rExp: 0
+  scale: -3
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+81:
+  entityID: 0x06
+  entityInstance: 6
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/Core_5_CPU0
+  sensorReadingType: 0x01
+  multiplierM: 1
+  offsetB: -127
+  bExp: 0
+  rExp: 0
+  scale: -3
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+82:
+  entityID: 0x06
+  entityInstance: 19
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/Core_0_CPU1
+  sensorReadingType: 0x01
+  multiplierM: 1
+  offsetB: -127
+  bExp: 0
+  rExp: 0
+  scale: -3
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+83:
+  entityID: 0x06
+  entityInstance: 20
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/Core_1_CPU1
+  sensorReadingType: 0x01
+  multiplierM: 1
+  offsetB: -127
+  bExp: 0
+  rExp: 0
+  scale: -3
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+84:
+  entityID: 0x06
+  entityInstance: 21
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/Core_2_CPU1
+  sensorReadingType: 0x01
+  multiplierM: 1
+  offsetB: -127
+  bExp: 0
+  rExp: 0
+  scale: -3
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+85:
+  entityID: 0x06
+  entityInstance: 22
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/Core_3_CPU1
+  sensorReadingType: 0x01
+  multiplierM: 1
+  offsetB: -127
+  bExp: 0
+  rExp: 0
+  scale: -3
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+86:
+  entityID: 0x06
+  entityInstance: 23
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/Core_4_CPU1
+  sensorReadingType: 0x01
+  multiplierM: 1
+  offsetB: -127
+  bExp: 0
+  rExp: 0
+  scale: -3
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+87:
+  entityID: 0x06
+  entityInstance: 24
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/Core_5_CPU1
+  sensorReadingType: 0x01
+  multiplierM: 1
+  offsetB: -127
+  bExp: 0
+  rExp: 0
+  scale: -3
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+88:
+  entityID: 0x06
+  entityInstance: 37
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/DIMM_C1_CPU0
+  sensorReadingType: 0x01
+  multiplierM: 1
+  offsetB: -127
+  bExp: 0
+  rExp: 0
+  scale: -3
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+120:
+    entityID: 3
+    entityInstance: 1
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+121:
+    entityID: 3
+    entityInstance: 2
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager

@@ -5,6 +5,14 @@ SRCREV := "${AUTOREV}"
 
 FILESEXTRAPATHS_append := "${THISDIR}/${PN}:"
 
+DEPENDS_append_runbmc-nuvoton = " runbmc-nuvoton-yaml-config"
+
+EXTRA_OECONF_runbmc-nuvoton = " \
+    SENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/runbmc-nuvoton-yaml-config/ipmi-sensors.yaml \
+    INVSENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/runbmc-nuvoton-yaml-config/ipmi-inventory-sensors.yaml \
+    FRU_YAML_GEN=${STAGING_DIR_HOST}${datadir}/runbmc-nuvoton-yaml-config/ipmi-fru-read.yaml \
+    "
+
 SRC_URI_append = " file://phosphor-ipmi-host.service"
 SRC_URI_append = " file://xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service"
 
@@ -18,4 +26,3 @@ do_install_append() {
     install -m 0644 ${WORKDIR}/xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service \
         ${D}${systemd_unitdir}/system
 }
-
