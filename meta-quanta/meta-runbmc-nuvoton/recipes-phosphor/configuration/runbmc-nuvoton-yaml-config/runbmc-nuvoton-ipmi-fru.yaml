@@ -1,4 +1,4 @@
-0:
+1:
   /system:
     entityID: 200
     entityInstance: 1
@@ -18,7 +18,6 @@
           IPMIFruProperty: Version
           IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.System:
-1:
   /system/chassis:
     entityID: 7
     entityInstance: 1
