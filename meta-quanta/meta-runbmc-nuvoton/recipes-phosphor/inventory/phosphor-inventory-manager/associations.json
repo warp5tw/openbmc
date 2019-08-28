@@ -12,7 +12,7 @@
                 "paths":
                 [
                     "/xyz/openbmc_project/sensors/power/ps0_input_power",
-                    "/xyz/openbmc_project/sensors/power/total_power",
+                    "/xyz/openbmc_project/sensors/power/ps0_output_power",
                     "/xyz/openbmc_project/sensors/voltage/ps0_input_current",
                     "/xyz/openbmc_project/sensors/voltage/ps0_input_voltage",
                     "/xyz/openbmc_project/sensors/current/ps0_output_current",
@@ -256,7 +256,7 @@
                     "/xyz/openbmc_project/sensors/voltage/ps0_input_voltage",
                     "/xyz/openbmc_project/sensors/voltage/ps0_output_voltage",
                     "/xyz/openbmc_project/sensors/power/ps0_input_power",
-                    "/xyz/openbmc_project/sensors/power/total_power",
+                    "/xyz/openbmc_project/sensors/power/ps0_output_power",
                     "/xyz/openbmc_project/sensors/current/ps0_input_current",
                     "/xyz/openbmc_project/sensors/current/ps0_output_current",
                     "/xyz/openbmc_project/sensors/temperature/Core_0_CPU1",
