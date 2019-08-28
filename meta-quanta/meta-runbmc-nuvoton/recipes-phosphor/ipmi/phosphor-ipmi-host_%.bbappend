@@ -1,7 +1,7 @@
 SRC_URI_remove = "git://github.com/openbmc/phosphor-host-ipmid"
 SRC_URI_prepend = "git://github.com/Nuvoton-Israel/phosphor-host-ipmid"
 
-SRCREV := "${AUTOREV}"
+SRCREV := "c9c900addea82ee4d1086e8d75483ce7a29947b3"
 
 FILESEXTRAPATHS_append := "${THISDIR}/${PN}:"
 
