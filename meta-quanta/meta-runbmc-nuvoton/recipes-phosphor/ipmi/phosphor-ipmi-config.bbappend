@@ -15,13 +15,16 @@ inherit image_version
 
 SRC_URI += " \
     file://channel_config.json \
-	file://dev_id.json \
+    file://dev_id.json \
+    file://power_reading.json \
     "
 do_install_append() {
     install -m 0644 -D ${WORKDIR}/channel_config.json \
         ${D}${datadir}/ipmi-providers/channel_config.json
-	install -m 0644 -D ${WORKDIR}/dev_id.json \
+    install -m 0644 -D ${WORKDIR}/dev_id.json \
         ${D}${datadir}/ipmi-providers/dev_id.json
+    install -m 0644 -D ${WORKDIR}/power_reading.json \
+        ${D}${datadir}/ipmi-providers/power_reading.json
 }
 
 unset do_patch[noexec]
