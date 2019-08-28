@@ -51,4 +51,5 @@ RDEPENDS_${PN}-system = " \
         phosphor-ipmi-sel-logger \
         first-boot-set-mac \
         dbus-sensors \
+        phosphor-node-manager-proxy \
         "
