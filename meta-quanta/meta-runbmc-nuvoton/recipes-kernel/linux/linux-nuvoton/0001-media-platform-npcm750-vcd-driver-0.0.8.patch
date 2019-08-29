@@ -1,0 +1,73 @@
+From 2b6d591c6c53b71ed66d119cf36804a588355ef3 Mon Sep 17 00:00:00 2001
+From: kwliu <kwliu@nuvoton.com>
+Date: Thu, 29 Aug 2019 14:50:44 +0800
+Subject: [PATCH] media: platform: npcm750: vcd: driver 0.0.8
+
+Do vcd init in device open and vcd stop in device close.
+---
+ drivers/media/platform/nuvoton/npcm750_vcd.c | 21 +++++++++-----------
+ 1 file changed, 9 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/media/platform/nuvoton/npcm750_vcd.c b/drivers/media/platform/nuvoton/npcm750_vcd.c
+index 7e5bdfd73c91..9db6b508302c 100644
+--- a/drivers/media/platform/nuvoton/npcm750_vcd.c
++++ b/drivers/media/platform/nuvoton/npcm750_vcd.c
+@@ -32,7 +32,7 @@
+ #include <asm/fb.h>
+ #include <linux/completion.h>
+ 
+-#define VCD_VERSION "0.0.7"
++#define VCD_VERSION "0.0.8"
+ 
+ #define VCD_IOC_MAGIC     'v'
+ #define VCD_IOCGETINFO	_IOR(VCD_IOC_MAGIC,  1, struct vcd_info)
+@@ -1051,7 +1051,12 @@ npcm750_vcd_open(struct inode *inode, struct file *file)
+ 
+ 	file->private_data = vcd;
+ 
+-	atomic_inc_return(&vcd->clients);
++	if (atomic_inc_return(&vcd->clients) == 1)
++		if (npcm750_vcd_init(vcd)) {
++			dev_err(vcd->dev, "%s: failed to init vcd module \n",
++				__func__);
++			return -EBUSY;
++		}
+ 
+ 	dev_dbg(vcd->dev, "open: client %d\n", atomic_read(&vcd->clients));
+ 	return 0;
+@@ -1062,7 +1067,8 @@ npcm750_vcd_release(struct inode *inode, struct file *file)
+ {
+ 	struct npcm750_vcd *vcd = file->private_data;
+ 
+-	atomic_dec_return(&vcd->clients);
++	if (atomic_dec_return(&vcd->clients) == 0)
++		npcm750_vcd_stop(vcd);
+ 
+ 	dev_dbg(vcd->dev, "close: client %d\n", atomic_read(&vcd->clients));
+ 	return 0;
+@@ -1343,13 +1349,6 @@ static int npcm750_vcd_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		vcd->de_mode = 1;
+ 
+-	ret = npcm750_vcd_init(vcd);
+-	if (ret) {
+-		dev_err(&pdev->dev, "%s: failed to init vcd module\n",
+-			__func__);
+-		goto err;
+-	}
+-
+ 	vcd->dev_p = &pdev->dev;
+ 
+ 	ret = npcm750_vcd_device_create(vcd);
+@@ -1383,8 +1382,6 @@ static int npcm750_vcd_remove(struct platform_device *pdev)
+ {
+ 	struct npcm750_vcd *vcd = platform_get_drvdata(pdev);
+ 
+-	npcm750_vcd_stop(vcd);
+-
+ 	free_irq(vcd->irq, vcd->dev);
+ 
+ 	device_destroy(vcd_class, vcd->dev_t);
+-- 
+2.17.1
+
