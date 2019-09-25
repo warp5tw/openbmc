@@ -1,0 +1,152 @@
+From 6010c7f228465777bf432ac5b7809378bedeb814 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Fri, 27 Sep 2019 11:57:42 +0800
+Subject: [PATCH] driver: mtd: npcm: update driver
+
+---
+ drivers/mtd/spi-nor/npcm-fiu.c | 61 +++++++++++++++++++++++++++-------
+ 1 file changed, 49 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/mtd/spi-nor/npcm-fiu.c b/drivers/mtd/spi-nor/npcm-fiu.c
+index 0007b83e70c6..88fed4f58ad0 100644
+--- a/drivers/mtd/spi-nor/npcm-fiu.c
++++ b/drivers/mtd/spi-nor/npcm-fiu.c
+@@ -21,9 +21,15 @@
+ #include <linux/log2.h>
+ #include <linux/mod_devicetable.h>
+ #include <linux/of_device.h>
++#include <linux/mfd/syscon.h>
+ 
++#include <linux/sizes.h>
+ #include <mtd/mtd-abi.h>
+ 
++/* NPCM7xx GCR module */
++#define NPCM7XX_INTCR3_OFFSET		0x9C
++#define NPCM7XX_INTCR3_FIU_FIX		BIT(6)
++
+ /* Flash Interface Unit (FIU) Registers */
+ #define NPCM_FIU_DRD_CFG		0x00
+ #define NPCM_FIU_DWR_CFG		0x04
+@@ -260,8 +266,17 @@ static int npcm_fiu_direct_read(struct mtd_info *mtd, loff_t from, size_t len,
+ {
+ 	struct spi_nor *nor = mtd->priv;
+ 	struct npcm_chip *chip = nor->priv;
++	void __iomem *src = chip->flash_region_mapped_ptr + from;
++	size_t offset = 0;
+ 
+-	memcpy_fromio(buf, chip->flash_region_mapped_ptr + from, len);
++	if (chip->host->spix_mode) {
++		while(offset < len) {
++			*(buf + offset) = ioread8(src + offset);
++			offset++;
++		}
++	} else {
++		memcpy_fromio(buf, src, len);
++	}
+ 
+ 	*retlen = len;
+ 	return 0;
+@@ -272,8 +287,17 @@ static int npcm_fiu_direct_write(struct mtd_info *mtd, loff_t to, size_t len,
+ {
+ 	struct spi_nor *nor = mtd->priv;
+ 	struct npcm_chip *chip = nor->priv;
++	void __iomem *dst = chip->flash_region_mapped_ptr + to;
++	size_t offset = 0;
+ 
+-	memcpy_toio(chip->flash_region_mapped_ptr + to, buf, len);
++	if (chip->host->spix_mode) {
++		while(offset < len) {
++			iowrite8(*(buf + offset), dst + offset);
++			offset++;
++		}
++	} else {
++		memcpy_toio(dst, buf, len);
++	}
+ 
+ 	*retlen = len;
+ 	return 0;
+@@ -620,7 +644,7 @@ static int npcm_mtd_ram_register(struct device_node *np,
+ 	mtd = &nor->mtd;
+ 
+ 	chip->flash_region_mapped_ptr =
+-		devm_ioremap(dev, (host->res_mem->start +
++		devm_ioremap_nocache(dev, (host->res_mem->start +
+ 				   (host->info->max_map_size *
+ 				    chip->chipselect)), MAP_SIZE_8MB);
+ 	if (!chip->flash_region_mapped_ptr) {
+@@ -651,14 +675,6 @@ static int npcm_mtd_ram_register(struct device_node *np,
+ 	regmap_update_bits(host->regmap, NPCM_FIU_DRD_CFG,
+ 			   NPCM_FIU_DRD_CFG_DBW,
+ 			   rx_dummy << NPCM_FIU_DRD_DBW_SHIFT);
+-	regmap_write(host->regmap, NPCM_FIU_DWR_CFG,
+-		     NPCM_FIU_DWR_16_BYTE_BURST);
+-	regmap_update_bits(host->regmap, NPCM_FIU_DWR_CFG,
+-			   NPCM_FIU_DWR_CFG_ABPCK,
+-			   DWR_ABPCK_4_BIT_PER_CLK << NPCM_FIU_DWR_ABPCK_SHIFT);
+-	regmap_update_bits(host->regmap, NPCM_FIU_DWR_CFG,
+-			   NPCM_FIU_DWR_CFG_DBPCK,
+-			   DWR_DBPCK_4_BIT_PER_CLK << NPCM_FIU_DWR_DBPCK_SHIFT);
+ 
+ 	ret = mtd_device_parse_register(mtd, NULL, NULL, NULL, 0);
+ 	if (ret)
+@@ -674,6 +690,7 @@ static void npcm_fiu_enable_direct_rd(struct spi_nor *nor,
+ 				      struct npcm_chip *chip)
+ {
+ 	struct device *dev = host->dev;
++	struct regmap *gcr_regmap;
+ 	u32 flashsize;
+ 
+ 	if (!host->res_mem) {
+@@ -697,7 +714,7 @@ static void npcm_fiu_enable_direct_rd(struct spi_nor *nor,
+ 	}
+ 
+ 	chip->flash_region_mapped_ptr =
+-		devm_ioremap(dev, (host->res_mem->start +
++		devm_ioremap_nocache(dev, (host->res_mem->start +
+ 				   (host->info->max_map_size *
+ 				    chip->chipselect)), flashsize);
+ 	if (!chip->flash_region_mapped_ptr) {
+@@ -705,6 +722,17 @@ static void npcm_fiu_enable_direct_rd(struct spi_nor *nor,
+ 		return;
+ 	}
+ 
++	if (of_device_is_compatible(dev->of_node, "nuvoton,npcm750-fiu")) {
++		gcr_regmap = 
++			syscon_regmap_lookup_by_compatible("nuvoton,npcm750-gcr");
++		if (IS_ERR(gcr_regmap)) {
++			dev_warn(dev, "Didn't find nuvoton,npcm750-gcr, direct read disabled\n");
++			return;
++		}
++		regmap_update_bits(gcr_regmap, NPCM7XX_INTCR3_OFFSET,
++				   NPCM7XX_INTCR3_FIU_FIX,
++				   NPCM7XX_INTCR3_FIU_FIX);
++	}
+ 	npcm_fiu_set_drd(nor, host);
+ 
+ 	host->direct_rd_proto = nor->read_proto;
+@@ -847,6 +875,8 @@ static int npcm_fiu_probe(struct platform_device *pdev)
+ 	struct device *dev = &pdev->dev;
+ 	struct npcm_fiu_bus *host;
+ 	struct resource *res;
++	u32 max_speed_hz;
++	int ret;
+ 
+ 	host = devm_kzalloc(dev, sizeof(*host), GFP_KERNEL);
+ 	if (!host)
+@@ -889,6 +919,13 @@ static int npcm_fiu_probe(struct platform_device *pdev)
+ 	if (IS_ERR(host->clk))
+ 		return PTR_ERR(host->clk);
+ 
++	if (!of_property_read_u32(dev->of_node, "spi-max-frequency",
++				  &max_speed_hz)) {
++		ret = clk_set_rate(host->clk, max_speed_hz);
++		if (ret < 0)
++			dev_warn(dev, "Failed setting new FIU3 max frequancy, return to BB FIU3 frequancy\n");
++	}
++
+ 	host->spix_mode = of_property_read_bool(dev->of_node, "spix-mode");
+ 
+ 	mutex_init(&host->lock);
+-- 
+2.17.1
+

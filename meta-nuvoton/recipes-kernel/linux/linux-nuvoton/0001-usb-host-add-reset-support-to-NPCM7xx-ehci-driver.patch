@@ -1,0 +1,88 @@
+From fcbd6d77e62a22673ea0936e267fd58b169e8698 Mon Sep 17 00:00:00 2001
+From: Tomer Maimon <tmaimon77@gmail.com>
+Date: Sun, 5 May 2019 16:26:59 +0300
+Subject: [PATCH] usb: host: add reset support to NPCM7xx ehci driver
+
+Add reset controller support to NPCM7xx ehci driver
+by removing reset procedure in the driver and using
+full USB reset procedure in the reset controller
+driver.
+
+Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
+---
+ drivers/usb/host/ehci-npcm7xx.c | 48 +--------------------------------
+ 1 file changed, 1 insertion(+), 47 deletions(-)
+
+diff --git a/drivers/usb/host/ehci-npcm7xx.c b/drivers/usb/host/ehci-npcm7xx.c
+index adaf8fb4b459..bb7137a98615 100644
+--- a/drivers/usb/host/ehci-npcm7xx.c
++++ b/drivers/usb/host/ehci-npcm7xx.c
+@@ -29,12 +29,6 @@
+ 
+ static const char hcd_name[] = "npcm7xx-ehci";
+ 
+-#define  USB2PHYCTL_OFFSET 0x144
+-
+-#define  IPSRST2_OFFSET 0x24
+-#define  IPSRST3_OFFSET 0x34
+-
+-
+ static struct hc_driver __read_mostly ehci_npcm7xx_hc_driver;
+ 
+ #ifdef CONFIG_PM_SLEEP
+@@ -62,51 +56,11 @@ static int npcm7xx_ehci_hcd_drv_probe(struct platform_device *pdev)
+ {
+ 	struct usb_hcd *hcd;
+ 	struct resource *res;
+-	struct regmap *gcr_regmap;
+-	struct regmap *rst_regmap;
+ 	const struct hc_driver *driver = &ehci_npcm7xx_hc_driver;
+ 	int irq;
+ 	int retval;
+ 
+-	dev_dbg(&pdev->dev,	"initializing npcm7xx ehci USB Controller\n");
+-
+-	gcr_regmap = syscon_regmap_lookup_by_compatible("nuvoton,npcm750-gcr");
+-	if (IS_ERR(gcr_regmap)) {
+-		dev_err(&pdev->dev, "%s: failed to find nuvoton,npcm750-gcr\n",
+-			__func__);
+-		return PTR_ERR(gcr_regmap);
+-	}
+-
+-	rst_regmap = syscon_regmap_lookup_by_compatible("nuvoton,npcm750-rst");
+-	if (IS_ERR(rst_regmap)) {
+-		dev_err(&pdev->dev, "%s: failed to find nuvoton,npcm750-rst\n",
+-			__func__);
+-		return PTR_ERR(rst_regmap);
+-	}
+-
+-	/********* phy init  ******/
+-	// reset usb host
+-	regmap_update_bits(rst_regmap, IPSRST2_OFFSET,
+-			(0x1 << 26), (0x1 << 26));
+-	regmap_update_bits(rst_regmap, IPSRST3_OFFSET,
+-			(0x1 << 25), (0x1 << 25));
+-	regmap_update_bits(gcr_regmap, USB2PHYCTL_OFFSET,
+-			(0x1 << 28), 0);
+-
+-	udelay(1);
+-
+-	// enable phy
+-	regmap_update_bits(rst_regmap, IPSRST3_OFFSET,
+-			(0x1 << 25), 0);
+-
+-	udelay(50); // enable phy
+-
+-	regmap_update_bits(gcr_regmap, USB2PHYCTL_OFFSET,
+-			(0x1 << 28), (0x1 << 28));
+-
+-	// enable host
+-	regmap_update_bits(rst_regmap, IPSRST2_OFFSET,
+-			(0x1 << 26), 0);
++	dev_dbg(&pdev->dev, "initializing npcm7xx ehci USB Controller\n");
+ 
+ 	if (usb_disabled())
+ 		return -ENODEV;
+-- 
+2.17.1
+
