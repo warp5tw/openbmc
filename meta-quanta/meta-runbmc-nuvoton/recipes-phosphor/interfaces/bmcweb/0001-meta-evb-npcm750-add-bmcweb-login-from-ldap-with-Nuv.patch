@@ -1,0 +1,449 @@
+From 88ed3aafdfd250a0e10fc239d403d5358c3a23bd Mon Sep 17 00:00:00 2001
+From: kfting <kfting@nuvoton.com>
+Date: Mon, 23 Sep 2019 10:24:58 +0800
+Subject: [PATCH] meta-evb-npcm750: add bmcweb login from ldap with Nuvoton's
+ supplement
+
+Signed-off-by: kfting <kfting@nuvoton.com>
+---
+ include/pam_authenticate.hpp         |   9 +-
+ redfish-core/lib/account_service.hpp | 337 ++++++++++++++++++++++-----
+ 2 files changed, 288 insertions(+), 58 deletions(-)
+
+diff --git a/include/pam_authenticate.hpp b/include/pam_authenticate.hpp
+index f211a29e..7bf8da14 100644
+--- a/include/pam_authenticate.hpp
++++ b/include/pam_authenticate.hpp
+@@ -55,12 +55,19 @@ inline bool pamAuthenticateUser(const std::string_view username,
+     const struct pam_conv localConversation = {
+         pamFunctionConversation, const_cast<char*>(passStr.c_str())};
+     pam_handle_t* localAuthHandle = NULL; // this gets set by pam_start
+-
++    std::string nuvo_login_intf("web");
+     if (pam_start("webserver", userStr.c_str(), &localConversation,
+                   &localAuthHandle) != PAM_SUCCESS)
+     {
+         return false;
+     }
++
++    if(PAM_SUCCESS != pam_set_item(localAuthHandle, PAM_TTY, (const void *)nuvo_login_intf.c_str()))
++    {
++        pam_end(localAuthHandle, PAM_SUCCESS);
++        return false;
++    }
++
+     int retval = pam_authenticate(localAuthHandle,
+                                   PAM_SILENT | PAM_DISALLOW_NULL_AUTHTOK);
+ 
+diff --git a/redfish-core/lib/account_service.hpp b/redfish-core/lib/account_service.hpp
+index 784cbd28..3cc7fdaa 100644
+--- a/redfish-core/lib/account_service.hpp
++++ b/redfish-core/lib/account_service.hpp
+@@ -21,6 +21,7 @@
+ #include <openbmc_dbus_rest.hpp>
+ #include <utils/json_utils.hpp>
+ #include <variant>
++#include <boost/container/flat_map.hpp>
+ 
+ namespace redfish
+ {
+@@ -63,6 +64,171 @@ using ManagedObjectType = std::vector<std::pair<
+ using GetObjectType =
+     std::vector<std::pair<std::string, std::vector<std::string>>>;
+ 
++int getUsersFromAllSession(boost::container::flat_map<std::string, std::string> &userMap)
++{
++    std::vector<const std::string*> sessionIds = crow::persistent_data::SessionStore::getInstance().\
++         getUniqueIds(false, crow::persistent_data::PersistenceType::TIMEOUT);
++
++    if(0 == sessionIds.size())
++    {
++        return -1;
++    }
++
++    for (const std::string* uid : sessionIds)
++    {
++       auto session = crow::persistent_data::SessionStore::getInstance().getSessionByUid(*uid);
++       if (nullptr != session)
++       {
++           auto it = userMap.find(session->username);
++           //Add the newly found username if the username is not already there
++           //since there could be multiple sessions for the same user.
++           if(userMap.end() == it)
++           {
++               userMap.emplace(session->username, session->uniqueId);
++           }
++       }
++       else
++       {
++           return -1;
++       }
++    }
++
++    return 0;
++}
++
++struct ldap_user_param 
++{
++    std::string passtmp;
++    bool userEnabled;
++    std::string userIpmiPriv;
++    uint8_t ipmiEnabled : 1;
++    uint8_t linkAuth : 1;
++    uint8_t callBack : 1;
++    uint8_t userLock : 1;
++    std::string userPriv;
++};
++
++bool isUserFromLDAP(std::string userName, struct ldap_user_param &ldap_ret)
++{
++#define LDAP_BUF_LENGTH 256 
++    FILE *fp=0;
++    //ipmi user password maximum length is 20 bytes.
++    char cmd_get[LDAP_BUF_LENGTH];
++    char read[LDAP_BUF_LENGTH];
++    bool is_ldap_user = false;
++    const char *tty = "web";
++    memset(read, '\0', sizeof(read));
++    sprintf(cmd_get,"getent.ldap nuvopasswd %s %s", userName.c_str(), tty);
++    fp = popen(cmd_get, "r");
++    if( fp && (fgets(read, sizeof(read), fp) != NULL) )
++    {
++        const char *emp ="\n";
++        if(0 == strcmp(read, emp))
++        {
++            is_ldap_user = false;
++        }
++        else
++        {
++            //it means that the user exists in the ldap server.
++            //the user passes the Nuvoton's authentication method
++            //since fgets adds an extra '\n' character, remove it from the read
++            //string.
++            read[strcspn(read, "\n")] = 0;
++            is_ldap_user = true;
++            std::string delim = " ";
++            std::string temp(read);
++            auto start = 0U;
++            auto end = temp.find(delim);
++            if (std::string::npos != end)
++            {
++                ldap_ret.passtmp.assign(temp.substr(start, end-start).c_str());
++            }
++
++            start = end + delim.length();
++            end = temp.find(delim, start);
++            if (std::string::npos != end)
++            {
++                ldap_ret.userEnabled = std::atoi(temp.substr(start, end-start).c_str());
++                if (ERANGE == errno)
++                {
++                    ldap_ret.userEnabled = 0;
++                }
++            }
++
++            start = end + delim.length();
++            end = temp.find(delim, start);
++            if (std::string::npos != end)
++            {
++                ldap_ret.userIpmiPriv.assign(temp.substr(start, end-start).c_str());
++            }
++
++            start = end + delim.length();
++            end = temp.find(delim, start);
++            if (std::string::npos != end)
++            {
++                ldap_ret.ipmiEnabled = std::atoi(temp.substr(start, end-start).c_str());
++                if (ERANGE == errno)
++                {
++                    ldap_ret.ipmiEnabled = 0;
++                }
++            }
++
++            start = end + delim.length();
++            end = temp.find(delim, start);
++            if (std::string::npos != end)
++            {
++                ldap_ret.linkAuth = std::atoi(temp.substr(start, end-start).c_str());
++                if (ERANGE == errno)
++                {
++                    ldap_ret.linkAuth = 0;
++                }
++            }
++
++            start = end + delim.length();
++            end = temp.find(delim, start);
++            if (std::string::npos != end)
++            {
++                ldap_ret.callBack = std::atoi(temp.substr(start, end-start).c_str());
++                if (ERANGE == errno)
++                {
++                    ldap_ret.callBack = 0;
++                }
++            }
++
++            start = end + delim.length();
++            end = temp.find(delim, start);
++            if (std::string::npos != end)
++            {
++                ldap_ret.userLock = std::atoi(temp.substr(start, end-start).c_str());
++                if (ERANGE == errno)
++                {
++                    ldap_ret.userLock = 0;
++                }
++            }
++
++            start = end + delim.length();
++            end = temp.find(delim, start);
++            if (std::string::npos != end)
++            {
++                ldap_ret.userPriv.assign(temp.substr(start, end-start).c_str());
++            }
++
++
++        }
++    }
++    else
++    {
++        is_ldap_user = false;
++    }
++    if(fp)
++    {
++        pclose(fp);
++    }
++
++    return is_ldap_user;
++}
++
++
+ inline std::string getPrivilegeFromRoleId(std::string_view role)
+ {
+     if (role == "priv-admin")
+@@ -986,6 +1152,8 @@ class AccountsCollection : public Node
+                     messages::internalError(asyncResp->res);
+                     return;
+                 }
++                boost::container::flat_map<std::string, std::string> userMap;
++                int user_ret = getUsersFromAllSession(userMap);
+ 
+                 nlohmann::json& memberArray =
+                     asyncResp->res.jsonValue["Members"];
+@@ -1005,10 +1173,30 @@ class AccountsCollection : public Node
+                     {
+                         lastIndex += 1;
+                     }
++                    if(!user_ret)
++                    {
++                        //Remove the user name if found both in memberArray and user Map
++                        auto it = userMap.find(path.substr(lastIndex));
++                        if(userMap.end() != it)
++                        {
++                            userMap.erase(it);
++                        }
++                    }
+                     memberArray.push_back(
+                         {{"@odata.id", "/redfish/v1/AccountService/Accounts/" +
+                                            path.substr(lastIndex)}});
+                 }
++                if(!user_ret)
++                {
++                    auto it = userMap.begin();
++                    while(userMap.end() != it)
++                    {
++                        memberArray.push_back( \
++                                {{"@odata.id", "/redfish/v1/AccountService/Accounts/" + \
++                                 it->first}});
++                        it++;
++                    }
++                }
+             },
+             "xyz.openbmc_project.User.Manager", "/xyz/openbmc_project/user",
+             "org.freedesktop.DBus.ObjectManager", "GetManagedObjects");
+@@ -1129,6 +1317,9 @@ class ManagerAccount : public Node
+                     messages::internalError(asyncResp->res);
+                     return;
+                 }
++
++                boost::container::flat_map<std::string, std::string> userMap;
++                getUsersFromAllSession(userMap);
+                 auto userIt = users.begin();
+ 
+                 for (; userIt != users.end(); userIt++)
+@@ -1138,78 +1329,103 @@ class ManagerAccount : public Node
+                         break;
+                     }
+                 }
+-                if (userIt == users.end())
++
++                auto it = userMap.find(accountName);
++                //if (userIt == users.end())
++                if ((userIt == users.end()) && (userMap.end() == it))
+                 {
+                     messages::resourceNotFound(asyncResp->res, "ManagerAccount",
+                                                accountName);
+                     return;
+                 }
+-                for (const auto& interface : userIt->second)
++                struct ldap_user_param ldap_ret;
++                bool is_ldap_user = isUserFromLDAP(accountName, ldap_ret);
++                if(is_ldap_user)
++                {
++                    asyncResp->res.jsonValue["Enabled"] = ldap_ret.userEnabled;
++                    std::string priv = getPrivilegeFromRoleId(ldap_ret.userPriv);
++                    if (priv.empty())
++                    {
++                        BMCWEB_LOG_ERROR << "Invalid user role";
++                        messages::internalError(asyncResp->res);
++                        return;
++                    }
++                    asyncResp->res.jsonValue["RoleId"] = priv;
++                    asyncResp->res.jsonValue["Locked"] = (ldap_ret.userLock)? true : false;
++                    asyncResp->res.jsonValue["Locked@Redfish.AllowableValues"] = {
++                                    "false"};
++
++
++                }
++                else
+                 {
+-                    if (interface.first ==
+-                        "xyz.openbmc_project.User.Attributes")
++                    for (const auto& interface : userIt->second)
+                     {
+-                        for (const auto& property : interface.second)
++                        if (interface.first ==
++                            "xyz.openbmc_project.User.Attributes")
+                         {
+-                            if (property.first == "UserEnabled")
++                            for (const auto& property : interface.second)
+                             {
+-                                const bool* userEnabled =
+-                                    std::get_if<bool>(&property.second);
+-                                if (userEnabled == nullptr)
++                                if (property.first == "UserEnabled")
+                                 {
+-                                    BMCWEB_LOG_ERROR
+-                                        << "UserEnabled wasn't a bool";
+-                                    messages::internalError(asyncResp->res);
+-                                    return;
++                                    const bool* userEnabled =
++                                        std::get_if<bool>(&property.second);
++                                    if (userEnabled == nullptr)
++                                    {
++                                        BMCWEB_LOG_ERROR
++                                            << "UserEnabled wasn't a bool";
++                                        messages::internalError(asyncResp->res);
++                                        return;
++                                    }
++                                    asyncResp->res.jsonValue["Enabled"] =
++                                        *userEnabled;
+                                 }
+-                                asyncResp->res.jsonValue["Enabled"] =
+-                                    *userEnabled;
+-                            }
+-                            else if (property.first ==
+-                                     "UserLockedForFailedAttempt")
+-                            {
+-                                const bool* userLocked =
+-                                    std::get_if<bool>(&property.second);
+-                                if (userLocked == nullptr)
++                                else if (property.first ==
++                                         "UserLockedForFailedAttempt")
+                                 {
+-                                    BMCWEB_LOG_ERROR << "UserLockedForF"
+-                                                        "ailedAttempt "
+-                                                        "wasn't a bool";
+-                                    messages::internalError(asyncResp->res);
+-                                    return;
++                                    const bool* userLocked =
++                                        std::get_if<bool>(&property.second);
++                                    if (userLocked == nullptr)
++                                    {
++                                        BMCWEB_LOG_ERROR << "UserLockedForF"
++                                                            "ailedAttempt "
++                                                            "wasn't a bool";
++                                        messages::internalError(asyncResp->res);
++                                        return;
++                                    }
++                                    asyncResp->res.jsonValue["Locked"] =
++                                        *userLocked;
++                                    asyncResp->res.jsonValue
++                                        ["Locked@Redfish.AllowableValues"] = {
++                                        "false"};
+                                 }
+-                                asyncResp->res.jsonValue["Locked"] =
+-                                    *userLocked;
+-                                asyncResp->res.jsonValue
+-                                    ["Locked@Redfish.AllowableValues"] = {
+-                                    "false"};
+-                            }
+-                            else if (property.first == "UserPrivilege")
+-                            {
+-                                const std::string* userRolePtr =
+-                                    std::get_if<std::string>(&property.second);
+-                                if (userRolePtr == nullptr)
++                                else if (property.first == "UserPrivilege")
+                                 {
+-                                    BMCWEB_LOG_ERROR
+-                                        << "UserPrivilege wasn't a "
+-                                           "string";
+-                                    messages::internalError(asyncResp->res);
+-                                    return;
++                                    const std::string* userRolePtr =
++                                        std::get_if<std::string>(&property.second);
++                                    if (userRolePtr == nullptr)
++                                    {
++                                        BMCWEB_LOG_ERROR
++                                            << "UserPrivilege wasn't a "
++                                               "string";
++                                        messages::internalError(asyncResp->res);
++                                        return;
++                                    }
++                                    std::string priv =
++                                        getPrivilegeFromRoleId(*userRolePtr);
++                                    if (priv.empty())
++                                    {
++                                        BMCWEB_LOG_ERROR << "Invalid user role";
++                                        messages::internalError(asyncResp->res);
++                                        return;
++                                    }
++                                    asyncResp->res.jsonValue["RoleId"] = priv;
++
++                                    asyncResp->res.jsonValue["Links"]["Role"] = {
++                                        {"@odata.id", "/redfish/v1/AccountService/"
++                                                      "Roles/" +
++                                                          priv}};
+                                 }
+-                                std::string priv =
+-                                    getPrivilegeFromRoleId(*userRolePtr);
+-                                if (priv.empty())
+-                                {
+-                                    BMCWEB_LOG_ERROR << "Invalid user role";
+-                                    messages::internalError(asyncResp->res);
+-                                    return;
+-                                }
+-                                asyncResp->res.jsonValue["RoleId"] = priv;
+-
+-                                asyncResp->res.jsonValue["Links"]["Role"] = {
+-                                    {"@odata.id", "/redfish/v1/AccountService/"
+-                                                  "Roles/" +
+-                                                      priv}};
+                             }
+                         }
+                     }
+@@ -1297,6 +1513,13 @@ class ManagerAccount : public Node
+                 return;
+             }
+         }
++        struct ldap_user_param ldap_ret;
++        bool is_ldap_user = isUserFromLDAP(username, ldap_ret);
++        if(is_ldap_user)
++        {
++            messages::success(asyncResp->res);
++            return;
++        }
+ 
+         std::string dbusObjectPath = "/xyz/openbmc_project/user/" + username;
+         dbus::utility::escapePathForDbus(dbusObjectPath);
+-- 
+2.17.1
+

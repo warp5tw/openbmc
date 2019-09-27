@@ -52,4 +52,6 @@ RDEPENDS_${PN}-system = " \
         phosphor-ipmi-blobs \
         runbmc-powerctrl \
         ipmitool \
+        python-argparse \
+        openldap-bin \
         "
