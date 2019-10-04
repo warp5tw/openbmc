@@ -1,0 +1,26 @@
+From ecf5ad7f1c9a4c5acb2b98a7cecd06c998d45581 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Fri, 4 Oct 2019 09:20:55 +0800
+Subject: [PATCH] Move to new associations interface
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ app/common/services/api-utils.js | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/app/common/services/api-utils.js b/app/common/services/api-utils.js
+index 51da8bb4..0ff29a7e 100644
+--- a/app/common/services/api-utils.js
++++ b/app/common/services/api-utils.js
+@@ -855,7 +855,7 @@ window.angular && (function(angular) {
+                             Constants.SEVERITY_TO_PRIORITY_MAP[severityCode];
+                         severityFlags[priority.toLowerCase()] = true;
+                         relatedItems = [];
+-                        content.data[key].associations.forEach(function(item) {
++                        content.data[key].Associations.forEach(function(item) {
+                           relatedItems.push(item[2]);
+                         });
+ 
+-- 
+2.17.1
+
