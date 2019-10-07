@@ -1,0 +1,33 @@
+From 31b703d7110b512ca2c733c84a21e4e36c45f647 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Mon, 7 Oct 2019 14:47:50 +0800
+Subject: [PATCH] dts: npcm7xx: runbmc: config jtag master pins
+
+---
+ arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+index 6eb04ba24145..1e752a83f2d7 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
++++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+@@ -1045,7 +1045,7 @@
+ 			};
+ 
+ 			spi1: spi@201000 {
+-				status = "okay";
++				status = "disabled";
+ 			};
+ 		};
+ 	};
+@@ -1141,6 +1141,7 @@
+ 				&gpio169o_pins
+ 				&gpio188o_pins
+ 				&gpio189_pins
++				&gpio192o_pins
+ 				&gpio196_pins
+ 				&gpio197_pins
+ 				&gpio198o_pins
+-- 
+2.17.1
+
