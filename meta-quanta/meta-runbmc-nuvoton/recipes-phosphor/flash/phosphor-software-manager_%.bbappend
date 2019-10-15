@@ -1,8 +1,8 @@
+SRC_URI = "git://github.com/Nuvoton-Israel/phosphor-bmc-code-mgmt.git"
+SRCREV = "c84c94c5c0852844e14d60935af3a4ea1f64d159"
+
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-SRC_URI += "file://0001-updater-Add-initial-bios-version-support.patch"
-SRC_URI += "file://0002-support_bios_update.patch"
-SRC_URI += "file://0003-activation-add-applyTime-support-for-no-ubi-layout-c.patch"
 SRC_URI += "file://force-reboot.service"
 
 inherit obmc-phosphor-systemd
