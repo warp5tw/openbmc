@@ -11,6 +11,7 @@ SRC_URI = " \
     file://runbmc-nuvoton-ipmi-fru-properties.yaml \
     file://runbmc-nuvoton-ipmi-inventory-sensors.yaml \
     file://runbmc-nuvoton-ipmi-sensors.yaml \
+    file://runbmc-nuvoton-dbus-monitor-config.yaml \
     "
 
 S = "${WORKDIR}"
@@ -26,6 +27,8 @@ do_install() {
         ${D}${datadir}/${BPN}/ipmi-inventory-sensors.yaml
     install -m 0644 -D runbmc-nuvoton-ipmi-sensors.yaml \
         ${D}${datadir}/${BPN}/ipmi-sensors.yaml
+    install -m 0644 -D runbmc-nuvoton-dbus-monitor-config.yaml \
+        ${D}${datadir}/phosphor-dbus-monitor/dbus-monitor-config.yaml
 }
 
 FILES_${PN}-dev = " \
@@ -33,6 +36,7 @@ FILES_${PN}-dev = " \
     ${datadir}/${BPN}/ipmi-fru-read.yaml \
     ${datadir}/${BPN}/ipmi-inventory-sensors.yaml \
     ${datadir}/${BPN}/ipmi-sensors.yaml \
+    ${datadir}/phosphor-dbus-monitor/dbus-monitor-config.yaml \
     "
 
 ALLOW_EMPTY_${PN} = "1"
