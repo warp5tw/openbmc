@@ -116,6 +116,9 @@
                     "/xyz/openbmc_project/sensors/power/p1_vccin_vr_pout",
                     "/xyz/openbmc_project/sensors/power/p1_vccio_vr_pin",
                     "/xyz/openbmc_project/sensors/power/p1_vccio_vr_pout",
+                    "/xyz/openbmc_project/sensors/power/total_power",
+                    "/xyz/openbmc_project/sensors/power/cpu_power",
+                    "/xyz/openbmc_project/sensors/power/memory_power",
                     "/xyz/openbmc_project/sensors/current/p0_dimm_vr0_current",
                     "/xyz/openbmc_project/sensors/current/p0_dimm_vr0_lin",
                     "/xyz/openbmc_project/sensors/current/p0_dimm_vr1_current",
@@ -177,7 +180,7 @@
                 ]
             }
         ]
-    },   
+    },
     {
         "path": "system/chassis",
         "endpoints":
@@ -253,6 +256,9 @@
                     "/xyz/openbmc_project/sensors/fan_tach/fan6",
                     "/xyz/openbmc_project/sensors/voltage/ps0_fan1",
                     "/xyz/openbmc_project/sensors/voltage/ps0_fan2",
+                    "/xyz/openbmc_project/sensors/power/total_power",
+                    "/xyz/openbmc_project/sensors/power/cpu_power",
+                    "/xyz/openbmc_project/sensors/power/memory_power",
                     "/xyz/openbmc_project/sensors/voltage/ps0_input_voltage",
                     "/xyz/openbmc_project/sensors/voltage/ps0_output_voltage",
                     "/xyz/openbmc_project/sensors/power/ps0_input_power",
