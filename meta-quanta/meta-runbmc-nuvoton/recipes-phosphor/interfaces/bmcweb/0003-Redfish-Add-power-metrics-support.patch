@@ -1,0 +1,119 @@
+From 62017bb2c9bb407282911b71fb853fafbc49559e Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Fri, 25 Oct 2019 15:40:34 +0800
+Subject: [PATCH] Redfish: Add power metrics support
+
+---
+ redfish-core/lib/power.hpp   | 76 +++++++++++++++++++++++++++++++++++-
+ redfish-core/lib/sensors.hpp |  2 +-
+ 2 files changed, 76 insertions(+), 2 deletions(-)
+
+diff --git a/redfish-core/lib/power.hpp b/redfish-core/lib/power.hpp
+index 8c3927b8..838a75db 100644
+--- a/redfish-core/lib/power.hpp
++++ b/redfish-core/lib/power.hpp
+@@ -207,13 +207,87 @@ class Power : public Node
+                         // null if the limit is not enabled.
+                         value = powerCap * std::pow(10, scale);
+                     }
++                    auto PowerMetricHandler =
++                        [sensorAsyncResp](
++                            const boost::system::error_code ec,
++                            const std::vector<std::pair<std::string, SensorVariant>>&
++                                properties) {
++                            if (ec)
++                            {
++                                messages::internalError(sensorAsyncResp->res);
++                                BMCWEB_LOG_ERROR
++                                    << "Power Metric GetAll handler: Dbus error " << ec;
++                                return;
++                            }
++                            nlohmann::json& tempArray =
++                                sensorAsyncResp->res.jsonValue["PowerControl"];
++                            nlohmann::json& sensorJson = tempArray.back();
++                            for (const std::pair<std::string, SensorVariant>& property :
++                                properties)
++                            {
++                                if (!property.first.compare("IntervalInMin"))
++                                {
++                                    const uint64_t* i =
++                                    sdbusplus::message::variant_ns::get_if<uint64_t>(
++                                        &property.second);
++
++                                    if (i)
++                                    {
++                                        nlohmann::json& value =
++                                            sensorJson["PowerMetrics"]["IntervalInMin"];
++                                        value = *i;
++                                    }
++                                }
++                                else if (!property.first.compare("MinConsumedWatts"))
++                                {
++                                    const uint16_t* i =
++                                    sdbusplus::message::variant_ns::get_if<uint16_t>(
++                                        &property.second);
++                                    if (i)
++                                    {
++                                        nlohmann::json& value =
++                                            sensorJson["PowerMetrics"]["MinConsumedWatts"];
++                                        value = *i;
++                                    }
++                                }
++                                else if (!property.first.compare("MaxConsumedWatts"))
++                                {
++                                    const uint16_t* i =
++                                    sdbusplus::message::variant_ns::get_if<uint16_t>(
++                                        &property.second);
++                                    if (i)
++                                    {
++                                        nlohmann::json& value =
++                                            sensorJson["PowerMetrics"]["MaxConsumedWatts"];
++                                        value = *i;
++                                    }
++                                }
++                                else if (!property.first.compare("AverageConsumedWatts"))
++                                {
++                                    const uint16_t* i =
++                                    sdbusplus::message::variant_ns::get_if<uint16_t>(
++                                        &property.second);
++                                    if (i)
++                                    {
++                                        nlohmann::json& value =
++                                            sensorJson["PowerMetrics"]["AverageConsumedWatts"];
++                                        value = *i;
++                                    }
++                                }                                 
++                            }
++                    };
++                    crow::connections::systemBus->async_method_call(
++                        std::move(PowerMetricHandler), "xyz.openbmc_project.NodeManagerProxy",
++                        "/xyz/openbmc_project/Power/PowerMetric",
++                        "org.freedesktop.DBus.Properties", "GetAll",
++                        "xyz.openbmc_project.Power.PowerMetric");    
+                 };
+ 
+             crow::connections::systemBus->async_method_call(
+                 std::move(valueHandler), "xyz.openbmc_project.Settings",
+                 "/xyz/openbmc_project/control/host0/power_cap",
+                 "org.freedesktop.DBus.Properties", "GetAll",
+-                "xyz.openbmc_project.Control.Power.Cap");
++                "xyz.openbmc_project.Control.Power.Cap");            
+         };
+ 
+         crow::connections::systemBus->async_method_call(
+diff --git a/redfish-core/lib/sensors.hpp b/redfish-core/lib/sensors.hpp
+index 76c304f7..172e0573 100644
+--- a/redfish-core/lib/sensors.hpp
++++ b/redfish-core/lib/sensors.hpp
+@@ -35,7 +35,7 @@ using GetSubTreeType = std::vector<
+               std::vector<std::pair<std::string, std::vector<std::string>>>>>;
+ 
+ using SensorVariant =
+-    std::variant<int64_t, double, uint32_t, bool, std::string>;
++    std::variant<int64_t, double, uint16_t, uint32_t, uint64_t, bool, std::string>;
+ 
+ using ManagedObjectsVectorType = std::vector<std::pair<
+     sdbusplus::message::object_path,
+-- 
+2.17.1
+
