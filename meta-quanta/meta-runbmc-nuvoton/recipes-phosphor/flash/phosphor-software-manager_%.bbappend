@@ -1,5 +1,5 @@
 SRC_URI = "git://github.com/Nuvoton-Israel/phosphor-bmc-code-mgmt.git"
-SRCREV = "c84c94c5c0852844e14d60935af3a4ea1f64d159"
+SRCREV = "11809ee9792409ec59252f16f52b3ca67e3c3b1f"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
