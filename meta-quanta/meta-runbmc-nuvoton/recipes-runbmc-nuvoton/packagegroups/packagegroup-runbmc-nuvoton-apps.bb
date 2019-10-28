@@ -54,4 +54,5 @@ RDEPENDS_${PN}-system = " \
         phosphor-node-manager-proxy \
         phosphor-image-signing \
         openssl-bin \
+        loadsvf \
         "
