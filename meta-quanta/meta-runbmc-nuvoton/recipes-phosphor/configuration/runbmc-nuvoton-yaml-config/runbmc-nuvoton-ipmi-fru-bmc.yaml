@@ -1,5 +1,5 @@
 2:
-  /system/chassis/bmc:
+  /system/chassis/motherboard/management_card/bmc:
     entityID: 7
     entityInstance: 1
     interfaces:
@@ -29,6 +29,7 @@
           IPMIFruProperty: Custom Field 1
           IPMIFruSection: Board
           IPMIFruValueDelimiter: 58
+      xyz.openbmc_project.Inventory.Item.Board:
       xyz.openbmc_project.Inventory.Item.Bmc:
       xyz.openbmc_project.Inventory.Item.NetworkInterface:
         MACAddress:

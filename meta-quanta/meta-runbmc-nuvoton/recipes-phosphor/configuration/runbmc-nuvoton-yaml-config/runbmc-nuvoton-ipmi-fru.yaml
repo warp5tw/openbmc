@@ -1,6 +1,6 @@
 1:
   /system:
-    entityID: 200
+    entityID: 7
     entityInstance: 1
     interfaces:
       xyz.openbmc_project.Inventory.Decorator.Asset:
@@ -18,14 +18,6 @@
           IPMIFruProperty: Version
           IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.System:
-  /system/chassis:
-    entityID: 7
-    entityInstance: 1
-    interfaces:
-     xyz.openbmc_project.Inventory.Item:
-        PrettyName:
-          IPMIFruProperty: Name
-          IPMIFruSection: Chassis
   /system/chassis/motherboard:
     entityID: 7
     entityInstance: 1
@@ -56,6 +48,7 @@
           IPMIFruProperty: Custom Field 1
           IPMIFruSection: Board
           IPMIFruValueDelimiter: 58
+      xyz.openbmc_project.Inventory.Item.Board:
 3:
   /system/chassis/motherboard/cpu0:
     entityID: 3
@@ -104,17 +97,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 6:
   /system/chassis/motherboard/dimm_a1:
@@ -124,17 +117,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 7:
   /system/chassis/motherboard/dimm_a2:
@@ -144,17 +137,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 8:
   /system/chassis/motherboard/dimm_a3:
@@ -164,17 +157,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 9:
   /system/chassis/motherboard/dimm_a4:
@@ -184,17 +177,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 10:
   /system/chassis/motherboard/dimm_a5:
@@ -204,17 +197,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 11:
   /system/chassis/motherboard/dimm_b0:
@@ -224,17 +217,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 12:
   /system/chassis/motherboard/dimm_b1:
@@ -244,17 +237,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 13:
   /system/chassis/motherboard/dimm_b2:
@@ -264,17 +257,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 14:
   /system/chassis/motherboard/dimm_b3:
@@ -284,17 +277,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 15:
   /system/chassis/motherboard/dimm_b4:
@@ -304,17 +297,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 16:
   /system/chassis/motherboard/dimm_b5:
@@ -324,17 +317,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 17:
   /system/chassis/motherboard/dimm_c0:
@@ -344,17 +337,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 18:
   /system/chassis/motherboard/dimm_c1:
@@ -364,17 +357,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 19:
   /system/chassis/motherboard/dimm_c2:
@@ -384,17 +377,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 20:
   /system/chassis/motherboard/dimm_c3:
@@ -404,17 +397,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 21:
   /system/chassis/motherboard/dimm_c4:
@@ -424,17 +417,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 22:
   /system/chassis/motherboard/dimm_c5:
@@ -444,17 +437,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 23:
   /system/chassis/motherboard/dimm_d0:
@@ -464,17 +457,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 24:
   /system/chassis/motherboard/dimm_d1:
@@ -484,17 +477,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 25:
   /system/chassis/motherboard/dimm_d2:
@@ -504,17 +497,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 26:
   /system/chassis/motherboard/dimm_d3:
@@ -524,17 +517,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 27:
   /system/chassis/motherboard/dimm_d4:
@@ -544,17 +537,17 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 28:
   /system/chassis/motherboard/dimm_d5:
@@ -564,16 +557,16 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         BuildDate:
           IPMIFruProperty: Mfg Date
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item:
         PrettyName:
           IPMIFruProperty: Name
-          IPMIFruSection: Board
+          IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Item.Dimm:
 
