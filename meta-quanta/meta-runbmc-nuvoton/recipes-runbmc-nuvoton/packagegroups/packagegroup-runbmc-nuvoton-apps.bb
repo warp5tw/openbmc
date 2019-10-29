@@ -50,6 +50,7 @@ RDEPENDS_${PN}-system = " \
         ipmitool \
         phosphor-ipmi-sel-logger \
         first-boot-set-mac \
+        first-boot-set-psu \
         dbus-sensors \
         phosphor-node-manager-proxy \
         phosphor-image-signing \
