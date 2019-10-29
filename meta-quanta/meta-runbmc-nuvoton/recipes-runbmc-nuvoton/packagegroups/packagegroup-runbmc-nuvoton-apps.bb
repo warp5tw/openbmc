@@ -55,4 +55,5 @@ RDEPENDS_${PN}-system = " \
         phosphor-image-signing \
         openssl-bin \
         loadsvf \
+        asd \
         "
