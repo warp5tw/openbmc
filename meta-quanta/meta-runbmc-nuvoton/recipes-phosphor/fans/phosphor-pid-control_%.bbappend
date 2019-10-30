@@ -8,10 +8,6 @@ SRC_URI_append_runbmc-nuvoton = " file://fan-reboot-control.service"
 FILES_${PN}_append_runbmc-nuvoton = " ${bindir}/fan-full-speed.sh"
 FILES_${PN}_append_runbmc-nuvoton = " ${datadir}/swampd/config.json"
 
-inherit systemd
-
-SRCREV = "6b9f59991b7f694866c98775b4179ae97c5e69a8"
-
 RDEPENDS_${PN} += "bash"
 
 SYSTEMD_SERVICE_${PN}_append_runbmc-nuvoton = " phosphor-pid-control.service"
