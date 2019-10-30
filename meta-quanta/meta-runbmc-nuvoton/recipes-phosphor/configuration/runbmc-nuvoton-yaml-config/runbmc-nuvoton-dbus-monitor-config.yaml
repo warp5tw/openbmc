@@ -83,7 +83,7 @@
   paths: example path group
   properties: example property group
   callback: example callback group
-  countop: '=='
+  countop: '>='
   countbound: 1
   op: '=='
   bound: true
