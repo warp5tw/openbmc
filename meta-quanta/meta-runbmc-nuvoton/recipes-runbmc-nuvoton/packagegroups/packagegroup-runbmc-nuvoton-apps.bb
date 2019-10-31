@@ -48,7 +48,7 @@ RDEPENDS_${PN}-system = " \
         phosphor-ipmi-blobs \
         runbmc-powerctrl \
         ipmitool \
-        phosphor-ipmi-sel-logger \
+        phosphor-sel-logger \
         first-boot-set-mac \
         first-boot-set-psu \
         dbus-sensors \
