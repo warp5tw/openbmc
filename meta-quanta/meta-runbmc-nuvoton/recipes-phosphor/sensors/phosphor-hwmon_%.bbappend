@@ -44,3 +44,5 @@ PECIITEMSFMT = "devices/platform/ahb/ahb--apb/f0100000.peci-bus/{0}.conf"
 PECIITEMS = "${@compose_list(d, 'PECIITEMSFMT', 'PECINAMES')}"
 PECIENVS = "obmc/hwmon/{0}"
 SYSTEMD_ENVIRONMENT_FILE_${PN} += "${@compose_list(d, 'PECIENVS', 'PECIITEMS')}"
+
+EXTRA_OECONF_append_runbmc-nuvoton= " --enable-update-functional-on-fail"
