@@ -1,6 +1,5 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-
 NAMES = " \
         i2c@82000/tmp421@4c \
         i2c@82000/power-supply@58 \
@@ -20,11 +19,8 @@ NAMES = " \
         i2c@88000/adm1278@11 \
         i2c@8d000/tmp75@4a  \
         "
-
 ITEMSFMT = "ahb/apb/{0}.conf"
-
 ITEMS += "${@compose_list(d, 'ITEMSFMT', 'NAMES')}"
-
 ENVS = "obmc/hwmon/{0}"
 SYSTEMD_ENVIRONMENT_FILE_${PN} += "${@compose_list(d, 'ENVS', 'ITEMS')}"
 
@@ -35,4 +31,16 @@ SYSTEMD_ENVIRONMENT_FILE_${PN} += "${@compose_list(d, 'FENVS', 'FITEMS')}"
 
 # ADC
 ADC_ITEMS = "adc@c000.conf"
-SYSTEMD_ENVIRONMENT_FILE_${PN} += "${@compose_list(d, 'FENVS', 'ADC_ITEMS')}"
+ADCENVS = "obmc/hwmon/ahb/apb/{0}"
+SYSTEMD_ENVIRONMENT_FILE_${PN} += "${@compose_list(d, 'ADCENVS', 'ADC_ITEMS')}"
+
+# PECI
+PECINAMES = " \
+        peci-0/0-30/peci-cputemp.0 \
+        peci-0/0-31/peci-cputemp.1\
+        peci-0/0-30/peci-dimmtemp.0 \
+        "
+PECIITEMSFMT = "devices/platform/ahb/ahb--apb/f0100000.peci-bus/{0}.conf"
+PECIITEMS = "${@compose_list(d, 'PECIITEMSFMT', 'PECINAMES')}"
+PECIENVS = "obmc/hwmon/{0}"
+SYSTEMD_ENVIRONMENT_FILE_${PN} += "${@compose_list(d, 'PECIENVS', 'PECIITEMS')}"
