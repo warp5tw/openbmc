@@ -1,4 +1,4 @@
-From 5f7160bfe4e75cb3202867bec88c959bdf4565e7 Mon Sep 17 00:00:00 2001
+From ff7442a9243193e671f6db1cd07265624b0555c3 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Wed, 25 Sep 2019 09:36:22 +0800
 Subject: [PATCH] driver: media: nuvoton: vcd and ece driver
@@ -10,8 +10,8 @@ Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
  drivers/media/platform/nuvoton/Kconfig       |    9 +
  drivers/media/platform/nuvoton/Makefile      |    2 +
  drivers/media/platform/nuvoton/npcm750_ece.c |  688 ++++++++
- drivers/media/platform/nuvoton/npcm750_vcd.c | 1533 ++++++++++++++++++
- 6 files changed, 2243 insertions(+)
+ drivers/media/platform/nuvoton/npcm750_vcd.c | 1540 ++++++++++++++++++
+ 6 files changed, 2250 insertions(+)
  create mode 100644 drivers/media/platform/nuvoton/Kconfig
  create mode 100644 drivers/media/platform/nuvoton/Makefile
  create mode 100644 drivers/media/platform/nuvoton/npcm750_ece.c
@@ -763,10 +763,10 @@ index 000000000000..7e73337bdd8a
 +MODULE_LICENSE("GPL v2");
 diff --git a/drivers/media/platform/nuvoton/npcm750_vcd.c b/drivers/media/platform/nuvoton/npcm750_vcd.c
 new file mode 100644
-index 000000000000..8697d1a5f82a
+index 000000000000..c67220dedeaa
 --- /dev/null
 +++ b/drivers/media/platform/nuvoton/npcm750_vcd.c
-@@ -0,0 +1,1533 @@
+@@ -0,0 +1,1540 @@
 +/*
 + * Copyright (c) 2018 Nuvoton Technology corporation.
 + *
@@ -801,7 +801,7 @@ index 000000000000..8697d1a5f82a
 +#include <asm/fb.h>
 +#include <linux/completion.h>
 +
-+#define VCD_VERSION "0.0.8"
++#define VCD_VERSION "0.0.10"
 +
 +#define VCD_IOC_MAGIC     'v'
 +#define VCD_IOCGETINFO	_IOR(VCD_IOC_MAGIC,  1, struct vcd_info)
@@ -1152,9 +1152,10 @@ index 000000000000..8697d1a5f82a
 +	{"1280 x 960", 1280, 960},
 +	{"1280 x 1024", 1280, 1024},
 +	{"1366 x 768", 1366, 768},
-+	{"1400 x 900", 1400, 900},
-+	{"1400 x 960", 1400, 960},
-+	{"1400 x 1050", 1400, 1050},
++	{"1440 x 900", 1440, 900},
++	{"1440 x 960", 1440, 960},
++	{"1440 x 1050", 1440, 1050},
++	{"1440 x 1080", 1440, 1080},
 +	{"1600 x 1050", 1600, 1050},
 +	{"1600 x 1200", 1600, 1200},
 +	{"1680 x 1050", 1680, 1050},
@@ -1504,7 +1505,8 @@ index 000000000000..8697d1a5f82a
 +static int npcm750_vcd_get_resolution(struct npcm750_vcd *vcd)
 +{
 +	int i;
-+	u8 retry = 3;
++	u8 res_retry = 3;
++	u8 vaild_retry = 3;
 +	u8 vaild = 0;
 +	u32 hortact = (npcm750_vcd_read(vcd,VCD_HOR_AC_TIM)
 +		& VCD_HOR_AC_TIM_MASK);
@@ -1522,17 +1524,22 @@ index 000000000000..8697d1a5f82a
 +		if (npcm750_vcd_hres(vcd) && npcm750_vcd_vres(vcd)) {
 +			struct regmap *gfxi = vcd->gfx_regmap;
 +			u32 dispst;
-+			/* wait for valid and stable resolution */
++
++			/* wait for resolution is available,
++			   and it is also captured by host */
 +			do {
-+				mdelay(500);
++				if (res_retry == 0)
++					return -1;
++				mdelay(300);
 +				regmap_read(gfxi, DISPST, &dispst);
-+				cond_resched();
++				res_retry--;
 +			} while (npcm750_vcd_vres(vcd) < 100 ||
 +					npcm750_vcd_pclk(vcd) == 0 ||
 +					(dispst & DISPST_HSCROFF));
 +		}
 +
-+		while (retry--) {
++		/* wait for valid resolution */
++		while (vaild_retry--) {
 +			for (i = 0 ; i < restlb_cnt ; i++) {
 +				if ((res_tlbs[i].hdisp == npcm750_vcd_hres(vcd)) &&
 +					(res_tlbs[i].vdisp == npcm750_vcd_vres(vcd))) {
@@ -1547,7 +1554,7 @@ index 000000000000..8697d1a5f82a
 +		}
 +
 +		if (!vaild) {
-+			dev_err(vcd->dev, "invaild resolution %d x %d\n",
++			dev_err(vcd->dev, "invalid resolution %d x %d\n",
 +				npcm750_vcd_hres(vcd), npcm750_vcd_vres(vcd));
 +			return -1;
 +		}
