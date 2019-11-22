@@ -1,0 +1,138 @@
+From 2f6464b3ee96233119765f0b4582a416accb0a1d Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Thu, 21 Nov 2019 14:35:58 +0800
+Subject: [PATCH] Add Redfish property PowerSupply EfficiencyPercent
+
+"PowerSupplies": [
+        {
+            "@odata.id": "/redfish/v1/Chassis/chassis/Power#/PowerSupplies/0",
+            "EfficiencyPercent": 90,
+            "Manufacturer": "FlexPower",
+            "MemberId": "powersupply0",
+            "Model": "MIS-S-1020",
+            "Name": "powersupply0",
+            "PartNumber": "FPS-213-D0000293-101",
+            "PowerInputWatts": 71.0,
+            "PowerOutputWatts": 50.5,
+            "SerialNumber": "MISPS1839A0A0RW",
+            "Status": {
+                "Health": "OK",
+                "State": "Enabled"
+            }
+        }
+]
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ redfish-core/lib/sensors.hpp | 67 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 66 insertions(+), 1 deletion(-)
+
+diff --git a/redfish-core/lib/sensors.hpp b/redfish-core/lib/sensors.hpp
+index ef682655..6728a02b 100644
+--- a/redfish-core/lib/sensors.hpp
++++ b/redfish-core/lib/sensors.hpp
+@@ -93,7 +93,7 @@ class InventoryItem
+   public:
+     InventoryItem(const std::string& objPath) :
+         objectPath(objPath), name(), isPresent(true), isFunctional(true),
+-        isPowerSupply(false), manufacturer(), model(), partNumber(),
++        isPowerSupply(false), powerSupplyEfficiencyPercent(0), manufacturer(), model(), partNumber(),
+         serialNumber(), sensors(), ledObjectPath(""),
+         ledState(LedState::UNKNOWN)
+     {
+@@ -110,6 +110,7 @@ class InventoryItem
+     bool isPresent;
+     bool isFunctional;
+     bool isPowerSupply;
++    int powerSupplyEfficiencyPercent;
+     std::string manufacturer;
+     std::string model;
+     std::string partNumber;
+@@ -1396,6 +1397,67 @@ static void storeInventoryItemData(
+     }
+ }
+ 
++/**
++ * @brief Gets D-Bus data for Power Supply Attributes such as EfficiencyPercent
++ *
++ * Uses the specified connections (services) (currently assumes just one) to
++ * obtain D-Bus data for Power Supply Attributes. Stores the resulting data in
++ * the inventoryItems vector. Only stores data in Power Supply inventoryItems.
++ *
++ * This data is later used to provide sensor property values in the JSON
++ * response.
++ *
++ * Finds the Power Supply Attributes data asynchronously.  Invokes callback
++ * when data has been obtained.
++ *
++ * @param sensorsAsyncResp Pointer to object holding response data.
++ * @param inventoryItem D-Bus inventory items associated with sensors.
++ */
++static void getPowerSupplyAttributesData(
++    std::shared_ptr<SensorsAsyncResp> sensorsAsyncResp,
++    InventoryItem* inventoryItem)
++{
++    BMCWEB_LOG_DEBUG << "getPowerSupplyAttributesData enter";
++
++    // Response handler for Get DeratingFactor property
++    auto respHandler = [sensorsAsyncResp, inventoryItem](
++                           const boost::system::error_code ec,
++                           const std::variant<uint32_t>& deratingFactor) {
++        BMCWEB_LOG_DEBUG << "getPowerSupplyAttributesData respHandler enter";
++        if (ec)
++        {
++            BMCWEB_LOG_ERROR
++                << "getPowerSupplyAttributesData respHandler DBus error " << ec;
++            messages::internalError(sensorsAsyncResp->res);
++            return;
++        }
++
++        const uint32_t* value = std::get_if<uint32_t>(&deratingFactor);
++        if (value != nullptr)
++        {
++            // Store value in Power Supply Inventory Items
++            inventoryItem->powerSupplyEfficiencyPercent = static_cast<int>(*value);
++        }
++        else
++        {
++            BMCWEB_LOG_DEBUG
++                << "Failed to find EfficiencyPercent value for PowerSupplies";
++        }
++
++        BMCWEB_LOG_DEBUG << "getPowerSupplyAttributesData respHandler exit";
++    };
++
++    // Get the DeratingFactor property for the PowerSupplyAttributes
++    // Currently only property on the interface/only one we care about
++    crow::connections::systemBus->async_method_call(
++        std::move(respHandler), "xyz.openbmc_project.Settings",
++        "/xyz/openbmc_project/control/power_supply_attributes",
++        "org.freedesktop.DBus.Properties", "Get",
++        "xyz.openbmc_project.Control.PowerSupplyAttributes", "DeratingFactor");
++
++    BMCWEB_LOG_DEBUG << "getPowerSupplyAttributesData exit";
++}
++
+ /**
+  * @brief Gets D-Bus data for inventory items associated with sensors.
+  *
+@@ -1480,6 +1542,8 @@ static void getInventoryItemsData(
+                 {
+                     // Store inventory data in InventoryItem
+                     storeInventoryItemData(*inventoryItem, objDictEntry.second);
++                    if (inventoryItem->isPowerSupply)
++                        getPowerSupplyAttributesData(sensorsAsyncResp, inventoryItem);                   
+                 }
+             }
+ 
+@@ -2067,6 +2131,7 @@ static nlohmann::json& getPowerSupply(nlohmann::json& powerSupplyArray,
+     powerSupply["SerialNumber"] = inventoryItem.serialNumber;
+     setLedState(powerSupply, &inventoryItem);
+     powerSupply["Status"]["State"] = getState(&inventoryItem);
++    powerSupply["EfficiencyPercent"] = inventoryItem.powerSupplyEfficiencyPercent;
+ 
+     const char* health = inventoryItem.isFunctional ? "OK" : "Critical";
+     powerSupply["Status"]["Health"] = health;
+-- 
+2.17.1
+
