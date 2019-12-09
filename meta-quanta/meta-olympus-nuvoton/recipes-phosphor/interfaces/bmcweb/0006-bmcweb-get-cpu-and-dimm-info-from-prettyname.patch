@@ -1,4 +1,4 @@
-From 4a15814fd393fbe267b9c24b92385a679317269f Mon Sep 17 00:00:00 2001
+From 1ea077281e0ef45af34231938afc533a4511fc65 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Tue, 19 Nov 2019 14:44:10 +0800
 Subject: [PATCH] bmcweb: get cpu and dimm info from prettyname
@@ -6,11 +6,11 @@ Subject: [PATCH] bmcweb: get cpu and dimm info from prettyname
 Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---
  redfish-core/lib/cpudimm.hpp | 111 ++++++++++++++++++++++++++++-------
- redfish-core/lib/systems.hpp |  33 ++++++++++-
- 2 files changed, 122 insertions(+), 22 deletions(-)
+ redfish-core/lib/systems.hpp |  35 ++++++++++-
+ 2 files changed, 123 insertions(+), 23 deletions(-)
 
 diff --git a/redfish-core/lib/cpudimm.hpp b/redfish-core/lib/cpudimm.hpp
-index d8d41919..f164e9bb 100644
+index ce36a0b..e7817f4 100644
 --- a/redfish-core/lib/cpudimm.hpp
 +++ b/redfish-core/lib/cpudimm.hpp
 @@ -77,6 +77,7 @@ void getCpuDataByInterface(std::shared_ptr<AsyncResp> aResp,
@@ -182,10 +182,10 @@ index d8d41919..f164e9bb 100644
          },
          service, objPath, "org.freedesktop.DBus.Properties", "GetAll", "");
 diff --git a/redfish-core/lib/systems.hpp b/redfish-core/lib/systems.hpp
-index 0e2e52db..b1624638 100644
+index 93eb403..13363a5 100644
 --- a/redfish-core/lib/systems.hpp
 +++ b/redfish-core/lib/systems.hpp
-@@ -215,6 +215,33 @@ void getComputerSystem(std::shared_ptr<AsyncResp> aResp,
+@@ -215,8 +215,35 @@ void getComputerSystem(std::shared_ptr<AsyncResp> aResp,
                                                               VariantType>
                                                   &property : properties)
                                          {
@@ -216,18 +216,21 @@ index 0e2e52db..b1624638 100644
 +                                                }
 +                                            }
 +#if 0
-                                             if (property.first ==
-                                                 "MemorySizeInKb")
+                                             if (property.first !=
+-                                                "MemorySizeInKB")
++                                                "MemorySizeInKb")
                                              {
-@@ -235,6 +262,7 @@ void getComputerSystem(std::shared_ptr<AsyncResp> aResp,
-                                                         "Enabled";
-                                                 }
+                                                 continue;
                                              }
+@@ -254,6 +281,7 @@ void getComputerSystem(std::shared_ptr<AsyncResp> aResp,
+                                                 .jsonValue["MemorySummary"]
+                                                           ["Status"]["State"] =
+                                                 "Enabled";
 +#endif
                                          }
                                      }
                                      else
-@@ -270,8 +298,11 @@ void getComputerSystem(std::shared_ptr<AsyncResp> aResp,
+@@ -289,8 +317,11 @@ void getComputerSystem(std::shared_ptr<AsyncResp> aResp,
                                  },
                                  connection.first, path,
                                  "org.freedesktop.DBus.Properties", "GetAll",
