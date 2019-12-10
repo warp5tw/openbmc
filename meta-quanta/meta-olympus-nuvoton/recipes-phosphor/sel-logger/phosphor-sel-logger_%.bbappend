@@ -1,5 +1,6 @@
-SRC_URI_olympus-nuvoton := "git://github.com/quanta-bmc/phosphor-sel-logger.git"
-SRCREV_olympus-nuvoton := "${AUTOREV}"
+FILESEXTRAPATHS_append_olympus-nuvoton := "${THISDIR}/${PN}:"
+
+# SRC_URI_append_olympus-nuvoton = " file://0001-add-sensor-evnet-log-support.patch"
 
 # Enable threshold monitoring
 EXTRA_OECMAKE += "-DSEL_LOGGER_MONITOR_THRESHOLD_EVENTS=ON"
