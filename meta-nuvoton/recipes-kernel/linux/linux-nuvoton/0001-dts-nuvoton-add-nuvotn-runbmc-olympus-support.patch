@@ -1,4 +1,4 @@
-From 846a226fb506c6cfa1f798ae54e9b547cb064a2f Mon Sep 17 00:00:00 2001
+From 0a32cb536b8d4314f85edccf88a44b7def58a4de Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Mon, 23 Sep 2019 18:57:49 +0800
 Subject: [PATCH] dts: nuvoton: add nuvotn runbmc olympus support
@@ -541,7 +541,7 @@ index 000000000000..f3390dd711c8
 +};
 diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
 new file mode 100644
-index 000000000000..ba8492ad4ea8
+index 000000000000..dbc95873cc5d
 --- /dev/null
 +++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
 @@ -0,0 +1,1188 @@
@@ -961,7 +961,7 @@ index 000000000000..ba8492ad4ea8
 +					reg = <0x4c>;
 +				};
 +				power-supply@58 {
-+					compatible = "delta,dps800";
++					compatible = "pmbus";
 +					reg = <0x58>;
 +				};
 +			};

@@ -25,7 +25,7 @@ SRC_URI += "file://0001-dts-npcm7xx-add-reset-support-to-EMC-node.patch"
 SRC_URI += "file://0001-dts-npcm7xx-correct-vcd-and-ece-node.patch"
 SRC_URI += "file://0001-dts-npcm7xx-runbmc-config-jtag-master-pins.patch"
 
-SRC_URI += "file://0001-driver-i2c-nuvoton-v26-test.patch"
+SRC_URI += "file://0001-driver-i2c-nuvoton-0.1.0.patch"
 SRC_URI += "file://0001-driver-usb-udc-add-NPCM-UDC.patch"
 SRC_URI += "file://0001-driver-media-nuvoton-vcd-and-ece-driver.patch"
 SRC_URI += "file://0001-driver-net-emc-driver-update.patch"
