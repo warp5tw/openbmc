@@ -1,0 +1,343 @@
+From 9d7c7a97077f98b7f7fb63e8c8ded216193deb87 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Mon, 23 Dec 2019 10:52:57 +0800
+Subject: [PATCH] driver: media: nuvoton: ece: v0.0.6 test
+
+---
+ drivers/media/platform/nuvoton/npcm750_ece.c | 159 +++++++------------
+ 1 file changed, 60 insertions(+), 99 deletions(-)
+
+diff --git a/drivers/media/platform/nuvoton/npcm750_ece.c b/drivers/media/platform/nuvoton/npcm750_ece.c
+index 7e73337bdd8a..583bbe499de3 100644
+--- a/drivers/media/platform/nuvoton/npcm750_ece.c
++++ b/drivers/media/platform/nuvoton/npcm750_ece.c
+@@ -23,12 +23,11 @@
+ #include <linux/of_address.h>
+ #include <linux/of.h>
+ #include <linux/of_irq.h>
+-#include <linux/interrupt.h>
+ #include <linux/delay.h>
+ #include <linux/dma-mapping.h>
+ #include <asm/fb.h>
+ 
+-#define ECE_VERSION "0.0.4"
++#define ECE_VERSION "0.0.6"
+ 
+ /* ECE Register */
+ #define DDA_CTRL	0x0000
+@@ -88,10 +87,6 @@
+ #define ECE_RESET _IO(ECE_IOC_MAGIC, 7)
+ #define ECE_IOC_MAXNR 7
+ 
+-#define ECE_OP_TIMEOUT msecs_to_jiffies(100)
+-
+-static const char ece_name[] = "NPCM750 ECE";
+-
+ struct ece_ioctl_cmd {
+ 	unsigned int framebuf;
+ 	unsigned int gap_len;
+@@ -107,8 +102,7 @@ struct ece_ioctl_cmd {
+ struct npcm750_ece {
+ 	void __iomem *base;
+ 	char __iomem *ed_buffer;
+-	struct mutex mlock; /* for ioctl*/
+-	spinlock_t lock;	/*for irq*/
++	struct mutex mlock; /* protect  ioctl*/
+ 	struct device *dev;
+ 	struct device *dev_p;
+ 	struct cdev dev_cdev;
+@@ -118,10 +112,7 @@ struct npcm750_ece {
+ 	u32 comp_start;
+ 	u32 lin_pitch;
+ 	u32 enc_gap;
+-	u32 status;
+ 	atomic_t clients;
+-	int irq;
+-	struct completion complete;
+ };
+ 
+ static void npcm750_ece_update_bits(struct npcm750_ece *ece, u32 offset,
+@@ -146,6 +137,13 @@ static void npcm750_ece_write(struct npcm750_ece *ece, u32 reg, u32 val)
+ 	writel(val, ece->base + reg);
+ }
+ 
++/* Rectangle Compressed Data Ready */
++static void
++npcm750_ece_clear_drs(struct npcm750_ece *ece)
++{
++	npcm750_ece_update_bits(ece, DDA_STS, DDA_STS_CDREADY, DDA_STS_CDREADY);
++}
++
+ /* Clear Offset of Compressed Rectangle*/
+ static void npcm750_ece_clear_rect_offset(struct npcm750_ece *ece)
+ {
+@@ -158,34 +156,34 @@ static u32 npcm750_ece_read_rect_offset(struct npcm750_ece *ece)
+ 	return npcm750_ece_read(ece, HEX_RECT_OFFSET);
+ }
+ 
+-/* Return data if a rectangle finished to be compressed */
+-static u32 npcm750_ece_get_ed_size(struct npcm750_ece *ece, u32 offset)
++/* Return TRUE if a rectangle finished to be compressed */
++static u32 npcm750_ece_is_rect_compressed(struct npcm750_ece *ece)
+ {
+-	u32 size;
+-	int timeout;
+-	char *buffer = ece->ed_buffer + offset;
++	u32 temp = npcm750_ece_read(ece, DDA_STS);
+ 
+-	reinit_completion(&ece->complete);
++	if (!(temp & DDA_STS_CDREADY))
++		return 0;
+ 
+-	timeout = wait_for_completion_interruptible_timeout(&ece->complete,
+-		ECE_OP_TIMEOUT);
+-	if (!timeout || !(ece->status & DDA_STS_CDREADY)) {
+-		dev_dbg(ece->dev, "ece compress timeout\n");
++	if (temp & DDA_STS_FIFOSTSE)
+ 		return 0;
+-	}
++
++	return 1;
++}
++
++/* Return data if a rectangle finished to be compressed */
++static u32 npcm750_ece_get_ed_size(struct npcm750_ece *ece, char *buffer )
++{
++	u32 size;
++
++	while (!npcm750_ece_is_rect_compressed(ece))
++		cond_resched();
+ 
+ 	size = (u32)(buffer[0]
+ 			| (buffer[1] << 8)
+ 			| (buffer[2] << 16)
+ 			| (buffer[3] << 24));
+ 
+-	ece->enc_gap =
+-		(npcm750_ece_read(ece, HEX_CTRL) & HEX_CTRL_ENC_GAP)
+-		>> HEX_CTRL_ENC_GAP_OFFSET;
+-
+-	if (ece->enc_gap == 0)
+-		ece->enc_gap = HEX_CTRL_ENC_MIN_GAP_SIZE;
+-
++	npcm750_ece_clear_drs(ece);
+ 	return size;
+ }
+ 
+@@ -298,9 +296,8 @@ static void npcm750_ece_reset(struct npcm750_ece *ece)
+ static int npcm750_ece_init(struct npcm750_ece *ece)
+ {
+ 	npcm750_ece_reset(ece);
+-
++	npcm750_ece_clear_drs(ece);
+ 	npcm750_ece_set_enc_dba(ece, ece->comp_start);
+-
+ 	ece->lin_pitch = DEFAULT_LP;
+ 
+ 	return 0;
+@@ -311,11 +308,10 @@ static int npcm750_ece_stop(struct npcm750_ece *ece)
+ {
+ 	npcm750_ece_update_bits(ece,
+ 				DDA_CTRL, DDA_CTRL_ECEEN, ~DDA_CTRL_ECEEN);
+-	npcm750_ece_update_bits(ece,
+-				DDA_CTRL, DDA_CTRL_INTEN, ~DDA_CTRL_INTEN);
+ 	npcm750_ece_update_bits(ece,
+ 				HEX_CTRL, HEX_CTRL_ENCDIS, HEX_CTRL_ENCDIS);
+ 	npcm750_ece_clear_rect_offset(ece);
++	npcm750_ece_clear_drs(ece);
+ 
+ 	return 0;
+ }
+@@ -348,20 +344,18 @@ static int npcm750_ece_open(struct inode *inode, struct file *file)
+ 
+ 	file->private_data = ece;
+ 
+-	if (atomic_inc_return(&ece->clients) == 1)
+-		npcm750_ece_init(ece);
++	atomic_inc_return(&ece->clients);
+ 
+ 	dev_dbg(ece->dev, "open: client %d\n", atomic_read(&ece->clients));
+ 
+ 	return 0;
+ }
+ 
+-static int npcm750_ece_close(struct inode *inode, struct file *file)
++static int npcm750_ece_release(struct inode *inode, struct file *file)
+ {
+ 	struct npcm750_ece *ece = file->private_data;
+ 
+-	if (atomic_dec_return(&ece->clients) == 0)
+-		npcm750_ece_stop(ece);
++	atomic_dec_return(&ece->clients);
+ 
+ 	dev_dbg(ece->dev, "close: client %d\n", atomic_read(&ece->clients));
+ 	return 0;
+@@ -376,10 +370,10 @@ long npcm750_ece_ioctl(struct file *filp, unsigned int cmd, unsigned long args)
+ 
+ 	switch (cmd) {
+ 	case ECE_IOCCLEAR_OFFSET:
+-
++	{
+ 		npcm750_ece_clear_rect_offset(ece);
+-
+ 		break;
++	}
+ 	case ECE_IOCGET_OFFSET:
+ 	{
+ 		u32 offset = npcm750_ece_read_rect_offset(ece);
+@@ -424,38 +418,48 @@ long npcm750_ece_ioctl(struct file *filp, unsigned int cmd, unsigned long args)
+ 		struct ece_ioctl_cmd data;
+ 		u32 ed_size = 0;
+ 		u32 offset = 0;
++		u32 status = 0;
++		char *next_addr = NULL;
+ 
+ 		err = copy_from_user(&data, (int __user *)args, sizeof(data))
+ 			? -EFAULT : 0;
+ 		if (err)
+ 			break;
+ 
+-		offset = npcm750_ece_read_rect_offset(ece);
++		status = npcm750_ece_read(ece, DDA_STS);
++		if (status & DDA_STS_FIFOSTSI) {
++			err = -EFAULT;
++			dev_err(ece->dev, "FIFO input is full\n");
++			break;
++		}
+ 
++		offset = npcm750_ece_read_rect_offset(ece);
+ 		if ((offset + (data.w * data.h * 2) + 12) >= ece->comp_len) {
+ 			err = -EFAULT;
+-			dev_dbg(ece->dev, "ece may reach beyond memory region\n");
++			dev_err(ece->dev, "ece may reach beyond memory region\n");
+ 			break;
+ 		}
+ 
+-		npcm750_ece_write(ece, DDA_STS,
+-			DDA_STS_CDREADY | DDA_STS_ACDRDY);
+-
+-		npcm750_ece_update_bits(ece,
+-			DDA_CTRL, DDA_CTRL_INTEN, DDA_CTRL_INTEN);
++		/* clear fist 4 bytes */
++		/* since the EncodedSize may still be at the memory */
++		/* cotroller write buffer and not in the DDR */
++		next_addr = ece->ed_buffer + offset;
++		memset(next_addr, 0, 4);
+ 
+ 		npcm750_ece_enc_rect(ece, data.x, data.y, data.w, data.h);
+ 
+-		ed_size = npcm750_ece_get_ed_size(ece, offset);
+-
+-		npcm750_ece_update_bits(ece,
+-			DDA_CTRL, DDA_CTRL_INTEN, ~DDA_CTRL_INTEN);
+-
++		ed_size = npcm750_ece_get_ed_size(ece, next_addr);
+ 		if (ed_size == 0) {
+ 			err = -EFAULT;
+ 			break;
+ 		}
+ 
++		ece->enc_gap =
++			(npcm750_ece_read(ece, HEX_CTRL) & HEX_CTRL_ENC_GAP)
++			>> HEX_CTRL_ENC_GAP_OFFSET;
++		if (ece->enc_gap == 0)
++			ece->enc_gap = HEX_CTRL_ENC_MIN_GAP_SIZE;
++
+ 		data.gap_len = ece->enc_gap;
+ 		data.len = ed_size;
+ 		err = copy_to_user((int __user *)args, &data, sizeof(data))
+@@ -492,42 +496,10 @@ long npcm750_ece_ioctl(struct file *filp, unsigned int cmd, unsigned long args)
+ 	return err;
+ }
+ 
+-static irqreturn_t npcm750_ece_irq_handler(int irq, void *dev_instance)
+-{
+-	struct device *dev = dev_instance;
+-	struct npcm750_ece *ece = (struct npcm750_ece *)dev->driver_data;
+-	u32 status_ack = 0;
+-	u32 status;
+-
+-	spin_lock(&ece->lock);
+-
+-	status = npcm750_ece_read(ece, DDA_STS);
+-
+-	ece->status = status;
+-
+-	if (status & DDA_STS_CDREADY) {
+-		dev_dbg(ece->dev, "DDA_STS_CDREADY\n");
+-		status_ack |= DDA_STS_CDREADY;
+-	}
+-
+-	if (status & DDA_STS_ACDRDY) {
+-		dev_dbg(ece->dev, "DDA_STS_ACDRDY\n");
+-		status_ack |= DDA_STS_ACDRDY;
+-	}
+-
+-	npcm750_ece_write(ece, DDA_STS, status_ack);
+-
+-	spin_unlock(&ece->lock);
+-
+-	complete(&ece->complete);
+-
+-	return IRQ_HANDLED;
+-}
+-
+ struct file_operations const npcm750_ece_fops = {
+ 	.unlocked_ioctl = npcm750_ece_ioctl,
+ 	.open = npcm750_ece_open,
+-	.release = npcm750_ece_close,
++	.release = npcm750_ece_release,
+ 	.mmap = npcm750_ece_mmap,
+ };
+ 
+@@ -586,8 +558,6 @@ static int npcm750_ece_probe(struct platform_device *pdev)
+ 		return -ENOMEM;
+ 
+ 	mutex_init(&ece->mlock);
+-	spin_lock_init(&ece->lock);
+-	init_completion(&ece->complete);
+ 
+ 	of_property_read_u32_index(pdev->dev.of_node,
+ 			     "phy-memory", 0, &ece->comp_start);
+@@ -618,6 +588,8 @@ static int npcm750_ece_probe(struct platform_device *pdev)
+ 		goto err;
+ 	}
+ 
++	npcm750_ece_init(ece);
++
+ 	ece->dev_p = &pdev->dev;
+ 
+ 	ret = npcm750_ece_device_create(ece);
+@@ -627,20 +599,9 @@ static int npcm750_ece_probe(struct platform_device *pdev)
+ 		goto err;
+ 	}
+ 
+-	ece->irq = of_irq_get(pdev->dev.of_node, 0);
+-	ret = request_irq(ece->irq, npcm750_ece_irq_handler,
+-			  IRQF_SHARED, ece_name, ece->dev);
+-	if (ret) {
+-		dev_err(&pdev->dev, "%s: failed to request irq for ece\n",
+-			__func__);
+-		goto irq_err;
+-	}
+-
+ 	pr_info("NPCM750 ECE Driver probed %s\n", ECE_VERSION);
+ 	return 0;
+ 
+-irq_err:
+-	device_destroy(ece->ece_class, ece->dev_t);
+ err:
+ 	kfree(ece);
+ 	return ret;
+@@ -675,7 +636,7 @@ MODULE_DEVICE_TABLE(of, npcm750_ece_of_match_table);
+ 
+ static struct platform_driver npcm750_ece_driver = {
+ 	.driver		= {
+-		.name	= ece_name,
++		.name	= "npcm750_ece",
+ 		.of_match_table = npcm750_ece_of_match_table,
+ 	},
+ 	.probe		= npcm750_ece_probe,
+-- 
+2.17.1
+
