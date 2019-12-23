@@ -1,15 +1,15 @@
-From ec29d2aee45538ef5f9c3cdc4e33b523d620a1ca Mon Sep 17 00:00:00 2001
+From aebd5ac48dca2dfa2404989a64bfc91b68decc67 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
-Date: Thu, 24 Oct 2019 18:20:52 +0800
-Subject: [PATCH] change the value number from int64 to double
+Date: Mon, 23 Dec 2019 15:30:33 +0800
+Subject: [PATCH] add scale and change the number from uint16 to int64
 
-The value property should be double type.
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---
  NodeManagerProxy.hpp | 6 ++++--
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/NodeManagerProxy.hpp b/NodeManagerProxy.hpp
-index 558500b..9652545 100644
+index 963cf40..1a93dbd 100644
 --- a/NodeManagerProxy.hpp
 +++ b/NodeManagerProxy.hpp
 @@ -603,9 +603,11 @@ class getNmStatistics : public Request
@@ -17,7 +17,7 @@ index 558500b..9652545 100644
          iface->register_property("MaxValue", static_cast<double>(maxValue));
          iface->register_property("MinValue", static_cast<double>(minValue));
 -        iface->register_property("Value", static_cast<uint16_t>(0));
-+        iface->register_property("Value", static_cast<double>(0.0));
++        iface->register_property("Value", static_cast<int64_t>(0));
          iface->register_property(
              "Unit", std::string("xyz.openbmc_project.Sensor.Value.Unit.Watts"));
 +        iface->register_property(
@@ -30,7 +30,7 @@ index 558500b..9652545 100644
  
          iface->set_property(
 -            "Value", static_cast<uint16_t>(getNmStatistics->data.stats.cur));
-+            "Value", static_cast<double>((double)getNmStatistics->data.stats.cur));
++            "Value", static_cast<int64_t>((int64_t)getNmStatistics->data.stats.cur));
      }
  
      void prepareRequest(uint8_t &netFn, uint8_t &lun, uint8_t &cmd,

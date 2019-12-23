@@ -7,7 +7,7 @@ SRCREV = "cceeff9cd35aa548cba039b8ad47c20c5870fa27"
 PV = "0.1+git${SRCPV}"
 
 FILESEXTRAPATHS_prepend_olympus-nuvoton := "${THISDIR}/${PN}:"
-SRC_URI += "file://0001-change-the-value-number-from-int64-to-double.patch"
+SRC_URI += "file://0001-add-scale-and-change-the-number-from-uint16-to-int64.patch"
 
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
