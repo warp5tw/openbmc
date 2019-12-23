@@ -1,4 +1,4 @@
-From e96732b28e431afca35f18749f863e10b6634d13 Mon Sep 17 00:00:00 2001
+From 9b1d422e3bcad33896ffb5243ff303417d151805 Mon Sep 17 00:00:00 2001
 From: Tim Lee <timlee660101@gmail.com>
 Date: Wed, 27 Nov 2019 09:56:22 +0800
 Subject: [PATCH] main: add feature for updating BootProgress and
@@ -22,8 +22,8 @@ Result:
 Signed-off-by: Tim Lee <timlee660101@gmail.com>
 ---
  lpcsnoop/snoop.hpp |  26 +++++++++
- main.cpp           | 131 ++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 155 insertions(+), 2 deletions(-)
+ main.cpp           | 133 ++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 158 insertions(+), 1 deletion(-)
 
 diff --git a/lpcsnoop/snoop.hpp b/lpcsnoop/snoop.hpp
 index acaeca7..89e9f56 100644
@@ -63,10 +63,10 @@ index acaeca7..89e9f56 100644
  template <typename... T>
  using ServerObject = typename sdbusplus::server::object::object<T...>;
 diff --git a/main.cpp b/main.cpp
-index 8928a5b..1e8252a 100644
+index f3815c1..f4416b4 100644
 --- a/main.cpp
 +++ b/main.cpp
-@@ -32,9 +32,15 @@
+@@ -32,9 +32,96 @@
  #include <sdeventplus/source/io.hpp>
  #include <thread>
  
@@ -79,13 +79,13 @@ index 8928a5b..1e8252a 100644
 +static constexpr auto biosDefs = "/etc/default/obmc/bios/bios_defs.json";
 +uint64_t OS_START, MEM_INIT, PCI_INIT, BOARD_INIT = 0;
 +
- /*
-  * 256 bytes is a nice amount.  It's improbable we'd need this many, but its
-  * gives us leg room in the event the driver poll doesn't return in a timely
-@@ -42,6 +48,80 @@ static size_t codeSize = 1; /* Size of each POST code in bytes */
-  */
- static constexpr size_t BUFFER_SIZE = 256;
- 
++/*
++ * 256 bytes is a nice amount.  It's improbable we'd need this many, but its
++ * gives us leg room in the event the driver poll doesn't return in a timely
++ * fashion.  So, mostly arbitrarily chosen.
++ */
++static constexpr size_t BUFFER_SIZE = 256;
++
 +int getDbusProperty(const std::string& service,
 +                    const std::string& objPath,
 +                    const std::string& interface,
@@ -163,23 +163,13 @@ index 8928a5b..1e8252a 100644
  static void usage(const char* name)
  {
      fprintf(stderr,
-@@ -76,6 +156,8 @@ void PostCodeEventHandler(sdeventplus::source::IO& s, int postFd,
-     std::array<uint8_t, BUFFER_SIZE> buffer;
-     int readb;
- 
-+    uint64_t postcode = 0;
-+
-     readb = read(postFd, buffer.data(), buffer.size());
-     if (readb < 0)
+@@ -62,7 +149,45 @@ void PostCodeEventHandler(sdeventplus::source::IO& s, int postFd,
+     }
+     if (readb > 0)
      {
-@@ -97,7 +179,46 @@ void PostCodeEventHandler(sdeventplus::source::IO& s, int postFd,
-     /* Broadcast the values read. */
-     for (int i = 0; i < readb; i += codeSize)
-     {
--        reporter->value(assembleBytes(buffer, i, codeSize));
-+        postcode = reporter->value(assembleBytes(buffer, i, codeSize));
-+
-+        if (postcode == OS_START)
+-        reporter->value(le64toh(code));
++        code = reporter->value(le64toh(code));
++        if (code == OS_START)
 +        {
 +            // Set BootProgress property value to OSStart
 +            if (0 != setDbusProperty(HostStateIntfServiceName, HostStateIntfObjectPath,
@@ -193,7 +183,7 @@ index 8928a5b..1e8252a 100644
 +                                     OSStatusPropertyString, standby))
 +                return;
 +        }
-+        else if (postcode == MEM_INIT)
++        else if (code == MEM_INIT)
 +        {
 +            // Set BootProgress property value to MemoryInit
 +            if (0 != setDbusProperty(HostStateIntfServiceName, HostStateIntfObjectPath,
@@ -201,7 +191,7 @@ index 8928a5b..1e8252a 100644
 +                                     BootProgressPropertyString, meminit))
 +                return;
 +        }
-+        else if (postcode == PCI_INIT)
++        else if (code == PCI_INIT)
 +        {
 +            // Set BootProgress property value to PCIInit
 +            if (0 != setDbusProperty(HostStateIntfServiceName, HostStateIntfObjectPath,
@@ -209,7 +199,7 @@ index 8928a5b..1e8252a 100644
 +                                     BootProgressPropertyString, pciinit))
 +                return;
 +        }
-+        else if (postcode == BOARD_INIT)
++        else if (code == BOARD_INIT)
 +        {
 +            // Set BootProgress property value to MotherboardInit
 +            if (0 != setDbusProperty(HostStateIntfServiceName, HostStateIntfObjectPath,
@@ -220,21 +210,19 @@ index 8928a5b..1e8252a 100644
      }
  }
  
-@@ -161,7 +282,13 @@ int main(int argc, char* argv[])
+@@ -126,6 +251,12 @@ int main(int argc, char* argv[])
          }
      }
  
--    postFd = open(snoopFilename, 0);
 +    // Get POST CODE from JSON configure file.
 +    OS_START = getPostCodeNum(POST_CODE_OS_START);
 +    MEM_INIT = getPostCodeNum(POST_CODE_MEM_INIT);
 +    PCI_INIT = getPostCodeNum(POST_CODE_PCI_INIT);
 +    BOARD_INIT = getPostCodeNum(POST_CODE_BOARD_INIT);
 +
-+    postFd = open(snoopFilename, O_NONBLOCK);
+     postFd = open(snoopFilename, O_NONBLOCK);
      if (postFd < 0)
      {
-         fprintf(stderr, "Unable to open: %s\n", snoopFilename);
 -- 
 2.17.1
 

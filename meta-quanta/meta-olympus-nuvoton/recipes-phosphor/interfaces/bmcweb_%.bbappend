@@ -1,6 +1,6 @@
 FILESEXTRAPATHS_prepend_olympus-nuvoton := "${THISDIR}/${PN}:"
 
-SRC_URI_append_olympus-nuvoton = " file://0002-bmcweb-increase-httpreqbody-to-35MB.patch \
+SRC_URI_append_olympus-nuvoton = " \
     file://0003-Redfish-Add-power-metrics-support.patch \
     file://0004-bmcweb-sensors-get-sensor-list-also-form-path-with-s.patch \
     file://0005-bmcweb-chassis-add-indicatorLED-support.patch \
@@ -21,3 +21,6 @@ EXTRA_OECMAKE += "-DBMCWEB_ENABLE_REDFISH_BMC_JOURNAL=ON"
 
 # Enable TFTP
 EXTRA_OECMAKE += "-DBMCWEB_INSECURE_ENABLE_REDFISH_FW_TFTP_UPDATE=ON"
+
+# Increase body limit for BIOS FW
+EXTRA_OECMAKE += "-DBMCWEB_HTTP_REQ_BODY_LIMIT_MB=35"

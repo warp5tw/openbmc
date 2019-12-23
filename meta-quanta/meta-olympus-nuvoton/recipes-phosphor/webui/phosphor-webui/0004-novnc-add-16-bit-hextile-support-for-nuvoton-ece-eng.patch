@@ -1,4 +1,4 @@
-From 670db591935499246079bf34e542b96b04fc33fa Mon Sep 17 00:00:00 2001
+From baaa4de338f9412f7271a35c3374eed5d0e69661 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Mon, 23 Dec 2019 10:56:34 +0800
 Subject: [PATCH] novnc: add 16-bit hextile support for nuvoton ece engine
@@ -8,7 +8,7 @@ Subject: [PATCH] novnc: add 16-bit hextile support for nuvoton ece engine
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/package.json b/package.json
-index 48f4cb14..5c56e07d 100644
+index 04c02dc9..75c79b88 100644
 --- a/package.json
 +++ b/package.json
 @@ -34,7 +34,7 @@
@@ -17,7 +17,7 @@ index 48f4cb14..5c56e07d 100644
    "dependencies": {
 -    "@novnc/novnc": "1.1.0",
 +    "@novnc/novnc": "Nuvoton-Israel/noVNC.git#openbmc-v1.1.0",
-     "angular": "1.7.8",
+     "angular": "1.7.9",
      "angular-animate": "1.7.8",
      "angular-clipboard": "1.7.0",
 -- 
