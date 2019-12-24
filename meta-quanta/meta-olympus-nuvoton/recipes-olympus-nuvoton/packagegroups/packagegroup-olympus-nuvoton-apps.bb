@@ -57,4 +57,5 @@ RDEPENDS_${PN}-system = " \
         loadsvf \
         asd \
         iptables \
+        iptable-save \
         "
