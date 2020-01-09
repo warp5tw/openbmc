@@ -1,7 +1,7 @@
-From 168430524aaa715a5962f2533ba01440fcdf3f56 Mon Sep 17 00:00:00 2001
+From 9c428da64697bdd9d9fd1998840d9b01f074993d Mon Sep 17 00:00:00 2001
 From: Tomer Maimon <tmaimon77@gmail.com>
 Date: Sun, 5 May 2019 15:50:26 +0300
-Subject: [PATCH] dts: npcm7xx: add reset support to SPI node
+Subject: [PATCH 13/34] dts: npcm7xx: add reset support to SPI node
 
 Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
 ---
@@ -10,10 +10,10 @@ Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi b/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi
-index 71dae3b14eee..b673ba38c5dd 100644
+index 78f4030bddfa..867bac2e91a7 100644
 --- a/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi
 +++ b/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi
-@@ -364,6 +364,7 @@
+@@ -368,6 +368,7 @@
  				interrupts = <GIC_SPI 31 IRQ_TYPE_LEVEL_HIGH>;
  				clocks = <&clk NPCM7XX_CLK_APB5>;
  				clock-names = "clk_apb5";
@@ -21,7 +21,7 @@ index 71dae3b14eee..b673ba38c5dd 100644
  				status = "disabled";
  			};
  
-@@ -377,6 +378,7 @@
+@@ -381,6 +382,7 @@
  				interrupts = <GIC_SPI 28 IRQ_TYPE_LEVEL_HIGH>;
  				clocks = <&clk NPCM7XX_CLK_APB5>;
  				clock-names = "clk_apb5";
@@ -30,10 +30,10 @@ index 71dae3b14eee..b673ba38c5dd 100644
  			};
  
 diff --git a/arch/arm/boot/dts/nuvoton-npcm750-evb.dts b/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
-index 4c664884b6ad..86a1df1624a0 100644
+index e02c04910ef0..7e4e9f17aa05 100644
 --- a/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
 +++ b/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
-@@ -47,8 +47,6 @@
+@@ -46,8 +46,6 @@
  		i2c13 = &i2c13;
  		i2c14 = &i2c14;
  		i2c15 = &i2c15;

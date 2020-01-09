@@ -1,7 +1,7 @@
-From 248c754c252db5323174c05501dc4de7a456f1d8 Mon Sep 17 00:00:00 2001
+From a15df2a18441c909cb19f3ae9cd2db3472d625e3 Mon Sep 17 00:00:00 2001
 From: kfting <kfting@nuvoton.com>
 Date: Mon, 15 Jul 2019 09:22:29 +0800
-Subject: [PATCH] i2c: nuvoton-npcm750-runbmc: integrate the slave mqueue
+Subject: [PATCH 03/34] i2c: nuvoton-npcm750-runbmc: integrate the slave mqueue
 
 1. Add support for the runbmc IPMB functionality
 2. The slave mqueue node is required on the i2c bus 5 for runbmc.
@@ -207,10 +207,10 @@ index 000000000000..376dff998fa3
 +  [10204.220734634] : 20 18 c8 2c 80 01 53
 +  [10204.468461664] : 20 18 c8 2c 80 01 53
 diff --git a/drivers/i2c/Kconfig b/drivers/i2c/Kconfig
-index efc3354d60ae..54a181d62486 100644
+index 1474e57ecafc..b49030593a1a 100644
 --- a/drivers/i2c/Kconfig
 +++ b/drivers/i2c/Kconfig
-@@ -118,6 +118,31 @@ if I2C_SLAVE
+@@ -119,6 +119,31 @@ if I2C_SLAVE
  config I2C_SLAVE_EEPROM
  	tristate "I2C eeprom slave driver"
  

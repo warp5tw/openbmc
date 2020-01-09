@@ -1,7 +1,7 @@
-From 6485c631195c7242144eac208b9831f8a64cb9a6 Mon Sep 17 00:00:00 2001
+From df18095270d791d35c74380df7a037fbe1665948 Mon Sep 17 00:00:00 2001
 From: kwliu <kwliu@nuvoton.com>
 Date: Mon, 8 Jul 2019 10:05:09 +0800
-Subject: [PATCH] add tps53622 and tps53659
+Subject: [PATCH 02/34] add tps53622 and tps53659
 
 ---
  drivers/hwmon/pmbus/Kconfig    |  19 ++++++
@@ -13,10 +13,10 @@ Subject: [PATCH] add tps53622 and tps53659
  create mode 100644 drivers/hwmon/pmbus/tps53659.c
 
 diff --git a/drivers/hwmon/pmbus/Kconfig b/drivers/hwmon/pmbus/Kconfig
-index a82018aaf473..270a3aea55f3 100644
+index 61062632b22b..791449bc5946 100644
 --- a/drivers/hwmon/pmbus/Kconfig
 +++ b/drivers/hwmon/pmbus/Kconfig
-@@ -198,4 +198,23 @@ config SENSORS_ZL6100
+@@ -230,4 +230,23 @@ config SENSORS_ZL6100
  	  This driver can also be built as a module. If so, the module will
  	  be called zl6100.
  
@@ -41,10 +41,10 @@ index a82018aaf473..270a3aea55f3 100644
 +
  endif # PMBUS
 diff --git a/drivers/hwmon/pmbus/Makefile b/drivers/hwmon/pmbus/Makefile
-index ea0e39518c21..027efd2723b7 100644
+index 03bacfcfd660..b4b18a271aca 100644
 --- a/drivers/hwmon/pmbus/Makefile
 +++ b/drivers/hwmon/pmbus/Makefile
-@@ -21,3 +21,5 @@ obj-$(CONFIG_SENSORS_TPS53679)	+= tps53679.o
+@@ -26,3 +26,5 @@ obj-$(CONFIG_SENSORS_TPS53679)	+= tps53679.o
  obj-$(CONFIG_SENSORS_UCD9000)	+= ucd9000.o
  obj-$(CONFIG_SENSORS_UCD9200)	+= ucd9200.o
  obj-$(CONFIG_SENSORS_ZL6100)	+= zl6100.o

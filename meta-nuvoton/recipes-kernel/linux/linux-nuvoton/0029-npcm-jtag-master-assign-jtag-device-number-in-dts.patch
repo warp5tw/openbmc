@@ -1,7 +1,7 @@
-From afda5f73b4b8b30f5943918c01dbb9c26ef921a4 Mon Sep 17 00:00:00 2001
+From 0d92d9968ccd17172b98a7bb899f6cd1bab22a41 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Fri, 20 Dec 2019 15:19:49 +0800
-Subject: [PATCH 1/2] npcm: jtag master: assign jtag device number in dts
+Subject: [PATCH 28/34] npcm: jtag master: assign jtag device number in dts
 
 Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---

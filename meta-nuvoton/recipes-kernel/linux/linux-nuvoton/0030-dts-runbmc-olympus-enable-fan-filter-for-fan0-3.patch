@@ -1,7 +1,7 @@
-From 119074a848ce048bafc2c53846a7f9e97920e0b7 Mon Sep 17 00:00:00 2001
+From 1202fb8cbcda11661ed3cefe46dcf6026f85d046 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Fri, 20 Dec 2019 15:21:23 +0800
-Subject: [PATCH] dts: runbmc-olympus: enable fan filter for fan0-2
+Subject: [PATCH 29/34] dts: runbmc-olympus: enable fan filter for fan0-2
 
 There is a noise issue on fan tach. channel that
 we should enalbe noise filter for fan0-2.

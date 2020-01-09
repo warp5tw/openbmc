@@ -1,8 +1,8 @@
-From 56e35ae373dc7727e46611de991ee007c440dda9 Mon Sep 17 00:00:00 2001
+From 9fd33b2b08d464e6229580f65dd85fc0876a2c43 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Tue, 7 Jan 2020 17:47:55 +0800
-Subject: [PATCH] dts: runbmc-olympus: export i2c-gpio FM_BMC_PWRBTN_OUT_N and
- RST_BMC_SYSRST_BTN_OUT_N
+Subject: [PATCH 33/34] dts: runbmc-olympus: export i2c-gpio
+ FM_BMC_PWRBTN_OUT_N and RST_BMC_SYSRST_BTN_OUT_N
 
 ---
  .../boot/dts/nuvoton-npcm750-runbmc-olympus.dts    | 14 ++------------

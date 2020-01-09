@@ -1,7 +1,7 @@
-From f5468e580eb0485372d7f56182a0a5c7a9fcdcc2 Mon Sep 17 00:00:00 2001
+From fea7be495aa668354050024422e0360bd03d7839 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Wed, 25 Sep 2019 10:16:58 +0800
-Subject: [PATCH] driver: usb: udc: add NPCM UDC
+Subject: [PATCH 19/34] driver: usb: udc: add NPCM UDC
 
 ---
  drivers/usb/gadget/udc/Kconfig    |   21 +
@@ -13,10 +13,10 @@ Subject: [PATCH] driver: usb: udc: add NPCM UDC
  create mode 100644 drivers/usb/gadget/udc/npcm_udc.h
 
 diff --git a/drivers/usb/gadget/udc/Kconfig b/drivers/usb/gadget/udc/Kconfig
-index ef0259a950ba..abdd85d2c305 100644
+index d354036ff6c8..bfcfafab8c20 100644
 --- a/drivers/usb/gadget/udc/Kconfig
 +++ b/drivers/usb/gadget/udc/Kconfig
-@@ -440,6 +440,27 @@ config USB_GADGET_XILINX
+@@ -441,6 +441,27 @@ config USB_GADGET_XILINX
  	  dynamically linked module called "udc-xilinx" and force all
  	  gadget drivers to also be dynamically linked.
  

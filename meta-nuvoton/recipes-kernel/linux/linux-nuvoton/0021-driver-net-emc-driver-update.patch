@@ -1,7 +1,7 @@
-From 8346159675852b5ed13a341cd176231aab77c68c Mon Sep 17 00:00:00 2001
+From 22f4f51e77e7d09bbb335b79e0e71b4dd42a785d Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Fri, 27 Sep 2019 11:17:27 +0800
-Subject: [PATCH] driver: net: emc: driver update
+Subject: [PATCH 21/34] driver: net: emc: driver update
 
 Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---

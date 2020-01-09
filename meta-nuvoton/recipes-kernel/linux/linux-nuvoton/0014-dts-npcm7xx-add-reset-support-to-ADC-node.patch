@@ -1,7 +1,7 @@
-From 5b6167c1bb56e1488ecb701c03d99845824ced4b Mon Sep 17 00:00:00 2001
+From 99b18099c0d9a13bede2f0593f5e9fc1b176e9b0 Mon Sep 17 00:00:00 2001
 From: Tomer Maimon <tmaimon77@gmail.com>
 Date: Sun, 5 May 2019 15:59:40 +0300
-Subject: [PATCH] dts: npcm7xx: add reset support to ADC node
+Subject: [PATCH 14/34] dts: npcm7xx: add reset support to ADC node
 
 Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
 ---
@@ -9,10 +9,10 @@ Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi b/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi
-index b673ba38c5dd..b3c3245a6d09 100644
+index 867bac2e91a7..cc73d4ebb98e 100644
 --- a/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi
 +++ b/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi
-@@ -462,6 +462,7 @@
+@@ -466,6 +466,7 @@
  				reg = <0xc000 0x8>;
  				interrupts = <GIC_SPI 0 IRQ_TYPE_LEVEL_HIGH>;
  				clocks = <&clk NPCM7XX_CLK_ADC>;

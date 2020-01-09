@@ -1,7 +1,7 @@
-From 9d7c7a97077f98b7f7fb63e8c8ded216193deb87 Mon Sep 17 00:00:00 2001
+From ed2d09e274f5248c8bde3bccf154483cbd44a7eb Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Mon, 23 Dec 2019 10:52:57 +0800
-Subject: [PATCH] driver: media: nuvoton: ece: v0.0.6 test
+Subject: [PATCH 30/34] driver: media: nuvoton: ece: v0.0.6 test
 
 ---
  drivers/media/platform/nuvoton/npcm750_ece.c | 159 +++++++------------

@@ -1,7 +1,7 @@
-From 1ed0e3597a8ba22e31ff3e6b9bbf9572b90fa05b Mon Sep 17 00:00:00 2001
+From a6a824dd83473a7696389763643ef69ab7ccb2c1 Mon Sep 17 00:00:00 2001
 From: Tomer Maimon <tmaimon77@gmail.com>
 Date: Sun, 5 May 2019 15:20:03 +0300
-Subject: [PATCH] reset: npcm: add NPCM reset controller driver
+Subject: [PATCH 05/34] reset: npcm: add NPCM reset controller driver
 
 Add Nuvoton NPCM BMC reset controller driver.
 
@@ -14,10 +14,10 @@ Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
  create mode 100644 drivers/reset/reset-npcm.c
 
 diff --git a/drivers/reset/Kconfig b/drivers/reset/Kconfig
-index 13d28fdbdbb5..a4f63163c541 100644
+index 7b07281aa0ae..5dbfdf6d717a 100644
 --- a/drivers/reset/Kconfig
 +++ b/drivers/reset/Kconfig
-@@ -80,6 +80,13 @@ config RESET_MESON_AUDIO_ARB
+@@ -89,6 +89,13 @@ config RESET_MESON_AUDIO_ARB
  	  This enables the reset driver for Audio Memory Arbiter of
  	  Amlogic's A113 based SoCs
  
@@ -32,10 +32,10 @@ index 13d28fdbdbb5..a4f63163c541 100644
  	bool
  
 diff --git a/drivers/reset/Makefile b/drivers/reset/Makefile
-index 4243c38228e2..5aa2cc00f551 100644
+index cf60ce526064..00767c03f5f2 100644
 --- a/drivers/reset/Makefile
 +++ b/drivers/reset/Makefile
-@@ -13,6 +13,7 @@ obj-$(CONFIG_RESET_LANTIQ) += reset-lantiq.o
+@@ -14,6 +14,7 @@ obj-$(CONFIG_RESET_LANTIQ) += reset-lantiq.o
  obj-$(CONFIG_RESET_LPC18XX) += reset-lpc18xx.o
  obj-$(CONFIG_RESET_MESON) += reset-meson.o
  obj-$(CONFIG_RESET_MESON_AUDIO_ARB) += reset-meson-audio-arb.o

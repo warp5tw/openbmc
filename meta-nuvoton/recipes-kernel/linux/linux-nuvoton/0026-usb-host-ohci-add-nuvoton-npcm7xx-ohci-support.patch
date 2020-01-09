@@ -1,7 +1,7 @@
-From 8de353c5e49845791ad09d0c91703ba881cbb6e6 Mon Sep 17 00:00:00 2001
+From c03114da858c146e1e3194e0929b3b50c526e584 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Mon, 23 Sep 2019 10:44:12 +0800
-Subject: [PATCH] usb: host: ohci: add nuvoton npcm7xx ohci support
+Subject: [PATCH 25/34] usb: host: ohci: add nuvoton npcm7xx ohci support
 
 Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---
@@ -12,10 +12,10 @@ Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
  create mode 100644 drivers/usb/host/ohci-npcm7xx.c
 
 diff --git a/drivers/usb/host/Kconfig b/drivers/usb/host/Kconfig
-index d809671c5fea..229ad79452e1 100644
+index 79b2e79dddd0..78eeb2e200ba 100644
 --- a/drivers/usb/host/Kconfig
 +++ b/drivers/usb/host/Kconfig
-@@ -409,6 +409,14 @@ config USB_OHCI_HCD
+@@ -400,6 +400,14 @@ config USB_OHCI_HCD
  
  if USB_OHCI_HCD
  
@@ -31,10 +31,10 @@ index d809671c5fea..229ad79452e1 100644
  	tristate "OHCI support for OMAP1/2 chips"
  	depends on ARCH_OMAP1
 diff --git a/drivers/usb/host/Makefile b/drivers/usb/host/Makefile
-index 84514f71ae44..281e57e2fc17 100644
+index b191361257cc..a98fd1184bec 100644
 --- a/drivers/usb/host/Makefile
 +++ b/drivers/usb/host/Makefile
-@@ -69,6 +69,7 @@ obj-$(CONFIG_USB_OHCI_HCD_S3C2410)	+= ohci-s3c2410.o
+@@ -66,6 +66,7 @@ obj-$(CONFIG_USB_OHCI_HCD_S3C2410)	+= ohci-s3c2410.o
  obj-$(CONFIG_USB_OHCI_HCD_LPC32XX)	+= ohci-nxp.o
  obj-$(CONFIG_USB_OHCI_HCD_PXA27X)	+= ohci-pxa27x.o
  obj-$(CONFIG_USB_OHCI_HCD_DAVINCI)	+= ohci-da8xx.o

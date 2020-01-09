@@ -1,7 +1,7 @@
-KBRANCH ?= "dev-5.2"
-LINUX_VERSION ?= "5.2.11"
+KBRANCH ?= "dev-5.4"
+LINUX_VERSION ?= "5.4.11"
 
-SRCREV="f9e04c3157234671b9d5e27bf9b7025b8b21e0d4"
+SRCREV="f7afc39e5727f68242a0d466e51a56d7d9c59337"
 
 require linux-nuvoton.inc
 
@@ -25,11 +25,9 @@ SRC_URI += "file://0015-dts-npcm7xx-add-reset-support-to-EMC-node.patch"
 SRC_URI += "file://0016-dts-npcm7xx-correct-vcd-and-ece-node.patch"
 SRC_URI += "file://0017-dts-npcm7xx-runbmc-config-jtag-master-pins.patch"
 
-SRC_URI += "file://0018-driver-i2c-nuvoton-0.1.0.patch"
 SRC_URI += "file://0019-driver-usb-udc-add-NPCM-UDC.patch"
 SRC_URI += "file://0020-driver-media-nuvoton-vcd-and-ece-driver.patch"
 SRC_URI += "file://0021-driver-net-emc-driver-update.patch"
-SRC_URI += "file://0022-driver-mtd-npcm-update-driver.patch"
 SRC_URI += "file://0023-driver-hwrng-add-NPCM-RNG.patch"
 SRC_URI += "file://0024-driver-misc-add-jtag-master-driver-for-npcm7xx.patch"
 SRC_URI += "file://0025-driver-ncsi-replace-del-timer-sync.patch"
@@ -41,8 +39,10 @@ SRC_URI += "file://0029-npcm-jtag-master-assign-jtag-device-number-in-dts.patch"
 SRC_URI += "file://0030-dts-runbmc-olympus-enable-fan-filter-for-fan0-3.patch"
 SRC_URI += "file://0031-driver-media-nuvoton-ece-v0.0.6-test.patch"
 SRC_URI += "file://0032-npcm7xx-misc-vdmx-driver.patch"
-SRC_URI += "file://0033-dts-runbmc-olympus-remove-i2c2-0x58-psu.patch"
+#SRC_URI += "file://0033-dts-runbmc-olympus-remove-i2c2-0x58-psu.patch"
 SRC_URI += "file://0034-dts-runbmc-olympus-export-i2c-gpio-FM_BMC_PWRBTN_OUT.patch"
-SRC_URI += "file://0035-driver-i2c-v26-test.patch"
-SRC_URI += "file://0036-Update-PECI-drivers-to-sync-with-linux-upstreaming-v.patch"
-SRC_URI += "file://0037-Add-support-for-new-PECI-commands.patch"
+
+SRC_URI += "file://0036-dts-runbmc-olympus-peci-support-new-peci-node.patch"
+SRC_URI += "file://0039-net-stmmac-do-not-init-phy-to-eee-if-eee_force_disab.patch"
+SRC_URI += "file://0040-update-fiu-dts.patch"
+SRC_URI += "file://0041-driver-clk-npcm7xx-update-for-5.4.patch"

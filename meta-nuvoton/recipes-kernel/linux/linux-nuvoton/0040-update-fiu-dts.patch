@@ -1,0 +1,42 @@
+From 062b966c8067756d564c5f90f55023396c1e47e0 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Fri, 17 Jan 2020 09:31:17 +0800
+Subject: [PATCH] update fiu dts
+
+---
+ arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+index 2398ab2ca9b8..938bd1e8992b 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
++++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+@@ -161,6 +161,7 @@
+ 				#address-cells = <1>;
+ 				#size-cells = <1>;
+ 				reg = <0>;
++				spi-max-frequency = <5000000>;
+ 				spi-rx-bus-width = <2>;
+ 				partitions@80000000 {
+ 					compatible = "fixed-partitions";
+@@ -198,7 +199,8 @@
+ 				#address-cells = <1>;
+ 				#size-cells = <1>;
+ 				reg = <1>;
+-				npcm,fiu-rx-bus-width = <2>;
++				spi-max-frequency = <5000000>;
++				spi-rx-bus-width = <2>;
+ 				partitions@88000000 {
+ 					compatible = "fixed-partitions";
+ 					#address-cells = <1>;
+@@ -223,6 +225,7 @@
+ 				#address-cells = <1>;
+ 				#size-cells = <1>;
+ 				reg = <0>;
++				spi-max-frequency = <5000000>;
+ 				spi-rx-bus-width = <2>;
+ 				partitions@A0000000 {
+ 					compatible = "fixed-partitions";
+-- 
+2.17.1
+

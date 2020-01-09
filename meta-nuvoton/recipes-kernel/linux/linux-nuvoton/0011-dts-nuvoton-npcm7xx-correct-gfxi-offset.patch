@@ -1,17 +1,17 @@
-From f7b22fa9e5e6b8b59ea0d1b51ccf98a1e439256b Mon Sep 17 00:00:00 2001
+From 56db23f2b5db0462e382be1d61efb801edd7e4a1 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Wed, 25 Sep 2019 10:20:08 +0800
-Subject: [PATCH] dts: nuvoton: npcm7xx: correct gfxi offset
+Subject: [PATCH 11/34] dts: nuvoton: npcm7xx: correct gfxi offset
 
 ---
  arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi b/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi
-index d630b256af97..923b996cd0e4 100644
+index 72841f54deb4..49b35154294b 100644
 --- a/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi
 +++ b/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi
-@@ -692,7 +692,7 @@
+@@ -683,7 +683,7 @@
  			gfxi: gfxi@f000e000 {
  				compatible = "nuvoton,npcm750-gfxi", "syscon",
  						"simple-mfd";

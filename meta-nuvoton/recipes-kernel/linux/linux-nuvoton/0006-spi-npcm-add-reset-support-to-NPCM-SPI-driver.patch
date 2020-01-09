@@ -1,7 +1,7 @@
-From 299d10bdd9772237b8a106fabea667bf6724e95c Mon Sep 17 00:00:00 2001
+From 27194ee210b517879d0f86fb4f40aaa50961d6df Mon Sep 17 00:00:00 2001
 From: Tomer Maimon <tmaimon77@gmail.com>
 Date: Sun, 5 May 2019 15:41:53 +0300
-Subject: [PATCH] spi: npcm: add reset support to NPCM SPI driver
+Subject: [PATCH 06/34] spi: npcm: add reset support to NPCM SPI driver
 
 Add reset controller support to NPCM SPI driver.
 
@@ -11,7 +11,7 @@ Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
  1 file changed, 10 insertions(+), 20 deletions(-)
 
 diff --git a/drivers/spi/spi-npcm-pspi.c b/drivers/spi/spi-npcm-pspi.c
-index 785bb1de6172..8ed633b21fba 100644
+index b191d57d1dc0..2b8de7ec95d0 100644
 --- a/drivers/spi/spi-npcm-pspi.c
 +++ b/drivers/spi/spi-npcm-pspi.c
 @@ -12,6 +12,7 @@
@@ -44,7 +44,7 @@ index 785bb1de6172..8ed633b21fba 100644
  static inline unsigned int bytes_per_word(unsigned int bits)
  {
  	return bits <= 8 ? 1 : 2;
-@@ -293,9 +288,9 @@ static int npcm_pspi_unprepare_transfer_hardware(struct spi_master *master)
+@@ -285,9 +280,9 @@ static int npcm_pspi_unprepare_transfer_hardware(struct spi_master *master)
  
  static void npcm_pspi_reset_hw(struct npcm_pspi *priv)
  {
@@ -57,7 +57,7 @@ index 785bb1de6172..8ed633b21fba 100644
  }
  
  static irqreturn_t npcm_pspi_handler(int irq, void *dev_id)
-@@ -361,10 +356,6 @@ static int npcm_pspi_probe(struct platform_device *pdev)
+@@ -352,10 +347,6 @@ static int npcm_pspi_probe(struct platform_device *pdev)
  	if (num_cs < 0)
  		return num_cs;
  
@@ -68,7 +68,7 @@ index 785bb1de6172..8ed633b21fba 100644
  	master = spi_alloc_master(&pdev->dev, sizeof(*priv));
  	if (!master)
  		return -ENOMEM;
-@@ -401,11 +392,10 @@ static int npcm_pspi_probe(struct platform_device *pdev)
+@@ -390,11 +381,10 @@ static int npcm_pspi_probe(struct platform_device *pdev)
  		goto out_disable_clk;
  	}
  
@@ -84,7 +84,7 @@ index 785bb1de6172..8ed633b21fba 100644
  	}
  
  	/* reset SPI-HW block */
-@@ -459,7 +449,7 @@ static int npcm_pspi_probe(struct platform_device *pdev)
+@@ -448,7 +438,7 @@ static int npcm_pspi_probe(struct platform_device *pdev)
  	if (ret)
  		goto out_disable_clk;
  

@@ -1,0 +1,63 @@
+From 127f6ea2eed900355442ef69b80fb15f889b3bbe Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Thu, 9 Jan 2020 11:51:07 +0800
+Subject: [PATCH] dts: runbmc-olympus: peci: support new peci node
+
+---
+ .../dts/nuvoton-npcm750-runbmc-olympus.dts    | 36 ++++++++++---------
+ 1 file changed, 19 insertions(+), 17 deletions(-)
+
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+index 224fbe73cc12..c50538f6ada6 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
++++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+@@ -1017,23 +1017,6 @@
+ 				};
+ 			};
+ 
+-			peci: peci-bus@100000 {
+-				cmd-timeout-ms = <1000>;
+-				pull-down = <0>;
+-				host-neg-bit-rate = <15>;
+-				status = "okay";
+-				intel-peci-dimmtemp@30 {
+-					compatible = "intel,peci-client";
+-					reg = <0x30>;
+-					status = "okay";
+-				};
+-				intel-peci-dimmtemp@31 {
+-					compatible = "intel,peci-client";
+-					reg = <0x31>;
+-					status = "okay";
+-				};
+-			};
+-
+ 			spi0: spi@200000 {
+ 				cs-gpios = <&gpio6 11 GPIO_ACTIVE_LOW>;
+ 				status = "okay";
+@@ -1182,3 +1165,22 @@
+ 	idle-states = <6>;
+ 	};
+ };
++
++&peci0 {
++	cmd-timeout-ms = <1000>;
++	pull-down = <0>;
++	host-neg-bit-rate = <15>;
++	status = "okay";
++
++	intel-peci-dimmtemp@30 {
++		compatible = "intel,peci-client";
++		reg = <0x30>;
++		status = "okay";
++	};
++
++	intel-peci-dimmtemp@31 {
++		compatible = "intel,peci-client";
++		reg = <0x31>;
++		status = "okay";
++	};
++};
+-- 
+2.17.1
+

@@ -1,4 +1,4 @@
-From cef3d5739547211bc9f8df2628dd3ff99ef87408 Mon Sep 17 00:00:00 2001
+From d3727abfa79f74a5554051852e0e0cda31afeee9 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Tue, 24 Sep 2019 18:22:27 +0800
 Subject: [PATCH] stmmac: Add eee fixup disable
@@ -16,24 +16,24 @@ Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
  3 files changed, 7 insertions(+)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index b14f46a57154..891939f55afe 100644
+index f826365c979d..37afe2ac94dd 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -416,6 +416,9 @@ bool stmmac_eee_init(struct stmmac_priv *priv)
- 	if (priv->dma_cap.eee) {
- 		int tx_lpi_timer = priv->tx_lpi_timer;
+@@ -395,6 +395,9 @@ bool stmmac_eee_init(struct stmmac_priv *priv)
+ 	if (!priv->dma_cap.eee)
+ 		return false;
  
-+		if (priv->plat->eee_force_disable)
-+			goto out;
++	if (priv->plat->eee_force_disable)
++		return false;
 +
- 		/* Check if the PHY supports EEE */
- 		if (phy_init_eee(ndev->phydev, 1)) {
- 			/* To manage at run-time if the EEE cannot be supported
+ 	mutex_lock(&priv->lock);
+ 
+ 	/* Check if it needs to be deactivated */
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index 9b5218a8c15b..e61db609fccd 100644
+index 170c3a052b14..c4873630c993 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -432,6 +432,9 @@ stmmac_probe_config_dt(struct platform_device *pdev, const char **mac)
+@@ -465,6 +465,9 @@ stmmac_probe_config_dt(struct platform_device *pdev, const char **mac)
  	plat->en_tx_lpi_clockgating =
  		of_property_read_bool(np, "snps,en-tx-lpi-clockgating");
  
@@ -44,10 +44,10 @@ index 9b5218a8c15b..e61db609fccd 100644
  	 * parameter is not present in the device tree.
  	 */
 diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-index 1a0bb622cf10..711edbd07634 100644
+index dc60d03c4b60..3db5fe142817 100644
 --- a/include/linux/stmmac.h
 +++ b/include/linux/stmmac.h
-@@ -166,6 +166,7 @@ struct plat_stmmacenet_data {
+@@ -164,6 +164,7 @@ struct plat_stmmacenet_data {
  	void (*exit)(struct platform_device *pdev, void *priv);
  	struct mac_device_info *(*setup)(void *priv);
  	void *bsp_priv;

@@ -1,7 +1,7 @@
-From 97a0c03605736836e7ebae05bdf25eb3942acee1 Mon Sep 17 00:00:00 2001
+From 89d1a6799b20f19370698806aac253bd53c257ea Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Tue, 7 Jan 2020 14:51:11 +0800
-Subject: [PATCH] dts: runbmc-olympus: remove i2c2-0x58 psu
+Subject: [PATCH 32/34] dts: runbmc-olympus: remove i2c2-0x58 psu
 
 Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---

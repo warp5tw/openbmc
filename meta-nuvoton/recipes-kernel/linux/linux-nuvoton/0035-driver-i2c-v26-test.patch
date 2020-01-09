@@ -1,7 +1,7 @@
-From 9f88b8135d052d866115a13f0ae74b62081c3584 Mon Sep 17 00:00:00 2001
+From a8be0559c42523038631d0acf911d78f2a61a4d8 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Tue, 7 Jan 2020 18:34:42 +0800
-Subject: [PATCH] v26 test
+Subject: [PATCH 34/34] v26 test
 
 ---
  drivers/i2c/busses/i2c-npcm7xx.c | 2352 +++++++++++++++++++++---------

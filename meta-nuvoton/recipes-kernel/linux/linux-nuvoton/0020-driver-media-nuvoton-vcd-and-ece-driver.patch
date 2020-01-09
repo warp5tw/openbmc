@@ -1,7 +1,7 @@
-From ff7442a9243193e671f6db1cd07265624b0555c3 Mon Sep 17 00:00:00 2001
+From d40367b62741bd0f262b31c69b5dcfac3f66048d Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Wed, 25 Sep 2019 09:36:22 +0800
-Subject: [PATCH] driver: media: nuvoton: vcd and ece driver
+Subject: [PATCH 20/34] driver: media: nuvoton: vcd and ece driver
 
 Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---
@@ -18,10 +18,10 @@ Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
  create mode 100644 drivers/media/platform/nuvoton/npcm750_vcd.c
 
 diff --git a/drivers/media/platform/Kconfig b/drivers/media/platform/Kconfig
-index f2b5f27ebacb..a1b9a6a63761 100644
+index f1f61419fd29..d298d529e814 100644
 --- a/drivers/media/platform/Kconfig
 +++ b/drivers/media/platform/Kconfig
-@@ -699,3 +699,12 @@ config VIDEO_RCAR_DRIF
+@@ -686,3 +686,12 @@ config VIDEO_RCAR_DRIF
  	  will be called rcar_drif.
  
  endif # SDR_PLATFORM_DRIVERS
@@ -35,13 +35,13 @@ index f2b5f27ebacb..a1b9a6a63761 100644
 +
 +endif #VIDEO_NUVOTON
 diff --git a/drivers/media/platform/Makefile b/drivers/media/platform/Makefile
-index 7cbbd925124c..6ea924d1038e 100644
+index 6ee7eb0d36f4..bb1c3dd1cfac 100644
 --- a/drivers/media/platform/Makefile
 +++ b/drivers/media/platform/Makefile
 @@ -101,3 +101,5 @@ obj-y					+= meson/
  obj-y					+= cros-ec-cec/
  
- obj-$(CONFIG_VIDEO_SUN6I_CSI)		+= sunxi/sun6i-csi/
+ obj-y					+= sunxi/
 +
 +obj-$(CONFIG_VIDEO_NUVOTON)     += nuvoton/
 diff --git a/drivers/media/platform/nuvoton/Kconfig b/drivers/media/platform/nuvoton/Kconfig

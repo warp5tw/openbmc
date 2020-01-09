@@ -1,7 +1,7 @@
-From 084f9816e978376398a2cedf0468092ae26f9016 Mon Sep 17 00:00:00 2001
+From 0631a932629240be61000a55b7c8517fc33fe957 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Tue, 24 Sep 2019 10:55:34 +0800
-Subject: [PATCH] driver: hwrng: add NPCM RNG
+Subject: [PATCH 22/34] driver: hwrng: add NPCM RNG
 
 ---
  drivers/char/hw_random/Kconfig    |  13 ++

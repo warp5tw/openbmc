@@ -1,7 +1,7 @@
-From b519b39d71935e81e4e48277da098ab15eeb5f51 Mon Sep 17 00:00:00 2001
+From 738eada53dc5e700f1450f5985e7cf8da67a0e95 Mon Sep 17 00:00:00 2001
 From: Tomer Maimon <tmaimon77@gmail.com>
 Date: Mon, 25 Nov 2019 21:55:24 +0200
-Subject: [PATCH 2/4] hwmon: npcm750: add FAN filter support
+Subject: [PATCH 27/34] hwmon: npcm750: add FAN filter support
 
 the FAN filter works as follow:
 each 200ms the driver wake up and store the FAN data
@@ -16,7 +16,7 @@ Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
  1 file changed, 60 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/hwmon/npcm750-pwm-fan.c b/drivers/hwmon/npcm750-pwm-fan.c
-index 9ee5d6cd5495..d50e56c190c0 100644
+index 1c06292286ea..619855c18154 100644
 --- a/drivers/hwmon/npcm750-pwm-fan.c
 +++ b/drivers/hwmon/npcm750-pwm-fan.c
 @@ -158,6 +158,7 @@
@@ -103,7 +103,7 @@ index 9ee5d6cd5495..d50e56c190c0 100644
  		*val = 0;
  		if (fan_cnt <= 0)
  			return fan_cnt;
-@@ -691,6 +736,7 @@ static int npcm7xx_en_pwm_fan(struct device *dev,
+@@ -671,6 +716,7 @@ static int npcm7xx_en_pwm_fan(struct device *dev,
  	u32 pwm_port;
  	int ret, fan_cnt, md;
  	u8 index, ch, fan_tckc, fan_tien;
@@ -111,7 +111,7 @@ index 9ee5d6cd5495..d50e56c190c0 100644
  
  	ret = of_property_read_u32(child, "reg", &pwm_port);
  	if (ret)
-@@ -720,6 +766,8 @@ static int npcm7xx_en_pwm_fan(struct device *dev,
+@@ -700,6 +746,8 @@ static int npcm7xx_en_pwm_fan(struct device *dev,
  	if (ret)
  		return ret;
  
@@ -120,7 +120,7 @@ index 9ee5d6cd5495..d50e56c190c0 100644
  	for (ch = 0; ch < fan_cnt; ch++) {
  		index = fan_ch[ch];
  		data->fan_present[index] = true;
-@@ -838,6 +886,17 @@ static int npcm7xx_pwm_fan_probe(struct platform_device *pdev)
+@@ -818,6 +866,17 @@ static int npcm7xx_pwm_fan_probe(struct platform_device *pdev)
  		return PTR_ERR(hwmon);
  	}
  

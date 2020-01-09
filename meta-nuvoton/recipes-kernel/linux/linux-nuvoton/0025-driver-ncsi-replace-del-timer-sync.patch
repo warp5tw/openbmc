@@ -1,14 +1,17 @@
-commit 346a3efd71d78fad447fe17dea135e4449a69ba3
-Author: Medad CChien <ctcchien@nuvoton.com>
-Date:   Thu Nov 21 15:35:40 2019 +0800
+From 65545ab80b03473b661696dc296fd9f238ba5e16 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Thu, 9 Jan 2020 11:21:30 +0800
+Subject: [PATCH 24/34] driver: ncsi: replace del_timer_sync() with del_timer()
 
-    driver: ncsi: replace del_timer_sync() with del_timer()
+---
+ net/ncsi/ncsi-manage.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/net/ncsi/ncsi-manage.c b/net/ncsi/ncsi-manage.c
-index 755aab66dcab..3df8d2fb1e42 100644
+index 70fe02697544..87484beee5fd 100644
 --- a/net/ncsi/ncsi-manage.c
 +++ b/net/ncsi/ncsi-manage.c
-@@ -182,7 +182,7 @@ void ncsi_stop_channel_monitor(struct ncsi_channel *nc)
+@@ -181,7 +181,7 @@ void ncsi_stop_channel_monitor(struct ncsi_channel *nc)
  	nc->monitor.enabled = false;
  	spin_unlock_irqrestore(&nc->lock, flags);
  
@@ -17,3 +20,6 @@ index 755aab66dcab..3df8d2fb1e42 100644
  }
  
  struct ncsi_channel *ncsi_find_channel(struct ncsi_package *np,
+-- 
+2.17.1
+

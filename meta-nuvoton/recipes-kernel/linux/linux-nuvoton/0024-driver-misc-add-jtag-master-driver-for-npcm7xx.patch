@@ -1,7 +1,7 @@
-From deac56a01f7417fc9748400e31f5c92fe4928ee7 Mon Sep 17 00:00:00 2001
+From 4abcba6b0601732ef807232ce86905a500f802b8 Mon Sep 17 00:00:00 2001
 From: Stanley Chu <yschu@nuvoton.com>
 Date: Tue, 8 Oct 2019 14:47:18 +0800
-Subject: [PATCH] driver: misc: add jtag master driver for npcm7xx
+Subject: [PATCH 23/34] driver: misc: add jtag master driver for npcm7xx
 
 ---
  drivers/misc/Kconfig                 |    1 +
@@ -17,21 +17,21 @@ Subject: [PATCH] driver: misc: add jtag master driver for npcm7xx
  create mode 100644 drivers/misc/nuvoton-jtag/jtag_drv.h
 
 diff --git a/drivers/misc/Kconfig b/drivers/misc/Kconfig
-index 9d96469fb41c..e717977e1dfe 100644
+index 06a2b753cc7c..d666bab7d4c8 100644
 --- a/drivers/misc/Kconfig
 +++ b/drivers/misc/Kconfig
-@@ -523,4 +523,5 @@ source "drivers/misc/cxl/Kconfig"
+@@ -496,4 +496,5 @@ source "drivers/misc/cxl/Kconfig"
  source "drivers/misc/ocxl/Kconfig"
  source "drivers/misc/cardreader/Kconfig"
  source "drivers/misc/habanalabs/Kconfig"
 +source "drivers/misc/nuvoton-jtag/Kconfig"
  endmenu
 diff --git a/drivers/misc/Makefile b/drivers/misc/Makefile
-index e13de4f0798f..d782b4aeb536 100644
+index b9e6d4c3e906..35136e157ff3 100644
 --- a/drivers/misc/Makefile
 +++ b/drivers/misc/Makefile
-@@ -61,3 +61,4 @@ obj-$(CONFIG_PVPANIC)   	+= pvpanic.o
- obj-$(CONFIG_HABANA_AI)		+= habanalabs/
+@@ -59,3 +59,4 @@ obj-$(CONFIG_HABANA_AI)		+= habanalabs/
+ obj-$(CONFIG_XILINX_SDFEC)	+= xilinx_sdfec.o
  obj-$(CONFIG_NPCM7XX_LPC_BPC)	+= npcm7xx-lpc-bpc.o
  obj-$(CONFIG_NPCM7XX_PCI_MBOX)	+= npcm7xx-pci-mbox.o
 +obj-$(CONFIG_NUVOTON_JTAG)      += nuvoton-jtag/

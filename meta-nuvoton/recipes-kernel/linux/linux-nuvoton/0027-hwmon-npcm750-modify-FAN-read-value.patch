@@ -1,18 +1,18 @@
-From 7bd0ceab052a574aab6884e6bc1ffd2de5c6091a Mon Sep 17 00:00:00 2001
+From c7bb2a9e2b91b31e67998d8db36ccb7e2dd474f1 Mon Sep 17 00:00:00 2001
 From: Tomer Maimon <tmaimon77@gmail.com>
 Date: Mon, 25 Nov 2019 21:49:33 +0200
-Subject: [PATCH 1/4] hwmon: npcm750: modify FAN read value
+Subject: [PATCH 26/34] hwmon: npcm750: modify FAN read value
 
 Remove interrupt and timer mechanism to get the FAN value,
 the FAN is running all the time and updating constantly the FAN value.
 
 Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
 ---
- drivers/hwmon/npcm750-pwm-fan.c | 316 +++++++-------------------------
- 1 file changed, 62 insertions(+), 254 deletions(-)
+ drivers/hwmon/npcm750-pwm-fan.c | 312 +++++++-------------------------
+ 1 file changed, 61 insertions(+), 251 deletions(-)
 
 diff --git a/drivers/hwmon/npcm750-pwm-fan.c b/drivers/hwmon/npcm750-pwm-fan.c
-index 979b579bc118..9ee5d6cd5495 100644
+index 11a28609da3c..1c06292286ea 100644
 --- a/drivers/hwmon/npcm750-pwm-fan.c
 +++ b/drivers/hwmon/npcm750-pwm-fan.c
 @@ -172,7 +172,6 @@
@@ -125,7 +125,7 @@ index 979b579bc118..9ee5d6cd5495 100644
 -		msecs_to_jiffies(NPCM7XX_FAN_POLL_TIMER_200MS);
 -	add_timer(&data->fan_timer);
 -}
--
+ 
 -static inline void npcm7xx_fan_compute(struct npcm7xx_pwm_fan_data *data,
 -				       u8 fan, u8 cmp, u8 fan_id, u8 flag_int,
 -				       u8 flag_mode, u8 flag_clear)
@@ -178,7 +178,7 @@ index 979b579bc118..9ee5d6cd5495 100644
 -		iowrite8((reg_int & ~flag_int),
 -			 NPCM7XX_FAN_REG_TIEN(data->fan_base, fan));
 -		reg_mode =  ioread8(NPCM7XX_FAN_REG_TCKC(data->fan_base, fan));
- 
+-
 -		/* stop capturing */
 -		iowrite8((reg_mode & ~flag_mode),
 -			 NPCM7XX_FAN_REG_TCKC(data->fan_base, fan));
@@ -325,7 +325,7 @@ index 979b579bc118..9ee5d6cd5495 100644
  				 data->fan_dev[channel].fan_pls_per_rev));
  		return 0;
  	default:
-@@ -729,9 +534,9 @@ static u32 npcm7xx_pwm_init(struct npcm7xx_pwm_fan_data *data)
+@@ -711,9 +516,9 @@ static u32 npcm7xx_pwm_init(struct npcm7xx_pwm_fan_data *data)
  
  static void npcm7xx_fan_init(struct npcm7xx_pwm_fan_data *data)
  {
@@ -336,7 +336,7 @@ index 979b579bc118..9ee5d6cd5495 100644
  	u32 apb_clk_freq;
  
  	for (md = 0; md < NPCM7XX_FAN_MAX_MODULE; md++) {
-@@ -779,7 +584,6 @@ static void npcm7xx_fan_init(struct npcm7xx_pwm_fan_data *data)
+@@ -761,7 +566,6 @@ static void npcm7xx_fan_init(struct npcm7xx_pwm_fan_data *data)
  
  		for (i = 0; i < NPCM7XX_FAN_MAX_CHN_NUM_IN_A_MODULE; i++) {
  			ch = md * NPCM7XX_FAN_MAX_CHN_NUM_IN_A_MODULE + i;
@@ -344,7 +344,7 @@ index 979b579bc118..9ee5d6cd5495 100644
  			data->fan_dev[ch].fan_pls_per_rev =
  				NPCM7XX_FAN_DEFAULT_PULSE_PER_REVOLUTION;
  			data->fan_dev[ch].fan_cnt = 0;
-@@ -885,8 +689,8 @@ static int npcm7xx_en_pwm_fan(struct device *dev,
+@@ -865,8 +669,8 @@ static int npcm7xx_en_pwm_fan(struct device *dev,
  {
  	u8 *fan_ch;
  	u32 pwm_port;
@@ -355,7 +355,7 @@ index 979b579bc118..9ee5d6cd5495 100644
  
  	ret = of_property_read_u32(child, "reg", &pwm_port);
  	if (ret)
-@@ -919,7 +723,24 @@ static int npcm7xx_en_pwm_fan(struct device *dev,
+@@ -899,7 +703,24 @@ static int npcm7xx_en_pwm_fan(struct device *dev,
  	for (ch = 0; ch < fan_cnt; ch++) {
  		index = fan_ch[ch];
  		data->fan_present[index] = true;
@@ -381,7 +381,7 @@ index 979b579bc118..9ee5d6cd5495 100644
  	}
  
  	return 0;
-@@ -978,7 +799,6 @@ static int npcm7xx_pwm_fan_probe(struct platform_device *pdev)
+@@ -958,7 +779,6 @@ static int npcm7xx_pwm_fan_probe(struct platform_device *pdev)
  	}
  
  	output_freq = npcm7xx_pwm_init(data);
@@ -389,19 +389,7 @@ index 979b579bc118..9ee5d6cd5495 100644
  
  	for (cnt = 0; cnt < NPCM7XX_PWM_MAX_MODULES  ; cnt++)
  		mutex_init(&data->pwm_lock[cnt]);
-@@ -987,10 +807,8 @@ static int npcm7xx_pwm_fan_probe(struct platform_device *pdev)
- 		spin_lock_init(&data->fan_lock[i]);
- 
- 		data->fan_irq[i] = platform_get_irq(pdev, i);
--		if (data->fan_irq[i] < 0) {
--			dev_err(dev, "get IRQ fan%d failed\n", i);
-+		if (data->fan_irq[i] < 0)
- 			return data->fan_irq[i];
--		}
- 
- 		sprintf(name, "NPCM7XX-FAN-MD%d", i);
- 		ret = devm_request_irq(dev, data->fan_irq[i], npcm7xx_fan_isr,
-@@ -1001,6 +819,8 @@ static int npcm7xx_pwm_fan_probe(struct platform_device *pdev)
+@@ -979,6 +799,8 @@ static int npcm7xx_pwm_fan_probe(struct platform_device *pdev)
  		}
  	}
  
@@ -410,7 +398,7 @@ index 979b579bc118..9ee5d6cd5495 100644
  	for_each_child_of_node(np, child) {
  		ret = npcm7xx_en_pwm_fan(dev, child, data);
  		if (ret) {
-@@ -1018,18 +838,6 @@ static int npcm7xx_pwm_fan_probe(struct platform_device *pdev)
+@@ -996,18 +818,6 @@ static int npcm7xx_pwm_fan_probe(struct platform_device *pdev)
  		return PTR_ERR(hwmon);
  	}
  

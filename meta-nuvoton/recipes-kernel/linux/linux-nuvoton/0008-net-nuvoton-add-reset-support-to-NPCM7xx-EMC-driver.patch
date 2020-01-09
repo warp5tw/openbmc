@@ -1,17 +1,15 @@
-From 390421a55da759e566a143193a30d260d6b4db8a Mon Sep 17 00:00:00 2001
-From: Tomer Maimon <tmaimon77@gmail.com>
-Date: Sun, 5 May 2019 16:05:31 +0300
-Subject: [PATCH] net: nuvoton: add reset support to NPCM7xx EMC driver
+From 08ca7bca4a908dbd7ae29504e750a3f9c75689f1 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Thu, 9 Jan 2020 11:00:16 +0800
+Subject: [PATCH 08/34] net: nuvoton: add reset support to NPCM7xx EMC driver
 
 Add reset controller support to NPCM7xx EMC driver.
-
-Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
 ---
  drivers/net/ethernet/nuvoton/npcm7xx_emc.c | 27 +++++++---------------
  1 file changed, 8 insertions(+), 19 deletions(-)
 
 diff --git a/drivers/net/ethernet/nuvoton/npcm7xx_emc.c b/drivers/net/ethernet/nuvoton/npcm7xx_emc.c
-index b47bc060c7c9..8cafc4ae9777 100644
+index efb441d511c5..746051d2a627 100644
 --- a/drivers/net/ethernet/nuvoton/npcm7xx_emc.c
 +++ b/drivers/net/ethernet/nuvoton/npcm7xx_emc.c
 @@ -20,6 +20,7 @@
@@ -29,11 +27,11 @@ index b47bc060c7c9..8cafc4ae9777 100644
 -	struct regmap *rst_regmap;
 +	struct reset_control *reset;
  
- 	/* Scratch page to use when rx skb alloc fails */
- 	void *rx_scratch;
-@@ -1877,26 +1878,14 @@ static int npcm7xx_ether_probe(struct platform_device *pdev)
+ 	/* debug counters */
+ 	unsigned int max_waiting_rx;
+@@ -1891,26 +1892,14 @@ static int npcm7xx_ether_probe(struct platform_device *pdev)
  
- 	ether = netdev_priv(netdev);
+ 	ether = netdev_priv(dev);
  
 -	ether->rst_regmap =
 -		syscon_regmap_lookup_by_compatible("nuvoton,npcm750-rst");
