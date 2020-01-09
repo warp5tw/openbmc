@@ -2,6 +2,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += "file://bios_defs.json"
 SRC_URI += "file://0001-main-add-feature-for-updating-BootProgress-and-Opera.patch"
+SRC_URI += "file://0001-do-not-exit-with-failure-when-read-system-call-retur.patch"
 
 SNOOP_DEVICE = "npcm7xx-lpc-bpc0"
 

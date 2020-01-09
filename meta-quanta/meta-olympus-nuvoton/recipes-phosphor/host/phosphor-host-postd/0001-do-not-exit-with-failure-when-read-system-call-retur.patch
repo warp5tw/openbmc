@@ -1,0 +1,26 @@
+From 6abbe28f4f6a61fb54e70ed211cba17d2f732ffb Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Thu, 9 Jan 2020 16:54:08 +0800
+Subject: [PATCH] do not exit with failure when read system call return -EAGAIN
+ because file IO is non-blocking
+
+---
+ main.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/main.cpp b/main.cpp
+index f4416b4..cab3a2f 100644
+--- a/main.cpp
++++ b/main.cpp
+@@ -143,6 +143,8 @@ void PostCodeEventHandler(sdeventplus::source::IO& s, int postFd,
+     ssize_t readb = read(postFd, &code, codeSize);
+     if (readb < 0)
+     {
++        if (errno == EAGAIN)
++            return;
+         /* Read failure. */
+         s.get_event().exit(1);
+         return;
+-- 
+2.17.1
+
