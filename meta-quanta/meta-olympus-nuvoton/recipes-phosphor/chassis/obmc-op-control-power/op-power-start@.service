@@ -3,7 +3,6 @@ Description=Start Power%i
 Wants=obmc-power-start@%i.target
 Before=obmc-power-start@%i.target
 After=obmc-power-start-pre@%i.target
-After=obmc-fan-control.target
 Wants=mapper-wait@-org-openbmc-control-power%i.service
 After=mapper-wait@-org-openbmc-control-power%i.service
 Conflicts=obmc-chassis-poweroff@%i.target
@@ -12,7 +11,7 @@ ConditionPathExists=!/run/openbmc/chassis@%i-on
 [Service]
 RemainAfterExit=yes
 Type=oneshot
-ExecStart=/bin/sh -c "echo 0 > /sys/class/gpio/gpio451; sleep 2; echo 1 > /sys/class/gpio/gpio451"
+ExecStart=/bin/sh -c "echo "starting..."; echo 0 > /sys/class/gpio/gpio451/value; sleep 1; echo 1 > /sys/class/gpio/gpio451/value"
 SyslogIdentifier=op-power-start
 
 [Install]
