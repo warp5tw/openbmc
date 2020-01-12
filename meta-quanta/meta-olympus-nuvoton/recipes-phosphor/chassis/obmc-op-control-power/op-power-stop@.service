@@ -10,7 +10,7 @@ Conflicts=obmc-chassis-poweron@%i.target
 
 [Service]
 RemainAfterExit=yes
-ExecStart=/bin/sh -c "echo "stopping..."; echo 0 > /sys/class/gpio/gpio451/value; sleep 1; echo 1 > /sys/class/gpio/gpio451/value"
+ExecStart=/usr/bin/env olympus-power-control.sh 0 506 451
 SyslogIdentifier=op-power-stop
 
 [Install]
