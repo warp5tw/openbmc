@@ -1,5 +1,4 @@
-FILESEXTRAPATHS_prepend_runbmc-buv := "${THISDIR}/${PN}:"
-
+FILESEXTRAPATHS_prepend_buv-runbmc := "${THISDIR}/${PN}:"
 
 ITEMS = " \
         i2c@8b000/ina219@40 \
@@ -11,4 +10,4 @@ ITEMS = " \
         "
 
 ENVS = "obmc/hwmon/ahb/apb/{0}.conf"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_runbmc-buv = " ${@compose_list(d, 'ENVS', 'ITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE_${PN}_append_buv-runbmc = " ${@compose_list(d, 'ENVS', 'ITEMS')}"
