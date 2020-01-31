@@ -35,10 +35,9 @@ SYSTEMD_PACKAGES = "${PN}-discover \
 # recommended to deal properly with these reset scenarios.
 RRECOMMENDS_${PN}-host = "${PN}-host-check ${PN}-reset-sensor-states"
 
-inherit autotools pkgconfig
+inherit meson pkgconfig
 inherit obmc-phosphor-dbus-service
 
-DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus"
 DEPENDS += "sdeventplus"
 DEPENDS += "phosphor-logging"
@@ -141,12 +140,7 @@ HOST_RST_RBT_ATTEMPTS_SVC_INST = "phosphor-reset-host-reboot-attempts@{0}.servic
 HOST_RST_RBT_ATTEMPTS_SVC_FMT = "../${HOST_RST_RBT_ATTEMPTS_SVC}:${HOST_START_TGTFMT}.requires/${HOST_RST_RBT_ATTEMPTS_SVC_INST}"
 SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_RST_RBT_ATTEMPTS_SVC_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_HOST_INSTANCES')}"
 
-do_install_append() {
-  install -d ${D}${sysconfdir}/phosphor-systemd-target-monitor
-  install ${S}/phosphor-target-monitor-default.json ${D}${sysconfdir}/phosphor-systemd-target-monitor/phosphor-target-monitor-default.json
-}
-
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
-SRCREV = "a65d30d16bad3521c3c03ccf2b5cef213e825576"
+SRCREV = "4640d48e998709f1b64b97347db0f1b355b7f423"
 
 S = "${WORKDIR}/git"
