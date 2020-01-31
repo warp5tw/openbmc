@@ -1,7 +1,7 @@
 SRC_URI_remove_olympus-nuvoton = "git://github.com/openbmc/phosphor-host-ipmid"
 SRC_URI_prepend_olympus-nuvoton = "git://github.com/Nuvoton-Israel/phosphor-host-ipmid"
 
-SRCREV := "120c8c0399420130fbe5d8ef9f22a71bd2027d54"
+SRCREV := "c7f69c1aea95434d4ae99928f2690979f09c39a5"
 
 FILESEXTRAPATHS_append_olympus-nuvoton := "${THISDIR}/${PN}:"
 
@@ -16,8 +16,6 @@ EXTRA_OECONF_olympus-nuvoton = " \
 
 SRC_URI_append_olympus-nuvoton = " file://phosphor-ipmi-host.service"
 SRC_URI_append_olympus-nuvoton = " file://xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service"
-SRC_URI_append_olympus-nuvoton = " file://0001-Add-support-for-enabling-disabling-network-IPMI.patch"
-SRC_URI_append_olympus-nuvoton = " file://0001-add-watchdog-sensor-type.patch"
 
 SYSTEMD_SERVICE_${PN}_append_olympus-nuvoton = " phosphor-ipmi-host.service"
 SYSTEMD_SERVICE_${PN}_append_olympus-nuvoton = " xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service"
