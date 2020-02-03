@@ -39,7 +39,7 @@ SRC_URI += "file://0029-npcm-jtag-master-assign-jtag-device-number-in-dts.patch"
 SRC_URI += "file://0030-dts-runbmc-olympus-enable-fan-filter-for-fan0-3.patch"
 SRC_URI += "file://0031-driver-media-nuvoton-ece-v0.0.6-test.patch"
 SRC_URI += "file://0032-npcm7xx-misc-vdmx-driver.patch"
-#SRC_URI += "file://0033-dts-runbmc-olympus-remove-i2c2-0x58-psu.patch"
+SRC_URI += "file://0033-dts-runbmc-olympus-remove-i2c2-0x58-psu.patch"
 SRC_URI += "file://0034-dts-runbmc-olympus-export-i2c-gpio-FM_BMC_PWRBTN_OUT.patch"
 
 SRC_URI += "file://0036-dts-runbmc-olympus-peci-support-new-peci-node.patch"
