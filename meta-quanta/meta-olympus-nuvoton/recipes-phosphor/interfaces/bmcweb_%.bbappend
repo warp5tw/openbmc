@@ -1,6 +1,7 @@
 FILESEXTRAPATHS_prepend_olympus-nuvoton := "${THISDIR}/${PN}:"
 
 SRC_URI_append_olympus-nuvoton = " \
+    file://0001-Support-for-NameServers-StaticNameServers.patch \
     file://0003-Redfish-Add-power-metrics-support.patch \
     file://0004-bmcweb-sensors-get-sensor-list-also-form-path-with-s.patch \
     file://0005-bmcweb-chassis-add-indicatorLED-support.patch \
