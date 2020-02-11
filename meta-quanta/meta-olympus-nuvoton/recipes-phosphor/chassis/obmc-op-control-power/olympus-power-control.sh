@@ -22,3 +22,15 @@ do
 done
 
 echo "gpio$3 output hi"
+
+if [ $1 = "1" ]; then
+    if [ -d "/sys/bus/platform/drivers/peci_npcm/f0100000.peci-bus" ]; then
+        echo f0100000.peci-bus > /sys/bus/platform/drivers/peci_npcm/unbind; echo f0100000.peci-bus > /sys/bus/platform/drivers/peci_npcm/bind
+    else
+        echo f0100000.peci-bus > /sys/bus/platform/drivers/peci_npcm/bind
+    fi
+else
+    if [ -d "/sys/bus/platform/drivers/peci_npcm/f0100000.peci-bus" ]; then
+        echo f0100000.peci-bus > /sys/bus/platform/drivers/peci_npcm/unbind
+    fi
+fi
