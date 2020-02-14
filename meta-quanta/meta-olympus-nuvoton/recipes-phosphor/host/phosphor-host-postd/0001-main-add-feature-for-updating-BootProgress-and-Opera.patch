@@ -1,4 +1,4 @@
-From 9b1d422e3bcad33896ffb5243ff303417d151805 Mon Sep 17 00:00:00 2001
+From 7b119b8429db6955b7f5a0fad23c11f23e79c562 Mon Sep 17 00:00:00 2001
 From: Tim Lee <timlee660101@gmail.com>
 Date: Wed, 27 Nov 2019 09:56:22 +0800
 Subject: [PATCH] main: add feature for updating BootProgress and
@@ -63,7 +63,7 @@ index acaeca7..89e9f56 100644
  template <typename... T>
  using ServerObject = typename sdbusplus::server::object::object<T...>;
 diff --git a/main.cpp b/main.cpp
-index f3815c1..f4416b4 100644
+index daec6c4..dde9602 100644
 --- a/main.cpp
 +++ b/main.cpp
 @@ -32,9 +32,96 @@
@@ -163,12 +163,12 @@ index f3815c1..f4416b4 100644
  static void usage(const char* name)
  {
      fprintf(stderr,
-@@ -62,7 +149,45 @@ void PostCodeEventHandler(sdeventplus::source::IO& s, int postFd,
-     }
-     if (readb > 0)
-     {
--        reporter->value(le64toh(code));
-+        code = reporter->value(le64toh(code));
+@@ -67,7 +154,45 @@ void PostCodeEventHandler(sdeventplus::source::IO& s, int postFd,
+         // since we are single threaded, external users will never see the
+         // first value.
+         reporter->value(~code, true);
+-        reporter->value(code);
++        code = reporter->value(code);
 +        if (code == OS_START)
 +        {
 +            // Set BootProgress property value to OSStart
@@ -210,7 +210,7 @@ index f3815c1..f4416b4 100644
      }
  }
  
-@@ -126,6 +251,12 @@ int main(int argc, char* argv[])
+@@ -131,6 +256,12 @@ int main(int argc, char* argv[])
          }
      }
  

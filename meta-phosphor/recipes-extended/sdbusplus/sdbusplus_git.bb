@@ -37,7 +37,7 @@ DEPENDS_append_class-native = " \
         "
 
 SRC_URI += "git://github.com/openbmc/sdbusplus"
-SRCREV = "43ea426d71e70a2fec3aab27dfa5ad6de0e9fbfd"
+SRCREV = "e57c38e9dd64e0a5bc12bac5b6d3199c7baa9595"
 
 PACKAGECONFIG ??= "libsdbusplus transaction"
 PACKAGECONFIG[libsdbusplus] = "--enable-libsdbusplus,--disable-libsdbusplus,systemd,libsystemd"
