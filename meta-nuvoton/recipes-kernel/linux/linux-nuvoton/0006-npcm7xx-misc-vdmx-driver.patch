@@ -1,23 +1,22 @@
-From db74c0447aec5c92c22d3587828b441a4dd29506 Mon Sep 17 00:00:00 2001
+From 9d3264782a38461680d6432132a499a756f3f419 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
-Date: Thu, 9 Jan 2020 11:23:32 +0800
-Subject: [PATCH 31/34] npcm7xx: misc: vdmx driver
+Date: Tue, 18 Feb 2020 15:42:31 +0800
+Subject: [PATCH] vdm driver
 
 ---
  arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi |   3 +-
- arch/arm/boot/dts/nuvoton-npcm750-evb.dts     |   5 +
  .../dts/nuvoton-npcm750-runbmc-olympus.dts    |   5 +
  drivers/misc/Kconfig                          |   7 +
  drivers/misc/Makefile                         |   1 +
  drivers/misc/npcm7xx-pci-vdm.c                | 417 ++++++++++++++++++
- 6 files changed, 437 insertions(+), 1 deletion(-)
+ 5 files changed, 432 insertions(+), 1 deletion(-)
  create mode 100644 drivers/misc/npcm7xx-pci-vdm.c
 
 diff --git a/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi b/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi
-index 977643da073e..a2feed25ec1e 100644
+index 60a0668a2099..c28e72d4edc2 100644
 --- a/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi
 +++ b/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi
-@@ -223,7 +223,8 @@
+@@ -224,7 +224,8 @@
  			compatible = "nuvoton,npcm750-vdm";
  			reg = <0xe0800000 0x1000
  				   0xf0822000 0x1000>;
@@ -27,31 +26,8 @@ index 977643da073e..a2feed25ec1e 100644
  		};
  
  		fiu0: fiu@fb000000 {
-diff --git a/arch/arm/boot/dts/nuvoton-npcm750-evb.dts b/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
-index 7e4e9f17aa05..63f195ed55a2 100644
---- a/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
-+++ b/arch/arm/boot/dts/nuvoton-npcm750-evb.dts
-@@ -30,6 +30,7 @@
- 		udc9 = &udc9;
- 		emmc0 = &sdhci0;
- 		emmc1 = &sdhci1;
-+		vdma = &vdma;
- 		i2c0 = &i2c0;
- 		i2c1 = &i2c1;
- 		i2c2 = &i2c2;
-@@ -255,6 +256,10 @@
- 			status = "okay";
- 		};
- 
-+		vdma: vdma@e0800000 {
-+			status = "okay";
-+		};
-+
- 		vcd: vcd@f0810000 {
- 			status = "okay";
- 		};
 diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
-index fceb13b956d4..25f261ccb1e5 100644
+index 4d0ce884e49c..828b163d3977 100644
 --- a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
 +++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
 @@ -28,6 +28,7 @@
@@ -62,7 +38,7 @@ index fceb13b956d4..25f261ccb1e5 100644
  		i2c0 = &i2c0;
  		i2c1 = &i2c1;
  		i2c2 = &i2c2;
-@@ -243,6 +244,10 @@
+@@ -222,6 +223,10 @@
  			status = "okay";
  		};
  
@@ -74,7 +50,7 @@ index fceb13b956d4..25f261ccb1e5 100644
  			status = "okay";
  		};
 diff --git a/drivers/misc/Kconfig b/drivers/misc/Kconfig
-index d666bab7d4c8..6b346e1b1a7f 100644
+index 06a2b753cc7c..1a6614f2613e 100644
 --- a/drivers/misc/Kconfig
 +++ b/drivers/misc/Kconfig
 @@ -481,6 +481,13 @@ config NPCM7XX_PCI_MBOX
@@ -92,13 +68,13 @@ index d666bab7d4c8..6b346e1b1a7f 100644
  source "drivers/misc/eeprom/Kconfig"
  source "drivers/misc/cb710/Kconfig"
 diff --git a/drivers/misc/Makefile b/drivers/misc/Makefile
-index 35136e157ff3..d677475f4bae 100644
+index b9e6d4c3e906..5e1f40bf1285 100644
 --- a/drivers/misc/Makefile
 +++ b/drivers/misc/Makefile
-@@ -60,3 +60,4 @@ obj-$(CONFIG_XILINX_SDFEC)	+= xilinx_sdfec.o
+@@ -59,3 +59,4 @@ obj-$(CONFIG_HABANA_AI)		+= habanalabs/
+ obj-$(CONFIG_XILINX_SDFEC)	+= xilinx_sdfec.o
  obj-$(CONFIG_NPCM7XX_LPC_BPC)	+= npcm7xx-lpc-bpc.o
  obj-$(CONFIG_NPCM7XX_PCI_MBOX)	+= npcm7xx-pci-mbox.o
- obj-$(CONFIG_NUVOTON_JTAG)      += nuvoton-jtag/
 +obj-$(CONFIG_NPCM7XX_PCI_VDM)  += npcm7xx-pci-vdm.o
 diff --git a/drivers/misc/npcm7xx-pci-vdm.c b/drivers/misc/npcm7xx-pci-vdm.c
 new file mode 100644

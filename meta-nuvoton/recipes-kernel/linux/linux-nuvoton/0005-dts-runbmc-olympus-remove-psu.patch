@@ -1,18 +1,17 @@
-From 89d1a6799b20f19370698806aac253bd53c257ea Mon Sep 17 00:00:00 2001
+From 13a63abb54daa3a02e1c5ab0d9cd7f3c77fff927 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
-Date: Tue, 7 Jan 2020 14:51:11 +0800
-Subject: [PATCH 32/34] dts: runbmc-olympus: remove i2c2-0x58 psu
+Date: Wed, 19 Feb 2020 13:20:53 +0800
+Subject: [PATCH] dts: runbmc-olympus: remove psu
 
-Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---
  arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts | 4 ----
  1 file changed, 4 deletions(-)
 
 diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
-index 25f261ccb1e5..50e0ce20ecaf 100644
+index 828b163d3977..dd2625915b14 100644
 --- a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
 +++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
-@@ -419,10 +419,6 @@
+@@ -398,10 +398,6 @@
  					compatible = "ti,tmp421";
  					reg = <0x4c>;
  				};
