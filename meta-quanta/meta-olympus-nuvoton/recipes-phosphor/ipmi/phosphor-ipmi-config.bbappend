@@ -5,6 +5,7 @@ inherit image_version
 SRC_URI_append_olympus-nuvoton = " file://channel_config.json"
 SRC_URI_append_olympus-nuvoton = " file://dev_id.json"
 SRC_URI_append_olympus-nuvoton = " file://power_reading.json"
+SRC_URI_append_olympus-nuvoton = " file://dcmi_sensors.json"
 
 do_install_append_olympus-nuvoton() {
     install -m 0644 -D ${WORKDIR}/channel_config.json \
@@ -13,6 +14,8 @@ do_install_append_olympus-nuvoton() {
         ${D}${datadir}/ipmi-providers/dev_id.json
     install -m 0644 -D ${WORKDIR}/power_reading.json \
         ${D}${datadir}/ipmi-providers/power_reading.json
+    install -m 0644 -D ${WORKDIR}/dcmi_sensors.json \
+        ${D}${datadir}/ipmi-providers/dcmi_sensors.json
 }
 
 unset do_patch[noexec]
