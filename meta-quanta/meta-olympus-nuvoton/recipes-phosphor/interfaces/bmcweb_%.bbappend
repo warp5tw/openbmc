@@ -5,6 +5,7 @@ SRC_URI_append_olympus-nuvoton = " \
     file://0003-Redfish-Add-power-metrics-support.patch \
     file://0004-bmcweb-sensors-get-sensor-list-also-form-path-with-s.patch \
     file://0005-bmcweb-chassis-add-indicatorLED-support.patch \
+    file://0006-bmcweb-get-cpu-and-dimm-info-from-prettyname.patch \
 "
 
 # Enable CPU Log and Raw PECI support
