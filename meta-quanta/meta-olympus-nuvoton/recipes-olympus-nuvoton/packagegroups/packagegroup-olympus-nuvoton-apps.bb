@@ -58,4 +58,5 @@ RDEPENDS_${PN}-system = " \
         asd \
         iptables \
         iptable-save \
+        pch-time-sync \
         "
