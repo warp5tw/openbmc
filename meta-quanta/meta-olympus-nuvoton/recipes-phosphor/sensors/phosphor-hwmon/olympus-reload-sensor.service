@@ -1,0 +1,10 @@
+[Unit]
+Description=Reload Sensor Configuration
+After=op-reset-chassis-running@0.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c "olympus-reload-sensor.sh boot_check"
+
+[Install]
+WantedBy=basic.target

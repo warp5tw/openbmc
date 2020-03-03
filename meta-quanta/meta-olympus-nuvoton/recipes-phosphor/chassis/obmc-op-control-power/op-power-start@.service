@@ -11,7 +11,8 @@ ConditionPathExists=!/run/openbmc/chassis@%i-on
 [Service]
 RemainAfterExit=yes
 Type=oneshot
-ExecStart=/usr/bin/env olympus-power-control.sh 1 506 451
+ExecStart=/bin/sh -c "olympus-power-control.sh 1 506 451"
+ExecStartPost=/bin/sh -c "olympus-reload-sensor.sh 1"
 SyslogIdentifier=op-power-start
 
 [Install]
