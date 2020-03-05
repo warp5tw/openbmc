@@ -1,0 +1,192 @@
+From b3096feecd961e032869be596a00f60bc40d31ed Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Fri, 6 Mar 2020 12:06:33 +0800
+Subject: [PATCH] Read power state from PCH for host state
+
+---
+ host_check_main.cpp    | 69 ++++++++++++++++++++++++++++++++----------
+ host_state_manager.cpp |  9 ++++++
+ meson.build            | 13 ++++++--
+ 3 files changed, 73 insertions(+), 18 deletions(-)
+
+diff --git a/host_check_main.cpp b/host_check_main.cpp
+index 56b22fb..5ca9aa9 100644
+--- a/host_check_main.cpp
++++ b/host_check_main.cpp
+@@ -1,3 +1,5 @@
++#include <fcntl.h>
++#include <sys/ioctl.h>
+ #include <cstdlib>
+ #include <unistd.h>
+ #include <iostream>
+@@ -9,6 +11,12 @@
+ #include <xyz/openbmc_project/Control/Host/server.hpp>
+ #include "config.h"
+ 
++extern "C" {
++#include <i2c/smbus.h>
++#include <linux/i2c-dev.h>
++#include <linux/i2c.h>
++}
++
+ using namespace std::literals;
+ using namespace phosphor::logging;
+ using namespace sdbusplus::xyz::openbmc_project::Control::server;
+@@ -25,6 +33,40 @@ constexpr auto CONTROL_HOST_INTERFACE = "xyz.openbmc_project.Control.Host";
+ bool cmdDone = false;
+ bool hostRunning = false;
+ 
++
++uint8_t i2cReadByteData(const int& i2cBus, const int& slaveAddr, const int& flags, const uint8_t& offset)
++{
++        std::string i2cDev = "/dev/i2c-" + std::to_string(i2cBus);
++        int fd = -1;
++
++        fd = open(i2cDev.c_str(), flags);
++        if (fd < 0)
++        {
++            throw std::runtime_error("Unable to open i2c device.");
++        }
++
++        if (ioctl(fd, I2C_SLAVE_FORCE, slaveAddr) < 0)
++        {
++            close(fd);
++            fd = -1;
++            throw std::runtime_error("Unable to set i2c slave address.");
++        }
++
++        int ret = i2c_smbus_read_byte_data(fd, offset);
++
++        if (ret < 0)
++        {
++            throw std::runtime_error("i2c read failed");
++        }
++
++        if (!(fd < 0))
++        {
++            close(fd);
++        }
++
++        return static_cast<uint8_t>(ret);
++}
++
+ // Function called on host control signals
+ static int hostControlSignal(sd_bus_message* msg, void* userData,
+                              sd_bus_error* retError)
+@@ -116,24 +158,19 @@ int main()
+ 
+     auto bus = sdbusplus::bus::new_default();
+ 
+-    std::string s = "type='signal',member='CommandComplete',path='"s +
+-                    CONTROL_HOST_PATH + "',interface='" +
+-                    CONTROL_HOST_INTERFACE + "'";
+-
+-    // Setup Signal Handler
+-    sdbusplus::bus::match::match hostControlSignals(bus, s.c_str(),
+-                                                    hostControlSignal, nullptr);
++    constexpr uint8_t pchDevI2CBusNumber = 0x04;
++    constexpr uint8_t pchDevI2CSlaveAddress = 0x44;
++    constexpr uint8_t pchDevRegPWState = 0x01;
+ 
+-    sendHeartbeat(bus);
++    int state =
++        i2cReadByteData(pchDevI2CBusNumber, pchDevI2CSlaveAddress, O_RDWR | O_CLOEXEC, pchDevRegPWState);
++    if (state <= 3) //S0-S3
++        hostRunning = true;
++    else
++        hostRunning = false;
+ 
+-    // Wait for signal
+-    while (!cmdDone)
+-    {
+-        bus.process_discard();
+-        if (cmdDone)
+-            break;
+-        bus.wait();
+-    }
++    std::string f_str = std::to_string(state);
++    log<level::INFO>(("Host Power State is " + f_str).c_str());
+ 
+     // If host running then create file
+     if (hostRunning)
+diff --git a/host_state_manager.cpp b/host_state_manager.cpp
+index b081021..c7749d5 100644
+--- a/host_state_manager.cpp
++++ b/host_state_manager.cpp
+@@ -17,6 +17,7 @@
+ #include "host_state_manager.hpp"
+ #include "config.h"
+ 
++
+ // Register class version with Cereal
+ CEREAL_CLASS_VERSION(phosphor::state::manager::Host, CLASS_VERSION)
+ 
+@@ -97,6 +98,8 @@ void Host::determineInitialState()
+                                convertForMessage(HostState::Running).c_str()));
+         server::Host::currentHostState(HostState::Running);
+         server::Host::requestedHostTransition(Transition::On);
++        bootprogress::Progress::bootProgress(ProgressStages::OSStart);
++        osstatus::Status::operatingSystemState(OSStatus::Standby);
+     }
+     else
+     {
+@@ -256,6 +259,10 @@ void Host::sysStateChange(sdbusplus::message::message& msg)
+     {
+         log<level::INFO>("Received signal that host is running");
+         this->currentHostState(server::Host::HostState::Running);
++        if (fs::exists("/run/openbmc/host@0-on")) {
++            this->bootProgress(bootprogress::Progress::ProgressStages::OSStart);
++            this->operatingSystemState(osstatus::Status::OSStatus::Standby);
++        }
+     }
+     else if ((newStateUnit == HOST_STATE_QUIESCE_TGT) &&
+              (newStateResult == "done") &&
+@@ -358,6 +365,8 @@ Host::HostState Host::currentHostState(HostState value)
+     return server::Host::currentHostState(value);
+ }
+ 
++
++
+ } // namespace manager
+ } // namespace state
+ } // namespace phosphor
+diff --git a/meson.build b/meson.build
+index f4eb4bb..8bbfc50 100644
+--- a/meson.build
++++ b/meson.build
+@@ -45,13 +45,22 @@ phosphordbusinterfaces = dependency('phosphor-dbus-interfaces')
+ 
+ cppfs = meson.get_compiler('cpp').find_library('stdc++fs')
+ 
++libi2c_dev = static_library(
++    'i2c_dev',
++    link_args : '-li2c',
++)
++
++libi2c_dep = declare_dependency(
++    link_with: libi2c_dev,
++    link_args : '-li2c')
++
+ executable('phosphor-host-state-manager',
+             'host_state_manager.cpp',
+             'host_state_manager_main.cpp',
+             'settings.cpp',
+             dependencies: [
+             sdbusplus, sdeventplus, phosphorlogging,
+-            phosphordbusinterfaces, cppfs
++            phosphordbusinterfaces, cppfs 
+             ],
+     implicit_include_directories: true,
+     install: true
+@@ -92,7 +101,7 @@ executable('phosphor-discover-system-state',
+ executable('phosphor-host-check',
+             'host_check_main.cpp',
+             dependencies: [
+-            sdbusplus, phosphorlogging
++            sdbusplus, phosphorlogging, libi2c_dep
+             ],
+     implicit_include_directories: true,
+     install: true
+-- 
+2.17.1
+
