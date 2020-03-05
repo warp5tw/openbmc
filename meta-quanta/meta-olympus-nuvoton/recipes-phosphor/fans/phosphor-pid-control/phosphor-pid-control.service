@@ -1,5 +1,6 @@
 [Unit]
 Description=OpenBMC Fan Control Daemon
+After=obmc-chassis-poweron@0.target
 
 [Service]
 Type=simple
