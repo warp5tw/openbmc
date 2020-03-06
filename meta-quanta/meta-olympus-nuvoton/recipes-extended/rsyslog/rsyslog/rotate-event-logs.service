@@ -5,5 +5,3 @@ Description=Rotates the event logs
 Type=oneshot
 ExecStart=/usr/sbin/logrotate /etc/logrotate.d/logrotate.rsyslog
 
-[Install]
-WantedBy=multi-user.target
