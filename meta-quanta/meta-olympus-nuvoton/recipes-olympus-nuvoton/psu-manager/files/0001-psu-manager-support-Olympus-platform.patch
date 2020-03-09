@@ -1,0 +1,96 @@
+From 53b2d29d0d155bcbf1c2fb4d085cfa64576e73cc Mon Sep 17 00:00:00 2001
+From: kfting <kfting@nuvoton.com>
+Date: Tue, 10 Mar 2020 16:20:52 +0800
+Subject: [PATCH] psu-manager support Olympus platform
+
+Signed-off-by: kfting <kfting@nuvoton.com>
+---
+ src/cold_redundancy.cpp |  8 +++-----
+ src/utility.cpp         | 12 +++++++++---
+ 2 files changed, 12 insertions(+), 8 deletions(-)
+
+diff --git a/src/cold_redundancy.cpp b/src/cold_redundancy.cpp
+index d6bd241..5737eac 100644
+--- a/src/cold_redundancy.cpp
++++ b/src/cold_redundancy.cpp
+@@ -90,13 +90,12 @@ ColdRedundancy::ColdRedundancy(
+             }
+             auto period = std::get_if<uint32_t>(&propMap["PeriodOfRotation"]);
+             auto redundancyEnabled =
+-                std::get_if<bool>(&propMap["ColdRedundancyEnabled"]);
++                std::get_if<bool>(&propMap["PowerSupplyRedundancyEnabled"]);
+             auto algorithm =
+                 std::get_if<std::string>(&propMap["RotationAlgorithm"]);
+             auto enabled = std::get_if<bool>(&propMap["RotationEnabled"]);
+             auto rankOrder = std::get_if<std::vector<uint8_t>>(
+                 &propMap["RotationRankOrder"]);
+-
+             if (period == nullptr || redundancyEnabled == nullptr ||
+                 algorithm == nullptr || enabled == nullptr ||
+                 rankOrder == nullptr)
+@@ -159,7 +158,7 @@ ColdRedundancy::ColdRedundancy(
+ 
+             for (auto& value : values)
+             {
+-                if (value.first == "ColdRedundancyEnabled")
++                if (value.first == "PowerSupplyRedundancyEnabled")
+                 {
+                     bool* pCREnabled = std::get_if<bool>(&(value.second));
+                     if (pCREnabled != nullptr)
+@@ -279,7 +278,7 @@ ColdRedundancy::ColdRedundancy(
+                     continue;
+                 }
+ 
+-                std::string psuEventName = "functional";
++                std::string psuEventName = "Functional";
+                 auto findEvent = values.find(psuEventName);
+                 if (findEvent != values.end())
+                 {
+@@ -497,7 +496,6 @@ void ColdRedundancy::createPSU(
+                                     auto psuAddress =
+                                         std::get_if<std::vector<uint64_t>>(
+                                             &propMap["Address"]);
+-
+                                     if (psuBus == nullptr ||
+                                         psuAddress == nullptr)
+                                     {
+diff --git a/src/utility.cpp b/src/utility.cpp
+index dc5573c..31eda06 100644
+--- a/src/utility.cpp
++++ b/src/utility.cpp
+@@ -248,7 +248,8 @@ void getPSUEvent(const std::array<const char*, 1>& configTypes,
+ 
+                         conn->async_method_call(
+                             [&conn, &state](const boost::system::error_code ec,
+-                                            const bool& result) {
++                                        //    const bool& result) {
++                                        PropertyMapType propMap) {
+                                 if (ec)
+                                 {
+                                     std::cerr << "Exception happened when get "
+@@ -256,6 +257,10 @@ void getPSUEvent(const std::array<const char*, 1>& configTypes,
+                                     return;
+                                 }
+ 
++                                auto result =
++                                        std::get_if<bool>(
++                                            &propMap["Functional"]);
++
+                                 if (!result)
+                                 {
+                                     state = PSUState::acLost;
+@@ -263,8 +268,9 @@ void getPSUEvent(const std::array<const char*, 1>& configTypes,
+                                 return;
+                             },
+                             serviceName.c_str(), pathStr.c_str(),
+-                            "org.freedesktop.DBus.Properties", "Get",
+-                            interface.c_str(), "functional");
++                            "org.freedesktop.DBus.Properties", "GetAll",
++                            //interface.c_str(), "Functional");
++                            interface);
+                     }
+                 }
+             }
+-- 
+2.17.1
+

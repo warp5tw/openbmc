@@ -1,0 +1,12 @@
+---
+/xyz/openbmc_project/State/Decorator/psu0_OperationalStatus:
+    - Interface: xyz.openbmc_project.State.Decorator.OperationalStatus
+      Properties:
+          Functional:
+              Default: 'true'
+
+/xyz/openbmc_project/State/Decorator/psu1_OperationalStatus:
+    - Interface: xyz.openbmc_project.State.Decorator.OperationalStatus
+      Properties:
+          Functional:
+              Default: 'true'

@@ -1,0 +1,20 @@
+---
+/xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply0:
+    - Interface: xyz.openbmc_project.Configuration.pmbus
+      Properties:
+          Name:
+             Default: '"psu0"'
+          Bus:
+             Default: 2
+          Address:
+             Default: 0x58
+
+/xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply1:
+    - Interface: xyz.openbmc_project.Configuration.pmbus
+      Properties:
+          Name:
+             Default: '"psu1"'
+          Bus:
+             Default: 7
+          Address:
+             Default: 0x58

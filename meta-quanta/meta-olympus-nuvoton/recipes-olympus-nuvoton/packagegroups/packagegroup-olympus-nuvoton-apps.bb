@@ -50,7 +50,6 @@ RDEPENDS_${PN}-system = " \
         ipmitool \
         phosphor-sel-logger \
         first-boot-set-mac \
-        first-boot-set-psu \
         phosphor-node-manager-proxy \
         phosphor-image-signing \
         openssl-bin \
@@ -59,4 +58,6 @@ RDEPENDS_${PN}-system = " \
         iptables \
         iptable-save \
         pch-time-sync \
+        psu-manager \
+        intel-ipmi-oem \
         "

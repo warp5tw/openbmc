@@ -1,0 +1,14 @@
+---
+/xyz/openbmc_project/control/power_supply_redundancy:
+    - Interface: xyz.openbmc_project.Control.PowerSupplyRedundancy
+      Properties:
+          PowerSupplyRedundancyEnabled:
+              Default: 'true'
+          RotationEnabled:
+              Default: 'true'
+          RotationAlgorithm:
+              Default: PowerSupplyRedundancy::Algo::bmcSpecific
+          RotationRankOrder: 
+              Default: '{1,2}'
+          PeriodOfRotation:
+              Default: 86400

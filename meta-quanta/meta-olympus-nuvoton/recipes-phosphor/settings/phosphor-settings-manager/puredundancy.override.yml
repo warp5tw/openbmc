@@ -1,0 +1,8 @@
+---
+/xyz/openbmc_project/inventory/system/chassis:
+    - Interface: xyz.openbmc_project.Configuration.PURedundancy
+      Properties:
+          Name:
+             Default: '"pur0"'
+          RedundantCount:
+             Default: 1

@@ -1,0 +1,55 @@
+From 38db556d86adcb262c13e416a95a0c6fdd19ad1d Mon Sep 17 00:00:00 2001
+From: kfting <kfting@nuvoton.com>
+Date: Thu, 12 Mar 2020 13:08:18 +0800
+Subject: [PATCH] support psu-manager
+
+1. Change ColdRedundancyEnabled to PowerSupplyRedundancyEnabled
+
+Signed-off-by: kfting <kfting@nuvoton.com>
+---
+ src/oemcommands.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/oemcommands.cpp b/src/oemcommands.cpp
+index f7d1c6d..a7b8df1 100644
+--- a/src/oemcommands.cpp
++++ b/src/oemcommands.cpp
+@@ -2078,7 +2078,7 @@ int getCRConfig(ipmi::Context::ptr ctx, const std::string& property,
+         ctx->yield, ec, service,
+         "/xyz/openbmc_project/control/power_supply_redundancy",
+         "org.freedesktop.DBus.Properties", "Get",
+-        "xyz.openbmc_project.Control.PowerSupplyRedundancy", property);
++        "xyz.openbmc_project.Control.PowerSupplyRedundancy", property.c_str());
+     if (ec)
+     {
+         phosphor::logging::log<phosphor::logging::level::ERR>(
+@@ -2178,7 +2178,7 @@ ipmi::RspType<uint8_t> ipmiOEMSetCRConfig(ipmi::Context::ptr ctx,
+             {
+                 return ipmi::responseInvalidFieldRequest();
+             }
+-            if (setCRConfig(ctx, "ColdRedundancyEnabled",
++            if (setCRConfig(ctx, "PowerSupplyRedundancyEnabled",
+                             static_cast<bool>(param1)))
+             {
+                 return ipmi::responseResponseError();
+@@ -2345,7 +2345,7 @@ ipmi::RspType<uint8_t, std::variant<uint8_t, uint32_t, std::vector<uint8_t>>>
+         }
+         case crParameter::crFeature:
+         {
+-            if (getCRConfig(ctx, "ColdRedundancyEnabled", value))
++            if (getCRConfig(ctx, "PowerSupplyRedundancyEnabled", value))
+             {
+                 return ipmi::responseResponseError();
+             }
+@@ -2353,7 +2353,7 @@ ipmi::RspType<uint8_t, std::variant<uint8_t, uint32_t, std::vector<uint8_t>>>
+             if (!pResponse)
+             {
+                 phosphor::logging::log<phosphor::logging::level::ERR>(
+-                    "Error to get ColdRedundancyEnable property");
++                    "Error to get PowerSupplyRedundancyEnabled property");
+                 return ipmi::responseResponseError();
+             }
+ 
+-- 
+2.17.1
+

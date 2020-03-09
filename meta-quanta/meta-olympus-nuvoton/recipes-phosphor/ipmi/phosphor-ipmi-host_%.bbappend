@@ -21,6 +21,9 @@ SYSTEMD_SERVICE_${PN}_append_olympus-nuvoton = " phosphor-ipmi-host.service"
 SYSTEMD_SERVICE_${PN}_append_olympus-nuvoton = " xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service"
 
 do_install_append_olympus-nuvoton() {
+    install -d ${D}${includedir}/phosphor-ipmi-host
+    install -m 0644 -D ${S}/sensorhandler.hpp ${D}${includedir}/phosphor-ipmi-host
+    install -m 0644 -D ${S}/selutility.hpp ${D}${includedir}/phosphor-ipmi-host
     install -d ${D}${systemd_unitdir}/system/
     install -m 0644 ${WORKDIR}/phosphor-ipmi-host.service \
         ${D}${systemd_unitdir}/system
