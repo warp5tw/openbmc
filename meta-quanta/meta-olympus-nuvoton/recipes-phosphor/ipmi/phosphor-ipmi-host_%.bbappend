@@ -1,7 +1,7 @@
 SRC_URI_remove_olympus-nuvoton = "git://github.com/openbmc/phosphor-host-ipmid"
 SRC_URI_prepend_olympus-nuvoton = "git://github.com/Nuvoton-Israel/phosphor-host-ipmid"
 
-SRCREV := "14d0ba37c53d05638fa791a947b36789fc76195a"
+SRCREV := "ec78b64af3dc9a52939d8255fa909cf5995c7ef5"
 
 FILESEXTRAPATHS_append_olympus-nuvoton := "${THISDIR}/${PN}:"
 
@@ -9,6 +9,7 @@ DEPENDS_append_olympus-nuvoton = " olympus-nuvoton-yaml-config"
 
 EXTRA_OECONF_olympus-nuvoton = " \
     --with-journal-sel \
+    --enable-boot-flag-safe-mode-support \
     SENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/olympus-nuvoton-yaml-config/ipmi-sensors.yaml \
     INVSENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/olympus-nuvoton-yaml-config/ipmi-inventory-sensors.yaml \
     FRU_YAML_GEN=${STAGING_DIR_HOST}${datadir}/olympus-nuvoton-yaml-config/ipmi-fru-read.yaml \
