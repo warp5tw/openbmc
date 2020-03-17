@@ -57,7 +57,7 @@ index ce36a0b..e7817f4 100644
 +                        }
 +                        else if (boost::find_first(strs[i], "Thread"))
 +                        {
-+                            aResp->res.jsonValue["ProcessorThreadCount"]
++                            aResp->res.jsonValue["TotalThreads"]
 +                                = std::stoi(strs[i-1]);
 +                        }
 +                        else if (boost::find_first(strs[i], "Cores"))
