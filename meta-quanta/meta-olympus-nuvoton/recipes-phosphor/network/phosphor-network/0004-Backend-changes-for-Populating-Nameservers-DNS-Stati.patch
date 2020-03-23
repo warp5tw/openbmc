@@ -1,4 +1,4 @@
-From 18fd1feb1132748dd232bfedccc399be766ec2bc Mon Sep 17 00:00:00 2001
+From 1c98a5f9b9066b5756e90dad2a168bf0293e3ccd Mon Sep 17 00:00:00 2001
 From: Manojkiran Eda <manojkiran.eda@gmail.com>
 Date: Tue, 15 Oct 2019 15:00:51 +0530
 Subject: [PATCH] Backend changes for Populating Nameservers(DNS & Static)
@@ -38,10 +38,10 @@ Change-Id: If10b9aa683d2b50e51780e91323c6d10a5ec3710
  2 files changed, 81 insertions(+), 7 deletions(-)
 
 diff --git a/ethernet_interface.cpp b/ethernet_interface.cpp
-index c3edd4b..0681307 100644
+index 004327a..f83a437 100644
 --- a/ethernet_interface.cpp
 +++ b/ethernet_interface.cpp
-@@ -35,11 +35,19 @@ namespace network
+@@ -35,6 +35,8 @@ namespace network
  
  using namespace phosphor::logging;
  using namespace sdbusplus::xyz::openbmc_project::Common::Error;
@@ -49,6 +49,8 @@ index c3edd4b..0681307 100644
 +using NotAllowedArgument = xyz::openbmc_project::Common::NotAllowed;
  using Argument = xyz::openbmc_project::Common::InvalidArgument;
  
+ struct EthernetIntfSocket
+@@ -62,6 +64,12 @@ struct EthernetIntfSocket
  static constexpr const char* networkChannelCfgFile =
      "/var/channel_intf_data.json";
  static constexpr const char* defaultChannelPriv = "priv-admin";
@@ -61,9 +63,9 @@ index c3edd4b..0681307 100644
  EthernetInterface::EthernetInterface(sdbusplus::bus::bus& bus,
                                       const std::string& objPath,
                                       bool dhcpEnabled, Manager& parent,
-@@ -54,7 +62,8 @@ EthernetInterface::EthernetInterface(sdbusplus::bus::bus& bus,
-     EthernetInterfaceIntf::iPv6AcceptRA(getIPv6AcceptRAFromConf());
-     MacAddressIntf::mACAddress(getMACAddress(intfName));
+@@ -81,7 +89,8 @@ EthernetInterface::EthernetInterface(sdbusplus::bus::bus& bus,
+         MacAddressIntf::mACAddress(getMACAddress(intfName));
+     }
      EthernetInterfaceIntf::nTPServers(getNTPServersFromConf());
 -    EthernetInterfaceIntf::nameservers(getNameServerFromConf());
 +    EthernetInterfaceIntf::nameservers(getNameServerFromResolvd());
@@ -71,7 +73,7 @@ index c3edd4b..0681307 100644
      InterfaceInfo ifInfo = EthernetInterface::getInterfaceInfo();
  
      EthernetInterfaceIntf::autoNeg(std::get<2>(ifInfo));
-@@ -451,6 +460,12 @@ bool EthernetInterface::dHCPEnabled(bool value)
+@@ -497,6 +506,12 @@ bool EthernetInterface::linkUp() const
  }
  
  ServerList EthernetInterface::nameservers(ServerList value)
@@ -84,7 +86,7 @@ index c3edd4b..0681307 100644
  {
      for (const auto& nameserverip : value)
      {
-@@ -460,13 +475,13 @@ ServerList EthernetInterface::nameservers(ServerList value)
+@@ -506,13 +521,13 @@ ServerList EthernetInterface::nameservers(ServerList value)
              log<level::ERR>("Not a valid IP address"),
                  entry("ADDRESS=%s", nameserverip.c_str());
              elog<InvalidArgument>(
@@ -100,7 +102,7 @@ index c3edd4b..0681307 100644
          writeConfigurationFile();
          // resolved reads the DNS server configuration from the
          // network file.
-@@ -476,10 +491,10 @@ ServerList EthernetInterface::nameservers(ServerList value)
+@@ -522,10 +537,10 @@ ServerList EthernetInterface::nameservers(ServerList value)
      {
          log<level::ERR>("Exception processing DNS entries");
      }
@@ -113,7 +115,7 @@ index c3edd4b..0681307 100644
  {
      fs::path confPath = manager.getConfDir();
  
-@@ -499,6 +514,58 @@ ServerList EthernetInterface::getNameServerFromConf()
+@@ -545,6 +560,58 @@ ServerList EthernetInterface::getNameServerFromConf()
      return servers;
  }
  
@@ -172,7 +174,7 @@ index c3edd4b..0681307 100644
  void EthernetInterface::loadVLAN(VlanId id)
  {
      std::string vlanInterfaceName = interfaceName() + "." + std::to_string(id);
-@@ -664,7 +731,7 @@ void EthernetInterface::writeConfigurationFile()
+@@ -710,7 +777,7 @@ void EthernetInterface::writeConfigurationFile()
      }
  
      // Add the DNS entry
@@ -182,10 +184,10 @@ index c3edd4b..0681307 100644
          stream << "DNS=" << dns << "\n";
      }
 diff --git a/ethernet_interface.hpp b/ethernet_interface.hpp
-index 3e4cf12..cd2a731 100644
+index 058d328..4c308d7 100644
 --- a/ethernet_interface.hpp
 +++ b/ethernet_interface.hpp
-@@ -185,6 +185,12 @@ class EthernetInterface : public Ifaces
+@@ -189,6 +189,12 @@ class EthernetInterface : public Ifaces
       */
      ServerList nameservers(ServerList value) override;
  
@@ -198,7 +200,7 @@ index 3e4cf12..cd2a731 100644
      /** @brief create Vlan interface.
       *  @param[in] id- VLAN identifier.
       */
-@@ -287,7 +293,8 @@ class EthernetInterface : public Ifaces
+@@ -292,7 +298,8 @@ class EthernetInterface : public Ifaces
      /** @brief get the name server details from the network conf
       *
       */

@@ -1,7 +1,7 @@
-From 5aed4263bad24f05c16b4ca3284fe7907605f73c Mon Sep 17 00:00:00 2001
+From 06eae35186d12d383827afc502c7d12a67def3df Mon Sep 17 00:00:00 2001
 From: AppaRao Puli <apparao.puli@linux.intel.com>
 Date: Wed, 5 Sep 2018 14:16:54 +0530
-Subject: [PATCH 2/4] Adding channel specific privilege to network
+Subject: [PATCH] Adding channel specific privilege to network
 
  - Adding the channel access information to the network
    interface object. This privilege will be used in
@@ -25,12 +25,12 @@ Signed-off-by: Yong Li <yong.b.li@linux.intel.com>
  4 files changed, 267 insertions(+), 1 deletion(-)
 
 diff --git a/ethernet_interface.cpp b/ethernet_interface.cpp
-index 2375482..c3edd4b 100644
+index c00e4f4..8b6fc00 100644
 --- a/ethernet_interface.cpp
 +++ b/ethernet_interface.cpp
-@@ -37,6 +37,9 @@ using namespace phosphor::logging;
- using namespace sdbusplus::xyz::openbmc_project::Common::Error;
- using Argument = xyz::openbmc_project::Common::InvalidArgument;
+@@ -59,6 +59,9 @@ struct EthernetIntfSocket
+     int sock{-1};
+ };
  
 +static constexpr const char* networkChannelCfgFile =
 +    "/var/channel_intf_data.json";
@@ -38,15 +38,15 @@ index 2375482..c3edd4b 100644
  EthernetInterface::EthernetInterface(sdbusplus::bus::bus& bus,
                                       const std::string& objPath,
                                       bool dhcpEnabled, Manager& parent,
-@@ -56,6 +59,7 @@ EthernetInterface::EthernetInterface(sdbusplus::bus::bus& bus,
- 
+@@ -84,6 +87,7 @@ EthernetInterface::EthernetInterface(sdbusplus::bus::bus& bus,
      EthernetInterfaceIntf::autoNeg(std::get<2>(ifInfo));
      EthernetInterfaceIntf::speed(std::get<0>(ifInfo));
+     EthernetInterfaceIntf::linkUp(std::get<3>(ifInfo));
 +    getChannelPrivilege(intfName);
  
      // Emit deferred signal.
      if (emitSignal)
-@@ -823,5 +827,117 @@ void EthernetInterface::deleteAll()
+@@ -866,5 +870,117 @@ void EthernetInterface::deleteAll()
      manager.writeToConfigurationFile();
  }
  
@@ -165,7 +165,7 @@ index 2375482..c3edd4b 100644
  } // namespace network
  } // namespace phosphor
 diff --git a/ethernet_interface.hpp b/ethernet_interface.hpp
-index 60c56e3..3e4cf12 100644
+index 68668d6..058d328 100644
 --- a/ethernet_interface.hpp
 +++ b/ethernet_interface.hpp
 @@ -2,11 +2,14 @@
@@ -209,7 +209,7 @@ index 60c56e3..3e4cf12 100644
  namespace fs = std::experimental::filesystem;
  
  class Manager; // forward declaration of network manager.
-@@ -195,6 +204,14 @@ class EthernetInterface : public Ifaces
+@@ -199,6 +208,14 @@ class EthernetInterface : public Ifaces
       */
      void deleteAll();
  
@@ -223,8 +223,8 @@ index 60c56e3..3e4cf12 100644
 +    using ChannelAccessIntf::maxPrivilege;
      using EthernetInterfaceIntf::dHCPEnabled;
      using EthernetInterfaceIntf::interfaceName;
-     using MacAddressIntf::mACAddress;
-@@ -291,6 +308,26 @@ class EthernetInterface : public Ifaces
+     using EthernetInterfaceIntf::linkUp;
+@@ -296,6 +313,26 @@ class EthernetInterface : public Ifaces
      std::string objPath;
  
      friend class TestEthernetInterface;

@@ -1,5 +1,5 @@
-From 6df30cfdb0b4890b1bf3e1a814f5e616bdd6cf23 Mon Sep 17 00:00:00 2001
-From: "manojkiran.eda@gmail.com" <manojeda@in.ibm.com>
+From f895008b03a8bf3c6d6ef8eb37202b77d22fc872 Mon Sep 17 00:00:00 2001
+From: "manojkiran.eda@gmail.com" <manojkiran.eda@gmail.com>
 Date: Thu, 3 Oct 2019 04:53:44 -0500
 Subject: [PATCH] Support for NameServers & StaticNameServers
 
@@ -35,10 +35,10 @@ Change-Id: I43b75091cce6938ea2fa094692f2c3f434e5a774
  1 file changed, 30 insertions(+), 16 deletions(-)
 
 diff --git a/redfish-core/lib/ethernet.hpp b/redfish-core/lib/ethernet.hpp
-index b6f3baa9..40df4b87 100644
+index 0a2a1858..1c51a706 100644
 --- a/redfish-core/lib/ethernet.hpp
 +++ b/redfish-core/lib/ethernet.hpp
-@@ -104,7 +104,8 @@ struct EthernetInterfaceData
+@@ -106,7 +106,8 @@ struct EthernetInterfaceData
      std::string ipv6_default_gateway;
      std::string mac_address;
      std::vector<std::uint32_t> vlan_id;
@@ -48,7 +48,7 @@ index b6f3baa9..40df4b87 100644
      std::vector<std::string> domainnames;
  };
  
-@@ -273,7 +274,19 @@ inline bool extractEthernetInterfaceData(const std::string &ethiface_id,
+@@ -293,7 +294,19 @@ inline bool extractEthernetInterfaceData(const std::string &ethiface_id,
                                      &propertyPair.second);
                              if (nameservers != nullptr)
                              {
@@ -69,7 +69,7 @@ index b6f3baa9..40df4b87 100644
                              }
                          }
                          else if (propertyPair.first == "DHCPEnabled")
-@@ -1484,7 +1497,8 @@ class EthernetInterface : public Node
+@@ -1521,7 +1534,8 @@ class EthernetInterface : public Node
              "xyz.openbmc_project.Network",
              "/xyz/openbmc_project/network/" + ifaceId,
              "org.freedesktop.DBus.Properties", "Set",
@@ -79,7 +79,7 @@ index b6f3baa9..40df4b87 100644
              std::variant<std::vector<std::string>>{updatedStaticNameServers});
      }
  
-@@ -1659,15 +1673,8 @@ class EthernetInterface : public Node
+@@ -1716,15 +1730,8 @@ class EthernetInterface : public Node
              {"@odata.id", "/redfish/v1/Managers/bmc/EthernetInterfaces/" +
                                iface_id + "/VLANs"}};
  
@@ -97,7 +97,7 @@ index b6f3baa9..40df4b87 100644
  
          nlohmann::json &ipv4_array = json_response["IPv4Addresses"];
          nlohmann::json &ipv4_static_array =
-@@ -1778,6 +1785,7 @@ class EthernetInterface : public Node
+@@ -1832,6 +1839,7 @@ class EthernetInterface : public Node
          std::optional<std::string> ipv6DefaultGateway;
          std::optional<nlohmann::json> ipv4StaticAddresses;
          std::optional<nlohmann::json> ipv6StaticAddresses;
@@ -105,18 +105,19 @@ index b6f3baa9..40df4b87 100644
          std::optional<std::vector<std::string>> staticNameServers;
          std::optional<nlohmann::json> dhcpv4;
          std::optional<nlohmann::json> dhcpv6;
-@@ -1786,13 +1794,19 @@ class EthernetInterface : public Node
+@@ -1841,14 +1849,20 @@ class EthernetInterface : public Node
  
          if (!json_util::readJson(
                  req, res, "HostName", hostname, "IPv4StaticAddresses",
 -                ipv4StaticAddresses, "MACAddress", macAddress,
 -                "StaticNameServers", staticNameServers, "IPv6DefaultGateway",
 -                ipv6DefaultGateway, "IPv6StaticAddresses", ipv6StaticAddresses,
--                "DHCPv4", dhcpv4, "DHCPv6", dhcpv6))
+-                "DHCPv4", dhcpv4, "DHCPv6", dhcpv6, "InterfaceEnabled",
 +                ipv4StaticAddresses, "MACAddress", macAddress, "NameServers",
 +                nameServers, "StaticNameServers", staticNameServers,
 +                "IPv6DefaultGateway", ipv6DefaultGateway, "IPv6StaticAddresses",
-+                ipv6StaticAddresses, "DHCPv4", dhcpv4, "DHCPv6", dhcpv6))
++                ipv6StaticAddresses, "DHCPv4", dhcpv4, "DHCPv6", dhcpv6, "InterfaceEnabled",
+                 interfaceEnabled))
          {
              return;
          }
