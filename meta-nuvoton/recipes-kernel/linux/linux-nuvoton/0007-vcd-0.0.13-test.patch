@@ -1,0 +1,377 @@
+From d3d7efce2d0ad4f45c7f7fabb4580229624373d1 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Mon, 23 Mar 2020 14:10:44 +0800
+Subject: [PATCH 1/2] vcd 0.0.13 test
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ drivers/media/platform/nuvoton/npcm750_vcd.c | 194 +++++++++----------
+ 1 file changed, 94 insertions(+), 100 deletions(-)
+
+diff --git a/drivers/media/platform/nuvoton/npcm750_vcd.c b/drivers/media/platform/nuvoton/npcm750_vcd.c
+index 5c3e023b4550..cd4c4833aaab 100644
+--- a/drivers/media/platform/nuvoton/npcm750_vcd.c
++++ b/drivers/media/platform/nuvoton/npcm750_vcd.c
+@@ -5,6 +5,7 @@
+  * SPDX-License-Identifier: GPL-2.0
+  */
+ 
++#include <linux/bitmap.h>
+ #include <linux/err.h>
+ #include <linux/io.h>
+ #include <linux/compat.h>
+@@ -32,7 +33,7 @@
+ #include <asm/fb.h>
+ #include <linux/completion.h>
+ 
+-#define VCD_VERSION "0.0.11"
++#define VCD_VERSION "0.0.13"
+ 
+ #define VCD_IOC_MAGIC     'v'
+ #define VCD_IOCGETINFO	_IOR(VCD_IOC_MAGIC,  1, struct vcd_info)
+@@ -210,9 +211,11 @@
+ /* GCR  Register */
+ #define INTCR 0x3c
+ #define  INTCR_GFXIFDIS	(BIT(8) | BIT(9))
++#define  INTCR_GIRST	BIT(17)
+ #define  INTCR_LDDRB	BIT(18)
+ #define  INTCR_DACOFF	BIT(15)
+ #define  INTCR_DEHS	BIT(27)
++#define  INTCR_KVMSI	BIT(28)
+ 
+ #define INTCR2 0x60
+ #define  INTCR2_GIRST2	BIT(2)
+@@ -396,6 +399,21 @@ static const res_tlb res_tlbs[] = {
+ 	{"1920 x 1200", 1920, 1200},
+ };
+ 
++static inline void bitmap_next_set_region(unsigned long *bitmap,
++					  unsigned int *rs, unsigned int *re,
++					  unsigned int end)
++{
++	*rs = find_next_bit(bitmap, end, *rs);
++	*re = find_next_zero_bit(bitmap, end, *rs + 1);
++}
++
++#define bitmap_for_each_set_region(bitmap, rs, re, start, end)		     \
++	for ((rs) = (start),						     \
++	     bitmap_next_set_region((bitmap), &(rs), &(re), (end));	     \
++	     (rs) < (re);						     \
++	     (rs) = (re) + 1,						     \
++	     bitmap_next_set_region((bitmap), &(rs), &(re), (end)))
++
+ static const int restlb_cnt = sizeof(res_tlbs) / sizeof(res_tlb);
+ 
+ static void npcm750_vcd_update(struct npcm750_vcd *vcd, u32 reg,
+@@ -818,46 +836,11 @@ static void npcm750_vcd_free_diff_table(struct npcm750_vcd *vcd)
+ 			kfree(tmp);
+ 		}
+ 	}
+-}
+ 
+-static void
+-npcm750_vcd_merge_rect(struct npcm750_vcd *vcd, struct rect_info *info)
+-{
+-	struct list_head *head = info->head;
+-	struct rect_list *list = info->list;
+-	struct rect_list *first = info->first;
+-
+-	if (!first) {
+-		first = list;
+-		info->first = first;
+-		list_add_tail(&list->list, head);
+-		vcd->rect_cnt++;
+-	} else {
+-		if (((list->r.x ==
+-		      (first->r.x + first->r.w))) &&
+-		      (list->r.y == first->r.y)) {
+-			first->r.w += list->r.w;
+-			kfree(list);
+-		} else if (((list->r.y ==
+-			     (first->r.y + first->r.h))) &&
+-			    (list->r.x == first->r.x)) {
+-			first->r.h += list->r.h;
+-			kfree(list);
+-		} else if (((list->r.y > first->r.y) &&
+-			    (list->r.y < (first->r.y + first->r.h))) &&
+-			   ((list->r.x > first->r.x) &&
+-			    (list->r.x < (first->r.x + first->r.w)))) {
+-			kfree(list);
+-		} else {
+-			list_add_tail(&list->list, head);
+-			vcd->rect_cnt++;
+-			info->first = list;
+-		}
+-	}
+ }
+ 
+ static struct rect_list *
+-npcm750_vcd_new_rect(struct npcm750_vcd *vcd, int offset, int index)
++npcm750_vcd_new_rect(struct npcm750_vcd *vcd, int offset, int index, int len)
+ {
+ 	struct rect_list *list = NULL;
+ 
+@@ -865,31 +848,26 @@ npcm750_vcd_new_rect(struct npcm750_vcd *vcd, int offset, int index)
+ 	if (!list)
+ 		return NULL;
+ 
+-	list->r.x = (offset << 4);
+-	list->r.y = (index >> 2);
+-	list->r.w = RECT_TILE_W;
+-	list->r.h = RECT_TILE_H;
+-	if ((list->r.x + RECT_TILE_W) > vcd->info.hdisp)
+-		list->r.w = vcd->info.hdisp - list->r.x;
+-	if ((list->r.y + RECT_TILE_H) > vcd->info.vdisp)
+-		list->r.h = vcd->info.vdisp - list->r.y;
+-
+-	return list;
+-}
+-
+-static int
+-npcm750_vcd_rect(struct npcm750_vcd *vcd, struct rect_info *info, u32 offset)
+-{
+-	int i = info->index;
++	if (len == 0) {
++		list->r.x = 0;
++		list->r.y = 0;
++		list->r.w = vcd->info.hdisp;
++		list->r.h = vcd->info.vdisp;
++	} else {
++		list->r.x = (offset << 4);
++		list->r.y = (index >> 2);
++		list->r.w = RECT_TILE_W * len;
++		list->r.h = RECT_TILE_H;
++		if ((list->r.x + RECT_TILE_W) > vcd->info.hdisp)
++			list->r.w = vcd->info.hdisp - list->r.x;
++		if ((list->r.y + RECT_TILE_H) > vcd->info.vdisp)
++			list->r.h = vcd->info.vdisp - list->r.y;
++	}
+ 
+-	if (offset < info->tile_perline) {
+-		info->list = npcm750_vcd_new_rect(vcd, offset, i);
+-		if (!info->list)
+-			return -ENOMEM;
++	list_add_tail(&list->list, &vcd->list);
++	vcd->rect_cnt++;
+ 
+-		npcm750_vcd_merge_rect(vcd, info);
+-	}
+-	return 0;
++	return list;
+ }
+ 
+ static int
+@@ -899,21 +877,17 @@ npcm750_vcd_build_table(struct npcm750_vcd *vcd, struct rect_info *info)
+ 	int j, z, ret;
+ 
+ 	for (j = 0 ; j < info->offset_perline ; j += 4) {
+-		if (npcm750_vcd_read(vcd, VCD_DIFF_TBL + (j + i)) != 0) {
+-			for (z = 0 ; z < 32; z++) {
+-				if ((npcm750_vcd_read(
+-					vcd,
+-					VCD_DIFF_TBL + (j + i)) >> z) & 0x01) {
+-					ret = npcm750_vcd_rect(
+-							vcd,
+-							info,
+-							z + (j << 3));
+-					if (ret < 0)
+-						return ret;
+-				}
++		u32 rs, re;
++		u32 reg_sr = npcm750_vcd_read(vcd, VCD_DIFF_TBL + (j + i));
++		if (reg_sr) {
++			const unsigned long *addr = (unsigned long *)&reg_sr;
++			bitmap_for_each_set_region(addr, rs, re, 0, 32) {
++				if (!npcm750_vcd_new_rect(vcd, rs + (j << 3), i, re - rs))
++					return -ENOMEM;
+ 			}
+ 		}
+ 	}
++
+ 	info->index += 64;
+ 	return info->tile_perline;
+ }
+@@ -922,28 +896,25 @@ static int npcm750_vcd_get_diff_table(struct npcm750_vcd *vcd)
+ {
+ 	struct rect_info info;
+ 	int ret = 0;
+-	u32 mod, tile_cnt = 0;
++	u32 tile_cnt = 0;
+ 
+ 	memset(&info, 0, sizeof(struct rect_info));
+ 	info.head = &vcd->list;
+ 
+ 	info.tile_perline = vcd->info.hdisp >> 4;
+-	mod = vcd->info.hdisp % RECT_TILE_W;
+-	if (mod != 0)
+-		info.tile_perline += 1;
++	if (vcd->info.hdisp % RECT_TILE_W)
++		info.tile_perline++;
+ 
+ 	info.tile_perrow = vcd->info.vdisp >> 4;
+-	mod = vcd->info.vdisp % RECT_TILE_H;
+-	if (mod != 0)
+-		info.tile_perrow += 1;
++	if (vcd->info.vdisp % RECT_TILE_H)
++		info.tile_perrow++;
+ 
+ 	info.tile_size =
+ 		info.tile_perrow * info.tile_perline;
+ 
+ 	info.offset_perline = info.tile_perline >> 5;
+-	mod = info.tile_perline % 32;
+-	if (mod != 0)
+-		info.offset_perline += 1;
++	if (info.tile_perline % 32)
++		info.offset_perline++;
+ 
+ 	info.offset_perline *= 4;
+ 
+@@ -964,6 +935,9 @@ static int npcm750_vcd_init(struct npcm750_vcd *vcd)
+ 	/* Enable display of KVM GFX and access to memory */
+ 	regmap_update_bits(gcr, INTCR, INTCR_GFXIFDIS, ~INTCR_GFXIFDIS);
+ 
++	/* KVM in progress */
++	regmap_update_bits(gcr, INTCR, INTCR_KVMSI, INTCR_KVMSI);
++
+ 	/* Set vrstenw and hrstenw */
+ 	regmap_update_bits(gcr, INTCR2,
+ 			   INTCR2_GIHCRST | INTCR2_GIVCRST,
+@@ -990,12 +964,10 @@ static int npcm750_vcd_init(struct npcm750_vcd *vcd)
+ 
+ 	/* Set vcd frame physical address */
+ 	npcm750_vcd_write(vcd, VCD_FBA_ADR, vcd->frame_start);
+-	npcm750_vcd_write(vcd, VCD_FBB_ADR, vcd->frame_start);
+ 
+ 	/* Set vcd mode */
+ 	npcm750_vcd_update(vcd, VCD_MODE, 0xFFFFFFFF,
+-			   VCD_MODE_VCDE | VCD_MODE_CM_565 |
+-			   VCD_MODE_IDBC | VCD_MODE_KVM_BW_SET);
++		VCD_MODE_CM_565 | VCD_MODE_KVM_BW_SET);
+ 
+ 	/* Set DVDE/DVHSYNC */
+ 	npcm750_vcd_dehs(vcd, vcd->de_mode);
+@@ -1030,6 +1002,14 @@ static int npcm750_vcd_init(struct npcm750_vcd *vcd)
+ 
+ static void npcm750_vcd_stop(struct npcm750_vcd *vcd)
+ {
++	struct regmap *gcr = vcd->gcr_regmap;
++
++	/* Disable display of KVM GFX and access to memory */
++	regmap_update_bits(gcr, INTCR, INTCR_GFXIFDIS, INTCR_GFXIFDIS);
++
++	/* KVM is not in progress */
++	regmap_update_bits(gcr, INTCR, INTCR_KVMSI, ~INTCR_KVMSI);
++
+ 	npcm750_vcd_write(vcd, VCD_INTE, 0);
+ 	npcm750_vcd_write(vcd, VCD_STAT, VCD_STAT_CLEAR);
+ 	npcm750_vcd_write(vcd, VCD_MODE, 0);
+@@ -1045,6 +1025,7 @@ static irqreturn_t npcm750_vcd_irq_handler(int irq, void *dev_instance)
+ 	struct npcm750_vcd *vcd = (struct npcm750_vcd *)dev->driver_data;
+ 	u32 status;
+ 	u32 status_ack = 0;
++	int i = 0;
+ 
+ 	spin_lock(&vcd->lock);
+ 
+@@ -1052,10 +1033,6 @@ static irqreturn_t npcm750_vcd_irq_handler(int irq, void *dev_instance)
+ 	if (status & VCD_STAT_IRQ) {
+ 		if (status & VCD_STAT_DONE) {
+ 			dev_dbg(vcd->dev, "VCD_STAT_DONE\n");
+-			if (vcd->cmd != VCD_CMD_OP_CAPTURE) {
+-				npcm750_vcd_free_diff_table(vcd);
+-				npcm750_vcd_get_diff_table(vcd);
+-			}
+ 			status_ack |= VCD_STAT_DONE;
+ 		}
+ 
+@@ -1166,7 +1143,13 @@ npcm750_vcd_open(struct inode *inode, struct file *file)
+ 
+ 	file->private_data = vcd;
+ 
+-	atomic_inc_return(&vcd->clients);
++	if (atomic_inc_return(&vcd->clients) == 1) {
++		if (npcm750_vcd_init(vcd)) {
++			dev_err(vcd->dev, "%s: failed to init vcd module\n",
++				__func__);
++			return -EBUSY;
++		}
++	}
+ 
+ 	dev_dbg(vcd->dev, "open: client %d\n", atomic_read(&vcd->clients));
+ 	return 0;
+@@ -1177,7 +1160,8 @@ npcm750_vcd_release(struct inode *inode, struct file *file)
+ {
+ 	struct npcm750_vcd *vcd = file->private_data;
+ 
+-	atomic_dec_return(&vcd->clients);
++	if (atomic_dec_return(&vcd->clients) == 0)
++		npcm750_vcd_stop(vcd);
+ 
+ 	dev_dbg(vcd->dev, "close: client %d\n", atomic_read(&vcd->clients));
+ 	return 0;
+@@ -1206,6 +1190,12 @@ npcm750_do_vcd_ioctl(struct npcm750_vcd *vcd, unsigned int cmd,
+ 			vcd->status = 0;
+ 			reinit_completion(&vcd->complete);
+ 
++			npcm750_vcd_update(vcd, VCD_MODE, VCD_MODE_IDBC,
++				VCD_MODE_IDBC);
++
++			npcm750_vcd_update(vcd, VCD_MODE, VCD_MODE_VCDE,
++				VCD_MODE_VCDE);
++
+ 			npcm750_vcd_command(vcd, vcd_cmd);
+ 			timeout = wait_for_completion_interruptible_timeout(&vcd->complete,
+ 			    VCD_OP_TIMEOUT);
+@@ -1221,13 +1211,25 @@ npcm750_do_vcd_ioctl(struct npcm750_vcd *vcd, unsigned int cmd,
+ 				if (!ret)
+ 					ret = -EBUSY;
+ 			}
++
++
++			npcm750_vcd_update(vcd, VCD_MODE, VCD_MODE_VCDE,
++				~VCD_MODE_VCDE);
++
++			npcm750_vcd_update(vcd, VCD_MODE, VCD_MODE_IDBC,
++				~VCD_MODE_IDBC);
++
++			if (vcd_cmd != VCD_CMD_OP_CAPTURE) {
++				npcm750_short_vcd_reset(vcd);
++				npcm750_vcd_free_diff_table(vcd);
++				npcm750_vcd_get_diff_table(vcd);
++			}
+ 		}
+ 		break;
+ 	}
+ 	case VCD_IOCCHKRES:
+ 	{
+ 		int changed = npcm750_vcd_get_resolution(vcd);
+-
+ 		if (changed < 0) {
+ 			ret = -EFAULT;
+ 			break;
+@@ -1242,7 +1244,6 @@ npcm750_do_vcd_ioctl(struct npcm750_vcd *vcd, unsigned int cmd,
+ 		struct rect_list *list;
+ 		struct rect r;
+ 		struct list_head *head = &vcd->list;
+-
+ 		if (vcd->rect_cnt == 0) {
+ 			r.x = 0;
+ 			r.y = 0;
+@@ -1462,13 +1463,6 @@ static int npcm750_vcd_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		vcd->de_mode = 1;
+ 
+-	ret = npcm750_vcd_init(vcd);
+-	if (ret) {
+-		dev_err(&pdev->dev, "%s: failed to init vcd module\n",
+-			__func__);
+-		goto err;
+-	}
+-
+ 	vcd->dev_p = &pdev->dev;
+ 
+ 	ret = npcm750_vcd_device_create(vcd);
+-- 
+2.17.1
+

@@ -1,0 +1,57 @@
+From 0cac8db462c609be80612fb16802d4e104892750 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Mon, 23 Mar 2020 15:54:03 +0800
+Subject: [PATCH] WAR: skip clear fault for flexpower
+
+There is a bug in this psu.
+When BMC sends clear fault cmd to this psu, the i2c bus will be hanged up due to psu firmware issue.
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts | 2 +-
+ drivers/hwmon/pmbus/pmbus.c                          | 1 +
+ drivers/hwmon/pmbus/pmbus_core.c                     | 3 +++
+ 3 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+index af9d8bf6152c..486f84142f9f 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
++++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+@@ -415,7 +415,7 @@
+ 					reg = <0x4c>;
+ 				};
+ 				power-supply@58 {
+-					compatible = "pmbus";
++					compatible = "flexpower";
+ 					reg = <0x58>;
+ 				};
+ 			};
+diff --git a/drivers/hwmon/pmbus/pmbus.c b/drivers/hwmon/pmbus/pmbus.c
+index c0bc43d01018..95c9b0da16b2 100644
+--- a/drivers/hwmon/pmbus/pmbus.c
++++ b/drivers/hwmon/pmbus/pmbus.c
+@@ -224,6 +224,7 @@ static const struct i2c_device_id pmbus_id[] = {
+ 	{"tps544c20", (kernel_ulong_t)&pmbus_info_one},
+ 	{"tps544c25", (kernel_ulong_t)&pmbus_info_one},
+ 	{"udt020", (kernel_ulong_t)&pmbus_info_one},
++	{"flexpower", (kernel_ulong_t)&pmbus_info_zero},
+ 	{}
+ };
+ 
+diff --git a/drivers/hwmon/pmbus/pmbus_core.c b/drivers/hwmon/pmbus/pmbus_core.c
+index 898d7378f4f8..bef66cb64f1c 100644
+--- a/drivers/hwmon/pmbus/pmbus_core.c
++++ b/drivers/hwmon/pmbus/pmbus_core.c
+@@ -479,6 +479,9 @@ void pmbus_clear_faults(struct i2c_client *client)
+ 	struct pmbus_data *data = i2c_get_clientdata(client);
+ 	int i;
+ 
++	if (!strcmp(client->name, "flexpower"))
++		return;
++
+ 	for (i = 0; i < data->info->pages; i++)
+ 		pmbus_clear_fault_page(client, i);
+ }
+-- 
+2.17.1
+
