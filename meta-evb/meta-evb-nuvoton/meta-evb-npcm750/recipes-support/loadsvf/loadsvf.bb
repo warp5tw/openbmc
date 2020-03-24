@@ -1,20 +1,14 @@
 DESCRIPTION = "CPLD/FPGA Programmer"
+PR = "r1"
+
 LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://COPYING;md5=12f884d2ae1ff87c09e5b7ccc2c4ca7e"
+LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-SRC_URI = "file://COPYING \
-	   file://Makefile \
-	   file://src/* \
-	   file://include/* \
-	  "
+SRC_URI = "git://github.com/Nuvoton-Israel/openbmc-util"
+SRCREV = "${AUTOREV}"
+S = "${WORKDIR}/git/loadsvf"
 
-S = "${WORKDIR}"
+inherit autotools pkgconfig
 
-do_compile() {
-	make
-}
+DEPENDS += "autoconf-archive-native"
 
-do_install() {
-        install -d ${D}${bindir}
-        install -m 0755 loadsvf ${D}${bindir}
-}
