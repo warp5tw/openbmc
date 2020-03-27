@@ -10,6 +10,8 @@ HOST_WARMREBOOT_TGTFMT = "obmc-host-warm-reboot@{0}.target"
 HOST_SHUT_FMT = "../${HOST_SHUT_TMPL}:${HOST_WARMREBOOT_TGTFMT}.requires/${HOST_SHUT_TMPL}"
 SYSTEMD_LINK_${PN}-host += "${@compose_list(d, 'HOST_SHUT_FMT', 'OBMC_HOST_INSTANCES')}"
 
+SYSTEMD_LINK_${PN}-host_remove = "${@compose_list_zip(d, 'HOST_WARM_REBOOT_SOFT_SVC_FMT', 'OBMC_HOST_INSTANCES')}"
+
 DEPENDS += "i2c-tools"
 
 do_install_append_olympus-nuvoton() {

@@ -16,15 +16,13 @@ EXTRA_OECONF_olympus-nuvoton = " \
     "
 
 SRC_URI_append_olympus-nuvoton = " file://phosphor-ipmi-host.service"
-SRC_URI_append_olympus-nuvoton = " file://xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service"
 
 SYSTEMD_SERVICE_${PN}_append_olympus-nuvoton = " phosphor-ipmi-host.service"
-SYSTEMD_SERVICE_${PN}_append_olympus-nuvoton = " xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service"
+SYSTEMD_LINK_${PN}_remove_olympus-nuvoton += "${@compose_list_zip(d, 'SOFT_FMT', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_SERVICE_${PN}_remove_olympus-nuvoton += "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service"
 
 do_install_append_olympus-nuvoton() {
     install -d ${D}${systemd_unitdir}/system/
     install -m 0644 ${WORKDIR}/phosphor-ipmi-host.service \
-        ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service \
         ${D}${systemd_unitdir}/system
 }
