@@ -60,6 +60,7 @@ Please submit any patches against the meta-runbmc-nuvoton layer to the maintaine
   * [In-Band Firmware Update](#in-band-firmware-update)
     + [HOST Tool](#host-tool)
     + [IPMI Library](#ipmi-library)
+- [OpenBMC Test Automation](#openbmc-test-automation)
 - [Features In Progressing](#features-in-progressing)
 - [Features Planned](#features-planned)
 - [IPMI Commands Verified](#ipmi-commands-verified)
@@ -1609,17 +1610,29 @@ This is an OpenBMC IPMI Library (Handler) for In-Band Firmware Update.
 **Maintainer**
 * Medad CChien
 
+## OpenBMC Test Automation
+
+**Source URL**
+
+* [https://github.com/Nuvoton-Israel/openbmc-test-automation](https://github.com/Nuvoton-Israel/openbmc-test-automation)
+
+In order to make sure all features and kernel drivers are running without problems, we introduce the [openbmc-test-automation](https://github.com/Nuvoton-Israel/openbmc-test-automation) to be our automated testing tool.
+
+So far, we have been testing ipmi and redfish related items(Total 390 test items), and more test items will be planned.
+
+<img width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/robot-test.PNG">
+
+Please download the test report in the link below
+* [Report](https://drive.google.com/open?id=10bmoyEAJvu00t-dwicChR67bND2_9Mzi)
+
 
 ## Features In Progressing
 * Improve IPMI
 * Improve Redfish
-* System logs
+* Intel Platform related features
 
 ## Features Planned
-* PLDM
-* NCSI
-* Improve Power contorl
-* Intel Platform related features
+* MCTP
 
 # IPMI Commands Verified
 
@@ -1818,7 +1831,7 @@ This is an OpenBMC IPMI Library (Handler) for In-Band Firmware Update.
 Type          | Size    | Note                                                                                                     |
 :-------------|:------- |:-------------------------------------------------------------------------------------------------------- |
 image-uboot   |  450 KB | u-boot 2019.01 + bootblock for NPCM750 only                                                                       |
-image-kernel  |  4.0 MB   | linux 5.2.11 version                                                                                       |
+image-kernel  |  4.0 MB   | linux 5.4 version  + initramfs                                                                                      |
 image-rofs    |  18.0 MB  | bottom layer of the overlayfs, read only                                                                 |
 image-rwfs    |  0 MB  | middle layer of the overlayfs, rw files in this partition will be created at runtime,<br /> with a maximum capacity of 3 MB|
 
@@ -1836,3 +1849,4 @@ image-rwfs    |  0 MB  | middle layer of the overlayfs, rw files in this partiti
 * 2019.12.19 Rename Message Bridging to Host Power Budget Control
 * 2019.12.19 Add Fan PID control
 * 2019.12.23 Fix some typo and text format
+* 2020.03.31 Add Open Test Automation and update Features In Progressing and Image Size
