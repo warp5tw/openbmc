@@ -41,6 +41,7 @@ Please submit any patches against the meta-runbmc-nuvoton layer to the maintaine
     + [BMC Firmware Update](#bmc-firmware-update)
     + [BIOS update](#bios-update)
     + [Server Power Operations](#server-power-operations)
+    + [Certificate Management](#Certificate-Management)
   * [System](#system)
     + [Time](#time)
     + [Sensor](#sensor)
@@ -437,6 +438,76 @@ Server Power Operations are using to Power on/Warm reboot/Cold reboot/Orderly sh
 **Maintainer**
 * Tim Lee
 
+### Certificate Management
+<img align="right" width="50%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/ssl_certificate.png">  
+
+Manage the certificates installed on BMC.  
+* Web Server certificate
+* LDAP Client certificate
+* CA certificate  
+
+Management operations:
+* Install a new certificate.  
+* Replace an existing certificate. 
+* Delete an existing certificate. 
+
+**Source URL**
+* [https://github.com/openbmc/phosphor-certificate-manager](https://github.com/openbmc/phosphor-certificate-manager)
+
+**How to use**  
+1. Web server certificate  
+   * Web server certificate is used to initiate a SSL session with browsers.
+   * bmcweb will generate a self-signed certificate if no server certificate exists.
+   * certificate file path
+     > /etc/ssl/certs/https/server.pem
+   * replace certificate with new one.
+     * generate a new self-signed certificate using openssl. 
+     ```
+     openssl req -x509 -sha256 -newkey rsa:2048  -nodes -days 365  -keyout cert.pem -out cert.pem  -subj "/O=XYZ Corporation /CN=www.xyz.com"
+     ```
+     * replace certificate by the new cert "cert.pem" via WebUI.  
+       <img align="top" width="70%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/replace_cert.png">
+     * restart bmcweb service on BMC.  
+       > systemctl restart bmcweb  
+       
+     * connect to BMC web server and check the web certificate issuer from browser, it should be "www.xyz.com".      
+       <img align="top" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/new_certificate.png">
+2. CA certificate
+   * if server authentication is required in a TLS session, LDAP client will use CA certificate (issuer of server certificate) to verify server's identity when initiating a TLS session.
+   * refer to [LDAP server setup](#ldap-server-setup) to generate a CA certificate and configure LDAP server.
+     * Note: CN in LDAP server certificate must match server's URI (i.e. IP address or hostname).
+       ```
+       #example ssl command to generate server certificate
+       openssl genrsa -out ldap_server.key 2048
+       openssl req -new -key ldap_server.key -out ldap_server.csr -subj '/C=OO/ST=OO/L=OO/O=OO/OU=OO/CN=10.103.152.11'
+       openssl x509 -req -days 365 -CA ca_cert.pem -CAkey ca_key.pem -CAcreateserial -CAserial serial -in ldap_server.csr -out ldap_server.pem
+       ```
+   * install CA certificate onto BMC via WebUI
+
+3. LDAP client certificate
+   * if client authentication is required in a TLS session, LDAP server will use CA certificate (issuer of client certificate) to verify client's identity when initiating a TLS session. BMC needs to install a client certificate signed with CA certificate.
+   * generate a client certificate with signature signed with CA certificate.
+     ```
+     openssl genrsa -out ldap_client.key 2048
+     openssl req -new -key ldap_client.key -out ldap_client.csr -subj '/C=TW/ST=Taiwan/L=Tainan/O=Nuvoton Ltd/OU=CS20/CN=ldap client'
+     openssl x509 -req -days 365 -CA ca_cert.pem -CAkey ca_key.pem -CAcreateserial -CAserial serial -in ldap_client.csr -out ldap_client.cert
+     ```
+   * Because the LDAP certificate installed on BMC also requires a private key, combine ssl certificate and private key into one pem file
+     ```
+     cat ldap_client.key ldap_client.cert > ldap_client.pem
+     ```
+   * install ldap_client.pem onto BMC via WebUI
+4. Enable LDAP over SSL  
+   * The enable action on WebUI will enable LDAP client to perform server authentication when initiating a TLS session.    
+      <img align="top" width="70%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/enable_ldap_over_ssl.png">
+    * To enable client authentication, add following config to ldap server configuration file (slapd.conf in this case).  
+      > TLSVerifyClient demand
+    
+5. Test LDAP server.
+   * Log in BMC WebUI using user1/123
+
+**Maintainer**
+* Stanley Chu
 
 ## System
 
@@ -1850,3 +1921,4 @@ image-rwfs    |  0 MB  | middle layer of the overlayfs, rw files in this partiti
 * 2019.12.19 Add Fan PID control
 * 2019.12.23 Fix some typo and text format
 * 2020.03.31 Add Open Test Automation and update Features In Progressing and Image Size
+* 2020.04.06 Add Certificate Management
