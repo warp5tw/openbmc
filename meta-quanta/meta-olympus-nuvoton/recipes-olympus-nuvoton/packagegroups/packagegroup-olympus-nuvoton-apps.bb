@@ -59,4 +59,6 @@ RDEPENDS_${PN}-system = " \
         iptables \
         iptable-save \
         pch-time-sync \
+        phosphor-power \
+        phosphor-power-systemd-links \
         "

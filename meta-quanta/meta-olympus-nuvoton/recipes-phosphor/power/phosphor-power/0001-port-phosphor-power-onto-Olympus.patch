@@ -1,0 +1,164 @@
+From 5796c4eac66bc227c13681d8b90e5bebb2211cfc Mon Sep 17 00:00:00 2001
+From: kfting <kfting@nuvoton.com>
+Date: Wed, 8 Apr 2020 10:26:34 +0800
+Subject: [PATCH] port phosphor-power onto Olympus
+
+1. It supports one PSU by default.
+2. Add the layers meta-aspeed and meta-openpower into bblayers.conf.
+
+Signed-off-by: kfting <kfting@nuvoton.com>
+---
+ power-supply/power_supply.cpp | 73 +++++++++++++++++++++++++++++++++--
+ utility.cpp                   |  3 +-
+ 2 files changed, 71 insertions(+), 5 deletions(-)
+
+diff --git a/power-supply/power_supply.cpp b/power-supply/power_supply.cpp
+index aa7588e..f2954f2 100644
+--- a/power-supply/power_supply.cpp
++++ b/power-supply/power_supply.cpp
+@@ -28,6 +28,9 @@
+ #include <phosphor-logging/log.hpp>
+ #include <xyz/openbmc_project/Common/Device/error.hpp>
+ 
++#include <boost/container/flat_map.hpp>
++#include <sdbusplus/bus.hpp>
++
+ #include <functional>
+ 
+ namespace phosphor
+@@ -41,6 +44,19 @@ using namespace phosphor::logging;
+ using namespace sdbusplus::org::open_power::Witherspoon::Fault::Error;
+ using namespace sdbusplus::xyz::openbmc_project::Common::Device::Error;
+ 
++using GetManagedPropertyType = boost::container::flat_map<
++    std::string,
++    sdbusplus::message::variant<std::string, bool, uint8_t, int16_t, uint16_t,
++    int32_t, uint32_t, int64_t, uint64_t, double>>;
++
++using GetManagedObjectsType = boost::container::flat_map<
++    sdbusplus::message::object_path,
++    boost::container::flat_map<std::string, GetManagedPropertyType>>;
++
++constexpr auto LOGGING_SERVICE = "xyz.openbmc_project.Logging";
++constexpr auto LOGGING_OBJECT = "/xyz/openbmc_project/logging";
++constexpr auto OBJM_INTF = "org.freedesktop.DBus.ObjectManager";
++
+ PowerSupply::PowerSupply(const std::string& name, size_t inst,
+                          const std::string& objpath, const std::string& invpath,
+                          sdbusplus::bus::bus& bus, const sdeventplus::Event& e,
+@@ -57,7 +73,7 @@ PowerSupply::PowerSupply(const std::string& name, size_t inst,
+                      syncHistory();
+ 
+                      // Update the inventory for the new device
+-                     updateInventory();
++                     //updateInventory();
+                  })),
+     powerOnInterval(t),
+     powerOnTimer(e, std::bind([this]() { this->powerOn = true; }))
+@@ -90,7 +106,8 @@ PowerSupply::PowerSupply(const std::string& name, size_t inst,
+     updatePresence();
+ 
+     // Write the SN, PN, etc to the inventory
+-    updateInventory();
++    // For now, the attribute nodes don't exist.
++    //updateInventory();
+ 
+     // Subscribe to power state changes
+     powerOnMatch = std::make_unique<match_t>(
+@@ -196,7 +213,7 @@ void PowerSupply::inventoryChanged(sdbusplus::message::message& msg)
+             presentTimer.setEnabled(false);
+ 
+             // Clear out the now outdated inventory properties
+-            updateInventory();
++            //updateInventory();
+         }
+     }
+ 
+@@ -219,7 +236,9 @@ void PowerSupply::powerStateChanged(sdbusplus::message::message& msg)
+     msg.read(msgSensor, msgData);
+ 
+     // Check if it was the Present property that changed.
+-    auto valPropMap = msgData.find("state");
++    // check pgood for now.
++    //auto valPropMap = msgData.find("state");
++    auto valPropMap = msgData.find("pgood");
+     if (valPropMap != msgData.end())
+     {
+         state =
+@@ -558,6 +577,51 @@ void PowerSupply::resolveError(const std::string& callout,
+ 
+     try
+     {
++        auto method = bus.new_method_call(LOGGING_SERVICE,
++                      LOGGING_OBJECT,
++                      OBJM_INTF, "GetManagedObjects");
++        auto reply = bus.call(method);
++        GetManagedObjectsType result;
++        reply.read(result);
++        auto intf_found = false;
++        std::string *logmessage = nullptr;
++        if (!result.empty())
++        {
++            for (auto &objectPath : result)
++            {
++                for (auto &interfaceMap : objectPath.second)
++                {
++                    if ("xyz.openbmc_project.Logging.Entry" ==
++                            interfaceMap.first)
++                    {
++                        for (auto &propertyMap : interfaceMap.second)
++                        {
++                            if (propertyMap.first == "Message")
++                            {
++                                logmessage = std::get_if<std::string>(
++                                        &propertyMap.second);
++                                if (nullptr != logmessage)
++                                {
++                                    if (message == *logmessage)
++                                    {
++                                        // Log entry matches call out and message, set Resolved to true
++                                        bool resolved = true;
++                                        util::setProperty(interfaceMap.first,
++                                                RESOLVED_PROP, objectPath.first,
++                                                LOGGING_SERVICE, bus, resolved);
++                                    }
++                                }
++                            }
++                        }
++                    }
++                }
++            }
++
++        }
++
++        return;
++
++#if 0
+         auto path = callout + "/fault";
+         // Get the service name from the mapper for the fault callout
+         auto service = util::getService(path, ASSOCIATION_IFACE, bus);
+@@ -597,6 +661,7 @@ void PowerSupply::resolveError(const std::string& callout,
+                                   logEntryService, bus, resolved);
+             }
+         }
++#endif
+     }
+     catch (std::exception& e)
+     {
+diff --git a/utility.cpp b/utility.cpp
+index 75ecb80..ade5c8f 100644
+--- a/utility.cpp
++++ b/utility.cpp
+@@ -113,7 +113,8 @@ bool isPoweredOn(sdbusplus::bus::bus& bus, bool defaultState)
+     {
+         // When state = 1, system is powered on
+         auto service = util::getService(POWER_OBJ_PATH, POWER_IFACE, bus);
+-        getProperty<int32_t>(POWER_IFACE, "state", POWER_OBJ_PATH, service, bus,
++        //getProperty<int32_t>(POWER_IFACE, "state", POWER_OBJ_PATH, service, bus,
++        getProperty<int32_t>(POWER_IFACE, "pgood", POWER_OBJ_PATH, service, bus,
+                              state);
+     }
+     catch (std::exception& e)
+-- 
+2.17.1
+

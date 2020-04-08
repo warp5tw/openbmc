@@ -1,0 +1,91 @@
+From 7ecb3049ed2f41dc5f11a862d8e7cb8418705421 Mon Sep 17 00:00:00 2001
+From: kfting <kfting@nuvoton.com>
+Date: Thu, 12 Mar 2020 11:56:45 +0800
+Subject: [PATCH] add support for psu-manager psupresence interface
+
+Signed-off-by: kfting <kfting@nuvoton.com>
+---
+ .../Configuration/PSUPresence.interface.yaml      | 15 +++++++++++++++
+ .../Configuration/PURedundancy.interface.yaml     | 11 +++++++++++
+ .../Configuration/pmbus.interface.yaml            | 15 +++++++++++++++
+ .../Control/PowerSupplyRedundancy.interface.yaml  |  2 --
+ 4 files changed, 41 insertions(+), 2 deletions(-)
+ create mode 100644 xyz/openbmc_project/Configuration/PSUPresence.interface.yaml
+ create mode 100644 xyz/openbmc_project/Configuration/PURedundancy.interface.yaml
+ create mode 100644 xyz/openbmc_project/Configuration/pmbus.interface.yaml
+
+diff --git a/xyz/openbmc_project/Configuration/PSUPresence.interface.yaml b/xyz/openbmc_project/Configuration/PSUPresence.interface.yaml
+new file mode 100644
+index 0000000..e65f975
+--- /dev/null
++++ b/xyz/openbmc_project/Configuration/PSUPresence.interface.yaml
+@@ -0,0 +1,15 @@
++description: >
++    An interface for psu-manager configuration.
++properties:
++    - name: Name
++      type: string
++      description: >
++          The configuration.
++    - name: Bus
++      type: uint64
++      description: >
++          The bus where a PSU is located.
++    - name: Address
++      type: array[uint64]
++      description: >
++          The PSU address.
+diff --git a/xyz/openbmc_project/Configuration/PURedundancy.interface.yaml b/xyz/openbmc_project/Configuration/PURedundancy.interface.yaml
+new file mode 100644
+index 0000000..0b50d8e
+--- /dev/null
++++ b/xyz/openbmc_project/Configuration/PURedundancy.interface.yaml
+@@ -0,0 +1,11 @@
++description: >
++    An interface for psu-manager puredundancy configuration.
++properties:
++    - name: Name
++      type: string
++      description: >
++          The configuration.
++    - name: RedundantCount
++      type: uint64
++      description: >
++          redundancy count.
+diff --git a/xyz/openbmc_project/Configuration/pmbus.interface.yaml b/xyz/openbmc_project/Configuration/pmbus.interface.yaml
+new file mode 100644
+index 0000000..b93374f
+--- /dev/null
++++ b/xyz/openbmc_project/Configuration/pmbus.interface.yaml
+@@ -0,0 +1,15 @@
++description: >
++    An interface for psu-manager pmbus configuration.
++properties:
++    - name: Name
++      type: string
++      description: >
++          The configuration.
++    - name: Bus
++      type: uint64
++      description: >
++          The bus where a PSU is located. 
++    - name: Address
++      type: uint64
++      description: >
++          The PSU address.
+diff --git a/xyz/openbmc_project/Control/PowerSupplyRedundancy.interface.yaml b/xyz/openbmc_project/Control/PowerSupplyRedundancy.interface.yaml
+index e02e0aa..64f1b28 100644
+--- a/xyz/openbmc_project/Control/PowerSupplyRedundancy.interface.yaml
++++ b/xyz/openbmc_project/Control/PowerSupplyRedundancy.interface.yaml
+@@ -3,8 +3,6 @@ description: >
+ properties:
+     - name: PowerSupplyRedundancyEnabled
+       type: boolean
+-      flags:
+-        - const
+       description: >
+           When true, the power supplies are redundant.
+     - name: RotationEnabled
+-- 
+2.17.1
+

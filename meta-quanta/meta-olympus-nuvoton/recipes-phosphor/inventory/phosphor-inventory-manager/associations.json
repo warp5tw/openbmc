@@ -23,6 +23,23 @@
         ]
     },
     {
+        "path": "system/chassis/motherboard/powersupply0",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "fault"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/logging/entry/1"
+                ]
+            }
+        ]
+    },
+    {
         "path": "system/chassis/motherboard/powersupply1",
         "endpoints":
         [

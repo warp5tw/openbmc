@@ -1,0 +1,10 @@
+---
+/xyz/openbmc_project/inventory/system/chassis/motherboard:
+    - Interface: xyz.openbmc_project.Configuration.PSUPresence
+      Properties:
+          Name:
+             Default: '"psu0"'
+          Bus:
+             Default: 2
+          Address:
+             Default: '{88}'
