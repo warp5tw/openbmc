@@ -1,4 +1,4 @@
-From 06eae35186d12d383827afc502c7d12a67def3df Mon Sep 17 00:00:00 2001
+From 0f53b2e239c5e1b4a7f570301641ddec2d43e4fc Mon Sep 17 00:00:00 2001
 From: AppaRao Puli <apparao.puli@linux.intel.com>
 Date: Wed, 5 Sep 2018 14:16:54 +0530
 Subject: [PATCH] Adding channel specific privilege to network
@@ -25,7 +25,7 @@ Signed-off-by: Yong Li <yong.b.li@linux.intel.com>
  4 files changed, 267 insertions(+), 1 deletion(-)
 
 diff --git a/ethernet_interface.cpp b/ethernet_interface.cpp
-index c00e4f4..8b6fc00 100644
+index ed1e1ba..60a1f23 100644
 --- a/ethernet_interface.cpp
 +++ b/ethernet_interface.cpp
 @@ -59,6 +59,9 @@ struct EthernetIntfSocket
@@ -38,15 +38,15 @@ index c00e4f4..8b6fc00 100644
  EthernetInterface::EthernetInterface(sdbusplus::bus::bus& bus,
                                       const std::string& objPath,
                                       bool dhcpEnabled, Manager& parent,
-@@ -84,6 +87,7 @@ EthernetInterface::EthernetInterface(sdbusplus::bus::bus& bus,
-     EthernetInterfaceIntf::autoNeg(std::get<2>(ifInfo));
+@@ -86,6 +89,7 @@ EthernetInterface::EthernetInterface(sdbusplus::bus::bus& bus,
      EthernetInterfaceIntf::speed(std::get<0>(ifInfo));
      EthernetInterfaceIntf::linkUp(std::get<3>(ifInfo));
+ #endif
 +    getChannelPrivilege(intfName);
  
      // Emit deferred signal.
      if (emitSignal)
-@@ -866,5 +870,117 @@ void EthernetInterface::deleteAll()
+@@ -869,5 +873,117 @@ void EthernetInterface::deleteAll()
      manager.writeToConfigurationFile();
  }
  

@@ -1,6 +1,6 @@
-From 1c98a5f9b9066b5756e90dad2a168bf0293e3ccd Mon Sep 17 00:00:00 2001
+From 65a6965830c3291ff1ee77ed24402b742ef19e52 Mon Sep 17 00:00:00 2001
 From: Manojkiran Eda <manojkiran.eda@gmail.com>
-Date: Tue, 15 Oct 2019 15:00:51 +0530
+Date: Mon, 6 Apr 2020 11:12:03 +0800
 Subject: [PATCH] Backend changes for Populating Nameservers(DNS & Static)
 
 - As per the proposed design :
@@ -31,14 +31,13 @@ Tested By:
   user sets a staic name server.
 
 Signed-off-by: Manojkiran Eda <manojkiran.eda@gmail.com>
-Change-Id: If10b9aa683d2b50e51780e91323c6d10a5ec3710
 ---
  ethernet_interface.cpp | 79 ++++++++++++++++++++++++++++++++++++++----
  ethernet_interface.hpp |  9 ++++-
  2 files changed, 81 insertions(+), 7 deletions(-)
 
 diff --git a/ethernet_interface.cpp b/ethernet_interface.cpp
-index 004327a..f83a437 100644
+index 60a1f23..e8319cd 100644
 --- a/ethernet_interface.cpp
 +++ b/ethernet_interface.cpp
 @@ -35,6 +35,8 @@ namespace network
@@ -70,9 +69,9 @@ index 004327a..f83a437 100644
 -    EthernetInterfaceIntf::nameservers(getNameServerFromConf());
 +    EthernetInterfaceIntf::nameservers(getNameServerFromResolvd());
 +    EthernetInterfaceIntf::staticNameServers(getstaticNameServerFromConf());
+ #if NIC_SUPPORTS_ETHTOOL
      InterfaceInfo ifInfo = EthernetInterface::getInterfaceInfo();
  
-     EthernetInterfaceIntf::autoNeg(std::get<2>(ifInfo));
 @@ -497,6 +506,12 @@ bool EthernetInterface::linkUp() const
  }
  
