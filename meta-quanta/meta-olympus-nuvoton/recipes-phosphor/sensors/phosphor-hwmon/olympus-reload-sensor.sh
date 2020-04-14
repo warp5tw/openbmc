@@ -13,7 +13,7 @@ if [ $1 = "1" ]; then
     fi
     systemctl start "xyz.openbmc_project.Hwmon@-ahb-apb-pwm\x2dfan\x2dcontroller\x40103000.service"
     echo -n "f0086000.i2c" > /sys/bus/platform/drivers/nuvoton-i2c/bind
-    sleep 1
+    sleep 15
     systemctl start xyz.openbmc_project.Logging.IPMI.service
 else
     if [ $1 = "boot_check" ]; then
@@ -35,7 +35,7 @@ else
     if [ -d "/sys/bus/platform/drivers/nuvoton-i2c/f0086000.i2c" ]; then
         echo -n "f0086000.i2c" > /sys/bus/platform/drivers/nuvoton-i2c/unbind
     fi
-    sleep 1
+    sleep 15
     if [ $1 = "0" ]; then
         systemctl start xyz.openbmc_project.Logging.IPMI.service
     fi
