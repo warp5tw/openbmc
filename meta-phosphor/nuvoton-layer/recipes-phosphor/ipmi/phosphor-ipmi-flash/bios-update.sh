@@ -120,7 +120,7 @@ if [ "$r" == "0" ]; then
     if [ ! -d "/sys/class/gpio/gpio227" ];then
 	    echo 227 > /sys/class/gpio/export
     fi
-	echo 1 > /sys/class/gpio/gpio227/value
+	echo high > /sys/class/gpio/gpio227/direction
 	cd /sys/bus/platform/devices/c0000000.fiu/driver
 	echo -n "c0000000.fiu" > unbind
 	echo -n "c0000000.fiu" > bind
@@ -137,7 +137,7 @@ if [ "$r" == "0" ]; then
 	sleep 10
 
 	echo "Unmount BISO flash"  tee -a ${IPMB_LOG}
-	echo 0 > /sys/class/gpio/gpio227/value
+	echo low > /sys/class/gpio/gpio227/direction
 	cd /sys/bus/platform/devices/c0000000.fiu/driver
 	echo -n "c0000000.fiu" > unbind
 	echo -n "c0000000.fiu" > bind
