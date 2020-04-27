@@ -1,15 +1,107 @@
-From d3d7efce2d0ad4f45c7f7fabb4580229624373d1 Mon Sep 17 00:00:00 2001
+From 090896e33101bd5783982edaf0f41a7fa50cd2f5 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Mon, 23 Mar 2020 14:10:44 +0800
-Subject: [PATCH 1/2] vcd 0.0.13 test
+Subject: [PATCH] driver: media: update vcd and ece
+
+vcd 0.0.14:
+     - Add bitmap search support
+     - Support ip reset
+
+ece 0.0.5 :
+     - Support ip reset
 
 Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---
- drivers/media/platform/nuvoton/npcm750_vcd.c | 194 +++++++++----------
- 1 file changed, 94 insertions(+), 100 deletions(-)
+ arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi |   2 +
+ drivers/media/platform/nuvoton/npcm750_ece.c  |  22 +-
+ drivers/media/platform/nuvoton/npcm750_vcd.c  | 215 ++++++++++--------
+ 3 files changed, 137 insertions(+), 102 deletions(-)
 
+diff --git a/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi b/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi
+index 48329bcf8c42..93a222b6e572 100644
+--- a/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi
++++ b/arch/arm/boot/dts/nuvoton-common-npcm7xx.dtsi
+@@ -274,6 +274,7 @@
+ 			reg = <0xf0810000 0x10000>;
+ 			phy-memory = <0x3e200000 0x600000>;
+ 			interrupts = <GIC_SPI 22 IRQ_TYPE_LEVEL_HIGH>;
++			resets = <&rstc NPCM7XX_RESET_IPSRST2 NPCM7XX_RESET_VCD>;
+ 			status = "disabled";
+ 		};
+ 
+@@ -282,6 +283,7 @@
+ 			reg = <0xf0820000 0x2000>;
+ 			phy-memory = <0x3e800000 0x600000>;
+ 			interrupts = <GIC_SPI 24 IRQ_TYPE_LEVEL_HIGH>;
++			resets = <&rstc NPCM7XX_RESET_IPSRST2 NPCM7XX_RESET_ECE>;
+ 			status = "disabled";
+ 		};
+ 
+diff --git a/drivers/media/platform/nuvoton/npcm750_ece.c b/drivers/media/platform/nuvoton/npcm750_ece.c
+index 7e73337bdd8a..766f57692a56 100644
+--- a/drivers/media/platform/nuvoton/npcm750_ece.c
++++ b/drivers/media/platform/nuvoton/npcm750_ece.c
+@@ -26,9 +26,10 @@
+ #include <linux/interrupt.h>
+ #include <linux/delay.h>
+ #include <linux/dma-mapping.h>
++#include <linux/reset.h>
+ #include <asm/fb.h>
+ 
+-#define ECE_VERSION "0.0.4"
++#define ECE_VERSION "0.0.5"
+ 
+ /* ECE Register */
+ #define DDA_CTRL	0x0000
+@@ -122,6 +123,7 @@ struct npcm750_ece {
+ 	atomic_t clients;
+ 	int irq;
+ 	struct completion complete;
++	struct reset_control *reset;
+ };
+ 
+ static void npcm750_ece_update_bits(struct npcm750_ece *ece, u32 offset,
+@@ -279,6 +281,13 @@ static void npcm750_ece_set_lp(struct npcm750_ece *ece, u32 pitch)
+ 	npcm750_ece_write(ece, RESOL, lp);
+ }
+ 
++static void npcm750_ece_reset_hw(struct npcm750_ece *ece)
++{
++	reset_control_assert(ece->reset);
++	udelay(5);
++	reset_control_deassert(ece->reset);
++}
++
+ /* Stop and reset the ECE state machine */
+ static void npcm750_ece_reset(struct npcm750_ece *ece)
+ {
+@@ -627,6 +636,15 @@ static int npcm750_ece_probe(struct platform_device *pdev)
+ 		goto err;
+ 	}
+ 
++	ece->reset = devm_reset_control_get(&pdev->dev, NULL);
++	if (IS_ERR(ece->reset)) {
++		ret = PTR_ERR(ece->reset);
++		goto err;
++	}
++
++	/* reset ECE-HW block */
++	npcm750_ece_reset_hw(ece);
++
+ 	ece->irq = of_irq_get(pdev->dev.of_node, 0);
+ 	ret = request_irq(ece->irq, npcm750_ece_irq_handler,
+ 			  IRQF_SHARED, ece_name, ece->dev);
+@@ -652,6 +670,8 @@ static int npcm750_ece_remove(struct platform_device *pdev)
+ 
+ 	npcm750_ece_stop(ece);
+ 
++	npcm750_ece_reset_hw(ece);
++
+ 	device_destroy(ece->ece_class, ece->dev_t);
+ 
+ 	class_destroy(ece->ece_class);
 diff --git a/drivers/media/platform/nuvoton/npcm750_vcd.c b/drivers/media/platform/nuvoton/npcm750_vcd.c
-index 5c3e023b4550..cd4c4833aaab 100644
+index 5c3e023b4550..1028b779e26e 100644
 --- a/drivers/media/platform/nuvoton/npcm750_vcd.c
 +++ b/drivers/media/platform/nuvoton/npcm750_vcd.c
 @@ -5,6 +5,7 @@
@@ -20,16 +112,18 @@ index 5c3e023b4550..cd4c4833aaab 100644
  #include <linux/err.h>
  #include <linux/io.h>
  #include <linux/compat.h>
-@@ -32,7 +33,7 @@
+@@ -31,8 +32,9 @@
+ #include <linux/workqueue.h>
  #include <asm/fb.h>
  #include <linux/completion.h>
++#include <linux/reset.h>
  
 -#define VCD_VERSION "0.0.11"
-+#define VCD_VERSION "0.0.13"
++#define VCD_VERSION "0.0.14"
  
  #define VCD_IOC_MAGIC     'v'
  #define VCD_IOCGETINFO	_IOR(VCD_IOC_MAGIC,  1, struct vcd_info)
-@@ -210,9 +211,11 @@
+@@ -210,9 +212,11 @@
  /* GCR  Register */
  #define INTCR 0x3c
  #define  INTCR_GFXIFDIS	(BIT(8) | BIT(9))
@@ -41,11 +135,19 @@ index 5c3e023b4550..cd4c4833aaab 100644
  
  #define INTCR2 0x60
  #define  INTCR2_GIRST2	BIT(2)
-@@ -396,6 +399,21 @@ static const res_tlb res_tlbs[] = {
+@@ -351,6 +355,7 @@ struct npcm750_vcd {
+ 	int irq;
+ 	struct completion complete;
+ 	u32 hortact;
++	struct reset_control *reset;
+ };
+ 
+ typedef struct
+@@ -396,6 +401,21 @@ static const res_tlb res_tlbs[] = {
  	{"1920 x 1200", 1920, 1200},
  };
  
-+static inline void bitmap_next_set_region(unsigned long *bitmap,
++static inline void bitmap_next_set_region(const unsigned long *bitmap,
 +					  unsigned int *rs, unsigned int *re,
 +					  unsigned int end)
 +{
@@ -63,7 +165,7 @@ index 5c3e023b4550..cd4c4833aaab 100644
  static const int restlb_cnt = sizeof(res_tlbs) / sizeof(res_tlb);
  
  static void npcm750_vcd_update(struct npcm750_vcd *vcd, u32 reg,
-@@ -818,46 +836,11 @@ static void npcm750_vcd_free_diff_table(struct npcm750_vcd *vcd)
+@@ -818,46 +838,11 @@ static void npcm750_vcd_free_diff_table(struct npcm750_vcd *vcd)
  			kfree(tmp);
  		}
  	}
@@ -111,7 +213,7 @@ index 5c3e023b4550..cd4c4833aaab 100644
  {
  	struct rect_list *list = NULL;
  
-@@ -865,31 +848,26 @@ npcm750_vcd_new_rect(struct npcm750_vcd *vcd, int offset, int index)
+@@ -865,55 +850,46 @@ npcm750_vcd_new_rect(struct npcm750_vcd *vcd, int offset, int index)
  	if (!list)
  		return NULL;
  
@@ -161,8 +263,11 @@ index 5c3e023b4550..cd4c4833aaab 100644
  }
  
  static int
-@@ -899,21 +877,17 @@ npcm750_vcd_build_table(struct npcm750_vcd *vcd, struct rect_info *info)
- 	int j, z, ret;
+ npcm750_vcd_build_table(struct npcm750_vcd *vcd, struct rect_info *info)
+ {
+ 	int i = info->index;
+-	int j, z, ret;
++	int j;
  
  	for (j = 0 ; j < info->offset_perline ; j += 4) {
 -		if (npcm750_vcd_read(vcd, VCD_DIFF_TBL + (j + i)) != 0) {
@@ -191,7 +296,7 @@ index 5c3e023b4550..cd4c4833aaab 100644
  	info->index += 64;
  	return info->tile_perline;
  }
-@@ -922,28 +896,25 @@ static int npcm750_vcd_get_diff_table(struct npcm750_vcd *vcd)
+@@ -922,28 +898,25 @@ static int npcm750_vcd_get_diff_table(struct npcm750_vcd *vcd)
  {
  	struct rect_info info;
  	int ret = 0;
@@ -227,7 +332,7 @@ index 5c3e023b4550..cd4c4833aaab 100644
  
  	info.offset_perline *= 4;
  
-@@ -964,6 +935,9 @@ static int npcm750_vcd_init(struct npcm750_vcd *vcd)
+@@ -964,6 +937,9 @@ static int npcm750_vcd_init(struct npcm750_vcd *vcd)
  	/* Enable display of KVM GFX and access to memory */
  	regmap_update_bits(gcr, INTCR, INTCR_GFXIFDIS, ~INTCR_GFXIFDIS);
  
@@ -237,7 +342,7 @@ index 5c3e023b4550..cd4c4833aaab 100644
  	/* Set vrstenw and hrstenw */
  	regmap_update_bits(gcr, INTCR2,
  			   INTCR2_GIHCRST | INTCR2_GIVCRST,
-@@ -990,12 +964,10 @@ static int npcm750_vcd_init(struct npcm750_vcd *vcd)
+@@ -990,12 +966,10 @@ static int npcm750_vcd_init(struct npcm750_vcd *vcd)
  
  	/* Set vcd frame physical address */
  	npcm750_vcd_write(vcd, VCD_FBA_ADR, vcd->frame_start);
@@ -251,8 +356,17 @@ index 5c3e023b4550..cd4c4833aaab 100644
  
  	/* Set DVDE/DVHSYNC */
  	npcm750_vcd_dehs(vcd, vcd->de_mode);
-@@ -1030,6 +1002,14 @@ static int npcm750_vcd_init(struct npcm750_vcd *vcd)
+@@ -1028,8 +1002,23 @@ static int npcm750_vcd_init(struct npcm750_vcd *vcd)
+ 	return 0;
+ }
  
++static void npcm750_vcd_reset_hw(struct npcm750_vcd *vcd)
++{
++	reset_control_assert(vcd->reset);
++	udelay(5);
++	reset_control_deassert(vcd->reset);
++}
++
  static void npcm750_vcd_stop(struct npcm750_vcd *vcd)
  {
 +	struct regmap *gcr = vcd->gcr_regmap;
@@ -266,15 +380,7 @@ index 5c3e023b4550..cd4c4833aaab 100644
  	npcm750_vcd_write(vcd, VCD_INTE, 0);
  	npcm750_vcd_write(vcd, VCD_STAT, VCD_STAT_CLEAR);
  	npcm750_vcd_write(vcd, VCD_MODE, 0);
-@@ -1045,6 +1025,7 @@ static irqreturn_t npcm750_vcd_irq_handler(int irq, void *dev_instance)
- 	struct npcm750_vcd *vcd = (struct npcm750_vcd *)dev->driver_data;
- 	u32 status;
- 	u32 status_ack = 0;
-+	int i = 0;
- 
- 	spin_lock(&vcd->lock);
- 
-@@ -1052,10 +1033,6 @@ static irqreturn_t npcm750_vcd_irq_handler(int irq, void *dev_instance)
+@@ -1052,10 +1041,6 @@ static irqreturn_t npcm750_vcd_irq_handler(int irq, void *dev_instance)
  	if (status & VCD_STAT_IRQ) {
  		if (status & VCD_STAT_DONE) {
  			dev_dbg(vcd->dev, "VCD_STAT_DONE\n");
@@ -285,7 +391,7 @@ index 5c3e023b4550..cd4c4833aaab 100644
  			status_ack |= VCD_STAT_DONE;
  		}
  
-@@ -1166,7 +1143,13 @@ npcm750_vcd_open(struct inode *inode, struct file *file)
+@@ -1166,7 +1151,13 @@ npcm750_vcd_open(struct inode *inode, struct file *file)
  
  	file->private_data = vcd;
  
@@ -300,7 +406,7 @@ index 5c3e023b4550..cd4c4833aaab 100644
  
  	dev_dbg(vcd->dev, "open: client %d\n", atomic_read(&vcd->clients));
  	return 0;
-@@ -1177,7 +1160,8 @@ npcm750_vcd_release(struct inode *inode, struct file *file)
+@@ -1177,7 +1168,8 @@ npcm750_vcd_release(struct inode *inode, struct file *file)
  {
  	struct npcm750_vcd *vcd = file->private_data;
  
@@ -310,7 +416,7 @@ index 5c3e023b4550..cd4c4833aaab 100644
  
  	dev_dbg(vcd->dev, "close: client %d\n", atomic_read(&vcd->clients));
  	return 0;
-@@ -1206,6 +1190,12 @@ npcm750_do_vcd_ioctl(struct npcm750_vcd *vcd, unsigned int cmd,
+@@ -1206,6 +1198,12 @@ npcm750_do_vcd_ioctl(struct npcm750_vcd *vcd, unsigned int cmd,
  			vcd->status = 0;
  			reinit_completion(&vcd->complete);
  
@@ -323,7 +429,7 @@ index 5c3e023b4550..cd4c4833aaab 100644
  			npcm750_vcd_command(vcd, vcd_cmd);
  			timeout = wait_for_completion_interruptible_timeout(&vcd->complete,
  			    VCD_OP_TIMEOUT);
-@@ -1221,13 +1211,25 @@ npcm750_do_vcd_ioctl(struct npcm750_vcd *vcd, unsigned int cmd,
+@@ -1221,13 +1219,25 @@ npcm750_do_vcd_ioctl(struct npcm750_vcd *vcd, unsigned int cmd,
  				if (!ret)
  					ret = -EBUSY;
  			}
@@ -350,7 +456,7 @@ index 5c3e023b4550..cd4c4833aaab 100644
  		if (changed < 0) {
  			ret = -EFAULT;
  			break;
-@@ -1242,7 +1244,6 @@ npcm750_do_vcd_ioctl(struct npcm750_vcd *vcd, unsigned int cmd,
+@@ -1242,7 +1252,6 @@ npcm750_do_vcd_ioctl(struct npcm750_vcd *vcd, unsigned int cmd,
  		struct rect_list *list;
  		struct rect r;
  		struct list_head *head = &vcd->list;
@@ -358,7 +464,7 @@ index 5c3e023b4550..cd4c4833aaab 100644
  		if (vcd->rect_cnt == 0) {
  			r.x = 0;
  			r.y = 0;
-@@ -1462,13 +1463,6 @@ static int npcm750_vcd_probe(struct platform_device *pdev)
+@@ -1462,19 +1471,21 @@ static int npcm750_vcd_probe(struct platform_device *pdev)
  	if (ret)
  		vcd->de_mode = 1;
  
@@ -372,6 +478,30 @@ index 5c3e023b4550..cd4c4833aaab 100644
  	vcd->dev_p = &pdev->dev;
  
  	ret = npcm750_vcd_device_create(vcd);
+ 	if (ret)
+ 		goto err;
+ 
++	vcd->reset = devm_reset_control_get(&pdev->dev, NULL);
++	if (IS_ERR(vcd->reset)) {
++		ret = PTR_ERR(vcd->reset);
++		goto err;
++	}
++
++	/* reset VCD-HW block */
++	npcm750_vcd_reset_hw(vcd);
++
+ 	vcd->irq = of_irq_get(pdev->dev.of_node, 0);
+ 	ret = request_irq(vcd->irq, npcm750_vcd_irq_handler,
+ 			  IRQF_SHARED, vcd_name, vcd->dev);
+@@ -1504,6 +1515,8 @@ static int npcm750_vcd_remove(struct platform_device *pdev)
+ 
+ 	npcm750_vcd_stop(vcd);
+ 
++	npcm750_vcd_reset_hw(vcd);
++
+ 	free_irq(vcd->irq, vcd->dev);
+ 
+ 	device_destroy(vcd_class, vcd->dev_t);
 -- 
 2.17.1
 
