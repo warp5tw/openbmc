@@ -48,4 +48,5 @@ RDEPENDS_${PN}-system = " \
 		phosphor-host-postd \
 		phosphor-ipmi-ipmb \
 		iperf3 \
+		loadsvf \
         "
