@@ -56,7 +56,7 @@ FILES_phosphor-rsyslog-config += " \
 "
 
 SRC_URI += "git://github.com/openbmc/phosphor-logging"
-SRCREV = "182071455a82b22e8111217d624c25f4c86dce43"
+SRCREV = "34836321dde458f251dd164ab161bcce08f53c6b"
 
 S = "${WORKDIR}/git"
 
@@ -74,7 +74,7 @@ DEPENDS_remove_class-native = " \
 # as they will not be available in host machine
 DEPENDS_remove_class-nativesdk = " \
         virtual/phosphor-logging-callouts \
-        sdbusplus-native \
+        sdbusplus \
         libcereal \
         systemd \
         phosphor-dbus-interfaces \
