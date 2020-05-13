@@ -1,4 +1,4 @@
-From 7b119b8429db6955b7f5a0fad23c11f23e79c562 Mon Sep 17 00:00:00 2001
+From b8173b114eb4ab50056c0f9f54c87e63b08179a4 Mon Sep 17 00:00:00 2001
 From: Tim Lee <timlee660101@gmail.com>
 Date: Wed, 27 Nov 2019 09:56:22 +0800
 Subject: [PATCH] main: add feature for updating BootProgress and
@@ -63,7 +63,7 @@ index acaeca7..89e9f56 100644
  template <typename... T>
  using ServerObject = typename sdbusplus::server::object::object<T...>;
 diff --git a/main.cpp b/main.cpp
-index daec6c4..dde9602 100644
+index 89f0224..2175d56 100644
 --- a/main.cpp
 +++ b/main.cpp
 @@ -32,9 +32,96 @@
@@ -207,10 +207,10 @@ index daec6c4..dde9602 100644
 +                                     BootProgressPropertyString, boardinit))
 +                return;
 +        }
-     }
- }
  
-@@ -131,6 +256,12 @@ int main(int argc, char* argv[])
+         // read depends on old data being cleared since it doens't always read
+         // the full code size
+@@ -156,6 +281,12 @@ int main(int argc, char* argv[])
          }
      }
  
