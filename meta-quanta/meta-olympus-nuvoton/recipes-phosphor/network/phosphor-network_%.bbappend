@@ -1,6 +1,7 @@
 EXTRA_OECONF_olympus-nuvoton += " --disable-link-local-autoconfiguration"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+SRCREV = "40a51df94c7668bf4de8f82b8c578c4a3b409974"
 
 DEPENDS += "nlohmann-json"
 
