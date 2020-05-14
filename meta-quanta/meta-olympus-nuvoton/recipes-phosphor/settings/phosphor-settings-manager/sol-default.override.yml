@@ -4,3 +4,7 @@
       Properties:
           Privilege:
               Default: 2
+          Enable:
+              Default: 'true'
+          Progress:
+              Default: 0
