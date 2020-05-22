@@ -1,0 +1,19 @@
+diff --git a/ethernet_interface.cpp b/ethernet_interface.cpp
+index b4f0a61..9b9348a 100644
+--- a/ethernet_interface.cpp
++++ b/ethernet_interface.cpp
+@@ -821,12 +821,12 @@ void EthernetInterface::writeConfigurationFile()
+     {
+         stream << "MACAddress=" << mac << "\n";
+     }
+-
++#if 0
+     if (!EthernetInterfaceIntf::nICEnabled())
+     {
+         stream << "Unmanaged=yes\n";
+     }
+-
++#endif
+     // write the network section
+     stream << "[Network]\n";
+ #ifdef LINK_LOCAL_AUTOCONFIGURATION
