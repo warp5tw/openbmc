@@ -26,15 +26,8 @@ RPROVIDES_${PN}-system += "virtual-obmc-system-mgmt"
 # RDEPENDS_${PN}-flash = " \
 #        "
 
-SUMMARY_${PN}-system_buv_entity = "BUV NUVOTON System"
-RDEPENDS_${PN}-system_buv-entity = " \
+SUMMARY_${PN}-system = "BUV NUVOTON System"
+RDEPENDS_${PN}-system = " \
         entity-manager \
-        obmc-ikvm \
-        obmc-console \
-        dhcpcd \
-        phosphor-ipmi-fru \
-        phosphor-ipmi-ipmb \
-        phosphor-ipmi-blobs \
         ipmitool \
-        phosphor-image-signing \
         "
