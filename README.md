@@ -55,6 +55,11 @@ As an example target Olympus Nuvoton
 export TEMPLATECONF=meta-quanta/meta-olympus-nuvoton/conf
 ```
 
+As an example target BUV RunBMC
+```
+export TEMPLATECONF=meta-evb/meta-evb-nuvoton/meta-buv-runbmc/conf
+```
+
 ### 4) Build
 
 ```
@@ -112,8 +117,12 @@ For more info follow the readme.txt in:
 In order to get a password for the ftp please contact BMC_Marketing@Nuvoton.com
 
 #### 9) Enabled features
-For more info of OpenBMC features we enabled in:
+Olympus RunBMC Platform
 [https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-quanta/meta-olympus-nuvoton](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-quanta/meta-olympus-nuvoton)
+
+
+BUV RunBMC Platform
+[https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-evb/meta-evb-nuvoton/meta-buv-runbmc)
 
 ## Contact
 - Mail: tomer.maimon@nuvoton.com,  avi.fishman@nuvoton.com or BMC_Marketing@Nuvoton.com
