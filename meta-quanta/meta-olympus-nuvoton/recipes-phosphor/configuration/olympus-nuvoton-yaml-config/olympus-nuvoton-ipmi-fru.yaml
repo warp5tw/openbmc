@@ -592,7 +592,7 @@
                     IPMIFruSection: Board
             xyz.openbmc_project.Inventory.Item:
                 PrettyName:
-                    IPMIFruProperty: Board Name
+                    IPMIFruProperty: Name
                     IPMIFruSection: Board
             xyz.openbmc_project.Inventory.Item.PowerSupply:
 30:
@@ -618,7 +618,7 @@
                     IPMIFruSection: Board
             xyz.openbmc_project.Inventory.Item:
                 PrettyName:
-                    IPMIFruProperty: Board Name
+                    IPMIFruProperty: Name
                     IPMIFruSection: Board
             xyz.openbmc_project.Inventory.Item.PowerSupply:
 31:
