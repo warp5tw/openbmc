@@ -1,50 +1,37 @@
-From 9e9a676297f933a60aa526c0a17fb4280c7a2d9b Mon Sep 17 00:00:00 2001
-From: Joseph Liu <kwliu@nuvoton.com>
-Date: Thu, 28 May 2020 13:17:03 +0800
+From 29fb4d77ab9e57afcce4a13ad659a687dc07d451 Mon Sep 17 00:00:00 2001
+From: Joseph <kwliu@nuvoton.com>
+Date: Thu, 4 Jun 2020 16:05:41 +0800
 Subject: [PATCH] add "Scale" d-bus interface property
 
 ---
- include/CPUSensor.hpp   | 3 ++-
- src/ADCSensor.cpp       | 6 ++++--
- src/CPUSensor.cpp       | 5 +++--
- src/HwmonTempSensor.cpp | 4 +++-
+ include/CPUSensor.hpp   | 1 +
+ src/ADCSensor.cpp       | 2 ++
+ src/CPUSensor.cpp       | 2 ++
+ src/HwmonTempSensor.cpp | 2 ++
  src/PSUSensor.cpp       | 4 ++++
- 5 files changed, 16 insertions(+), 6 deletions(-)
+ 5 files changed, 11 insertions(+)
 
 diff --git a/include/CPUSensor.hpp b/include/CPUSensor.hpp
-index 8f9cb6e..79528af 100644
+index 8f9cb6e..09f2421 100644
 --- a/include/CPUSensor.hpp
 +++ b/include/CPUSensor.hpp
-@@ -26,11 +26,12 @@ class CPUSensor : public Sensor
-               const std::string& configuration, int cpuId, bool show,
-               double dtsOffset);
-     ~CPUSensor();
--    static constexpr unsigned int sensorScaleFactor = 1000;
-+    static constexpr unsigned int sensorScaleFactor = 1;
-     static constexpr unsigned int sensorPollMs = 1000;
+@@ -31,6 +31,7 @@ class CPUSensor : public Sensor
      static constexpr size_t warnAfterErrorCount = 10;
      static constexpr double maxReading = 127;
      static constexpr double minReading = -128;
-+    static constexpr double Scale = -3;
++    static constexpr double Scale = 0;
      static constexpr const char* labelTcontrol = "Tcontrol";
  
    private:
 diff --git a/src/ADCSensor.cpp b/src/ADCSensor.cpp
-index 51e8ece..437ce20 100644
+index 51e8ece..3c509d9 100644
 --- a/src/ADCSensor.cpp
 +++ b/src/ADCSensor.cpp
-@@ -37,11 +37,12 @@ static constexpr unsigned int sensorPollMs = 500;
- static constexpr size_t warnAfterErrorCount = 10;
- static constexpr unsigned int gpioBridgeEnableMs = 20;
- // scaling factor from hwmon
--static constexpr unsigned int sensorScaleFactor = 1000;
-+static constexpr unsigned int sensorScaleFactor = 1;
- 
--static constexpr double roundFactor = 10000; // 3 decimal places
-+static constexpr double roundFactor = 1;
+@@ -42,6 +42,7 @@ static constexpr unsigned int sensorScaleFactor = 1000;
+ static constexpr double roundFactor = 10000; // 3 decimal places
  static constexpr double maxReading = 20;
  static constexpr double minReading = 0;
-+static constexpr double Scale = -3;
++static constexpr double Scale = 0;
  
  ADCSensor::ADCSensor(const std::string& path,
                       sdbusplus::asio::object_server& objectServer,
@@ -57,36 +44,27 @@ index 51e8ece..437ce20 100644
      {
          thresholdInterfaceWarning = objectServer.add_interface(
 diff --git a/src/CPUSensor.cpp b/src/CPUSensor.cpp
-index 59f7462..7e55721 100644
+index 59f7462..e1b0067 100644
 --- a/src/CPUSensor.cpp
 +++ b/src/CPUSensor.cpp
-@@ -58,8 +58,9 @@ CPUSensor::CPUSensor(const std::string& path, const std::string& objectType,
-             "xyz.openbmc_project.Sensor.Value");
+@@ -59,6 +59,8 @@ CPUSensor::CPUSensor(const std::string& path, const std::string& objectType,
          sensorInterface->register_property("Unit",
              std::string("xyz.openbmc_project.Sensor.Value.Unit.DegreesC"));
--
--        if (auto fileParts = thresholds::splitFileName(path))
+ 
 +	sensorInterface->register_property("Scale", Scale);
-+        
-+	if (auto fileParts = thresholds::splitFileName(path))
++
+         if (auto fileParts = thresholds::splitFileName(path))
          {
              auto [type, nr, item] = *fileParts;
-             std::string interfacePath;
 diff --git a/src/HwmonTempSensor.cpp b/src/HwmonTempSensor.cpp
-index 8bcf1c8..1f8209c 100644
+index 8bcf1c8..36aa41e 100644
 --- a/src/HwmonTempSensor.cpp
 +++ b/src/HwmonTempSensor.cpp
-@@ -31,11 +31,12 @@
- #include <vector>
- 
- static constexpr unsigned int sensorPollMs = 500;
--static constexpr unsigned int sensorScaleFactor = 1000;
-+static constexpr unsigned int sensorScaleFactor = 1;
- static constexpr size_t warnAfterErrorCount = 10;
+@@ -36,6 +36,7 @@ static constexpr size_t warnAfterErrorCount = 10;
  
  static constexpr double maxReading = 127;
  static constexpr double minReading = -128;
-+static constexpr double Scale = -3;
++static constexpr double Scale = 0;
  
  HwmonTempSensor::HwmonTempSensor(
      const std::string& path, const std::string& objectType,
@@ -129,5 +107,5 @@ index 4e48bae..5a768e8 100644
      if (thresholds::hasWarningInterface(thresholds))
      {
 -- 
-2.17.1
+2.25.1
 

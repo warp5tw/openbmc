@@ -2,264 +2,264 @@
     "Exposes": [
         {
             "Index": 0,
-            "Name": "ADC1",
+            "Name": "ADC0",
             "PowerState": "Always",
-            "ScaleFactor": 1,
+            "ScaleFactor": 0.607,
             "Thresholds": [
                 {
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 2100
+                    "Value": 3.5
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 2050
+                    "Value": 3.4
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 1950
+                    "Value": 3.1
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 1900
+                    "Value": 3.0
                 }
             ],
             "Type": "ADC"
         },
         {
             "Index": 1,
-            "Name": "ADC2",
+            "Name": "ADC1",
             "PowerState": "Always",
-            "ScaleFactor": 1,
+            "ScaleFactor": 0.5,
             "Thresholds": [
                 {
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 1680
+                    "Value": 3.5
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 1700
+                    "Value": 3.4
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 1550
+                    "Value": 3.1
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 1500
+                    "Value": 3.0
                 }
             ],
             "Type": "ADC"
         },
         {
             "Index": 2,
-            "Name": "ADC3",
+            "Name": "ADC2",
             "PowerState": "Always",
-            "ScaleFactor": 1,
+            "ScaleFactor": 0.33,
             "Thresholds": [
                 {
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 1150
+                    "Value": 3.5
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 1200
+                    "Value": 3.4
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 1080
+                    "Value": 3.1
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 1000
+                    "Value": 3.0
                 }
             ],
             "Type": "ADC"
         },
         {
             "Index": 3,
-            "Name": "ADC4",
+            "Name": "ADC3",
             "PowerState": "Always",
-            "ScaleFactor": 1,
+            "ScaleFactor": 0.25,
             "Thresholds": [
                 {
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 950
+                    "Value": 3.5
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 900
+                    "Value": 3.4
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 800
+                    "Value": 3.1
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 750
+                    "Value": 3.0
                 }
             ],
             "Type": "ADC"
         },
         {
             "Index": 4,
-            "Name": "ADC5",
+            "Name": "ADC4",
             "PowerState": "Always",
-            "ScaleFactor": 1,
+            "ScaleFactor": 0.543,
             "Thresholds": [
                 {
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 1500
+                    "Value": 3.5
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 1300
+                    "Value": 3.4
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 900
+                    "Value": 3.1
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 800
+                    "Value": 3.0
                 }
             ],
             "Type": "ADC"
         },
         {
             "Index": 5,
-            "Name": "ADC6",
+            "Name": "ADC5",
             "PowerState": "Always",
-            "ScaleFactor": 1,
+            "ScaleFactor": 0.543,
             "Thresholds": [
                 {
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 1500
+                    "Value": 3.5
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 1300
+                    "Value": 3.4
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 900
+                    "Value": 3.1
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 800
+                    "Value": 3.0
                 }
             ],
             "Type": "ADC"
         },
         {
             "Index": 6,
-            "Name": "ADC7",
+            "Name": "ADC6",
             "PowerState": "Always",
-            "ScaleFactor": 1,
+            "ScaleFactor": 0.543,
             "Thresholds": [
                 {
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 1500
+                    "Value": 3.5
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 1300
+                    "Value": 3.4
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 900
+                    "Value": 3.1
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 800
+                    "Value": 3.0
                 }
             ],
             "Type": "ADC"
         },
         {
             "Index": 7,
-            "Name": "ADC8",
+            "Name": "ADC7",
             "PowerState": "Always",
-            "ScaleFactor": 1,
+            "ScaleFactor": 0.543,
             "Thresholds": [
                 {
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 1500
+                    "Value": 3.5
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 1300
+                    "Value": 3.4
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 900
+                    "Value": 3.1
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower critical",
                     "Severity": 1,
-                    "Value": 800
+                    "Value": 3.0
                 }
             ],
             "Type": "ADC"
@@ -303,25 +303,25 @@
         {
             "Address": "0x48",
             "Bus": 12,
-            "Name": "Outlet Temp",
+            "Name": "BUV Board",
             "Thresholds": [
                 {
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 65000
+                    "Value": 65
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 50000
+                    "Value": 50
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 15000
+                    "Value": 15
                 },
                 {
                     "Direction": "less than",
@@ -335,25 +335,25 @@
         {
             "Address": "0x4A",
             "Bus": 13,
-            "Name": "BMC Temp",
+            "Name": "BMC Card",
             "Thresholds": [
                 {
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 75000
+                    "Value": 75
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 60000
+                    "Value": 60
                 },
                 {
                     "Direction": "less than",
                     "Name": "lower non critical",
                     "Severity": 0,
-                    "Value": 15000
+                    "Value": 15
                 },
                 {
                     "Direction": "less than",
@@ -367,7 +367,7 @@
         {
             "Address": "0x40",
             "Bus": 11,
-            "Name": "MB_P12V_INA219",
+            "Name": "P12V_INA219",
             "CurrScaleFactor": 200,
             "Labels": [
                 "in1",
@@ -407,15 +407,15 @@
                 {
                     "Direction": "greater than",
                     "Label": "curr1",
-                    "Name": "upper non critical",
-                    "Severity": 0,
-                    "Value": 1.5
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 4.5
                 },
                 {
                     "Direction": "less than",
                     "Label": "curr1",
-                    "Name": "lower non critical",
-                    "Severity": 0,
+                    "Name": "lower critical",
+                    "Severity": 1,
                     "Value": 0
                 },
                 {
@@ -438,7 +438,7 @@
         {
             "Address": "0x41",
             "Bus": 11,
-            "Name": "MB_P3V_INA219",
+            "Name": "P3V_INA219",
             "CurrScaleFactor": 200,
             "Labels": [
                 "in1",
@@ -464,15 +464,15 @@
                 {
                     "Direction": "greater than",
                     "Label": "curr1",
-                    "Name": "upper non critical",
-                    "Severity": 0,
+                    "Name": "upper critical",
+                    "Severity": 1,
                     "Value": 4.5
                 },
                 {
                     "Direction": "less than",
                     "Label": "curr1",
-                    "Name": "lower non critical",
-                    "Severity": 0,
+                    "Name": "lower critical",
+                    "Severity": 1,
                     "Value": 0
                 },
                 {

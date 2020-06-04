@@ -30,4 +30,7 @@ SUMMARY_${PN}-system = "BUV NUVOTON System"
 RDEPENDS_${PN}-system = " \
         entity-manager \
         ipmitool \
+        phosphor-sel-logger \
+        intel-ipmi-oem \
+        e2fsprogs-mke2fs \
         "
