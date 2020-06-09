@@ -1,0 +1,53 @@
+commit e105acc29fc0cdb0c86dd47cc28a41dcba8c27f3
+Author: Ravi Teja <raviteja28031990@gmail.com>
+Date:   Wed May 13 06:35:49 2020 -0500
+
+    Redfish(Network): Fix PATCH of existing IPv4StaticAddresses properties
+    
+    Currently Unable to modify(PATCH) existing IP address properties.
+    
+    Failure case:
+    add an ipv4 static address and try to do patch operation to modify
+    properties of this static address entry.
+    say existing entry
+    "IPv4StaticAddresses": [
+     {
+          "Address": "223.7.7.7",
+          "AddressOrigin": "Static",
+          "Gateway": "223.7.7.1",
+          "SubnetMask": "255.255.0.0"
+     }]
+    
+    do patch operation, it returns success but does not update properties.
+    1.PATCH -D '{"IPv4StaticAddresses": [{"Address": "10.7.7.20","SubnetMask": "255.255.0.0","Gateway":"223.7.7.1"}]}'
+    2.PATCH -D '{"IPv4StaticAddresses": [{},{"Address": "10.8.8.8"}]}
+    both cases expected to work.
+    .
+    Test By:
+     Pacthing existing entry properties and creating new entries.
+     1.PATCH -d '{"IPv4StaticAddresses": [{},{"Address": "10.7.7.20","SubnetMask": "255.255.0.0","Gateway":"10.7.7.1"}]}'
+     2.PATCH -D '{"IPv4StaticAddresses": [{},{"Address": "10.8.8.8"}]}
+     3.PATCH -d '{"IPv4StaticAddresses": [{},{"Address": "10.8.8.8"},{"Address": "10.9.9.9","SubnetMask": "255.255.0.0","Gateway":"9.41.164.1"}]}'
+     4.GET https://${IP}/redfish/v1/Managers/bmc/EthernetInterfaces/eth0/
+    
+    Signed-off-by: Ravi Teja <raviteja28031990@gmail.com>
+    Change-Id: Ic23330592e9041ddd1e9f96d08ea0bb88c6d8ca7
+
+diff --git a/redfish-core/lib/ethernet.hpp b/redfish-core/lib/ethernet.hpp
+index 7915bd0..b32520b 100644
+--- a/redfish-core/lib/ethernet.hpp
++++ b/redfish-core/lib/ethernet.hpp
+@@ -1544,13 +1544,6 @@ class EthernetInterface : public Node
+ 
+                 if (NICIPentry != ipv4Data.cend())
+                 {
+-                    if (gw != nullptr || addr != nullptr)
+-                    {
+-                        // Shouldn't be possible based on errorInEntry, but
+-                        // it flags -wmaybe-uninitialized in the compiler,
+-                        // so defend against that
+-                        return;
+-                    }
+                     deleteAndCreateIPv4(ifaceId, NICIPentry->id, prefixLength,
+                                         *gw, *addr, asyncResp);
+                     NICIPentry =
