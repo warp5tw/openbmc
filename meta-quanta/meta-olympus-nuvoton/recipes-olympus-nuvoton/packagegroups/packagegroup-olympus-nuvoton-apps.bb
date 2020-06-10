@@ -62,5 +62,4 @@ RDEPENDS_${PN}-system = " \
         phosphor-post-code-manager \
         smbios-mdrv2 \
         intel-dbus-interfaces \
-        intel-ipmi-oem \
         "
