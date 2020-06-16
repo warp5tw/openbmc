@@ -34,6 +34,8 @@ RDEPENDS_${PN}-fans = " \
 SUMMARY_${PN}-flash = "OLYMPUS NUVOTON Flash"
 RDEPENDS_${PN}-flash = " \
         phosphor-ipmi-flash \
+        ipmi-bios-update \
+        ipmi-bmc-update \
         "
 
 SUMMARY_${PN}-system = "OLYMPUS NUVOTON System"

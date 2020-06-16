@@ -13,4 +13,4 @@ SYSTEMD_SERVICE_${PN}-updater_append_olympus-nuvoton = " \
 FILES_${PN}-updater_append_olympus-nuvoton = " \
     ${datadir}/phosphor-bmc-code-mgmt/bios-release"
 
-PACKAGECONFIG += "verify_signature"
+PACKAGECONFIG_olympus-nuvoton += "verify_signature"
