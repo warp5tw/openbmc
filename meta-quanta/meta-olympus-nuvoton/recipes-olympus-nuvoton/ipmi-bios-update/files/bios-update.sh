@@ -79,24 +79,32 @@ SendIPMB() {
         ${1} ${2} ${3} ${4} \
         ${5} ${6} ${7} ${8} ${9})
 
-    echo "IPMB Respond ${res} " | tee -a ${FLASH_LOG}
-    res=$(echo ${res} | awk '{print $3}')
+    echo "IPMB Respond ${res}" | tee -a ${FLASH_LOG}
 }
 
 ForceMERecovery() {
     i=0
-    res=0
+    done=0
 
     echo "Force ME Recovery" | tee -a ${FLASH_LOG}
-    until [ "$res" == "${MeForceMERecoveryRes}" -o "$i" == "${ME_TIMEOUT}" ]
+    until [ "$done" == "1" -o "$i" == "${ME_TIMEOUT}" ]
     do
         i=$(($i+1))
         SendIPMB ${MeChannelNum} ${MeForceMERecoveryNetFn} \
             ${MeForceMERecoveryLun} ${MeForceMERecoveryCmd} \
             4 ${IntelID0} ${IntelID1} ${IntelID2} ${MeRestartRecoveryFW}
+
+        cmdr=$(echo ${res} | awk '{print $3}')
+        completed=$(echo ${res} | awk '{print $6}')
+
+        if [ "${cmdr}" == "${MeForceMERecoveryRes}" -a "${completed}" == "0" ];then
+           done=1
+        fi
+
         sleep 1
     done
-    if [ "$res" != "${MeForceMERecoveryRes}" ];then
+
+    if [ "$done" != "1" ];then
         echo "Force ME Recovery fail!! $res" | tee -a ${FLASH_LOG}
         exit 1
     fi
@@ -106,15 +114,24 @@ ForceMERecovery() {
 
 MEColdReset() {
     i=0
-    res=0
-    until [ "$res" == "${MeGetDevIdRes}" -o "$i" == "${ME_TIMEOUT}" ]
+    done=0
+    until [ "$done" == "1" -o "$i" == "${ME_TIMEOUT}" ]
     do
         i=$(($i+1))
         SendIPMB ${MeChannelNum} ${MeColdResetNetFn} \
             ${MeColdResetLun} ${MeColdResetCmd} 0
+
+        cmdr=$(echo ${res} | awk '{print $3}')
+        completed=$(echo ${res} | awk '{print $6}')
+
+        if [ "${cmdr}" == "${MeGetDevIdRes}" -a "${completed}" == "0" ];then
+           done=1
+        fi
+
         sleep 1
     done
-    if [ "$res" != "${MeGetDevIdRes}" ];then
+
+    if [ "$done" != "1" ];then
         echo "ME Reset fail!! $res" | tee -a ${FLASH_LOG}
         exit 1
     fi
@@ -125,8 +142,6 @@ MEColdReset() {
 }
 
 HostPower() {
-    echo "Power ${1}" | tee -a ${FLASH_LOG}
-
     i=0
     res=0
 
