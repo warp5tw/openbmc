@@ -7,9 +7,7 @@ inherit allarch
 
 SRC_URI_olympus-nuvoton = " \
     file://olympus-nuvoton-ipmi-fru.yaml \
-    file://olympus-nuvoton-ipmi-fru-bmc.yaml \
     file://olympus-nuvoton-ipmi-fru-properties.yaml \
-    file://olympus-nuvoton-ipmi-inventory-sensors.yaml \
     file://olympus-nuvoton-ipmi-sensors.yaml \
     file://olympus-nuvoton-dbus-monitor-config.yaml \
     "
@@ -17,14 +15,10 @@ SRC_URI_olympus-nuvoton = " \
 S = "${WORKDIR}"
 
 do_install_olympus-nuvoton() {
-    cat olympus-nuvoton-ipmi-fru.yaml olympus-nuvoton-ipmi-fru-bmc.yaml > fru-read.yaml
-
     install -m 0644 -D olympus-nuvoton-ipmi-fru-properties.yaml \
         ${D}${datadir}/${BPN}/ipmi-extra-properties.yaml
-    install -m 0644 -D fru-read.yaml \
+    install -m 0644 -D olympus-nuvoton-ipmi-fru.yaml \
         ${D}${datadir}/${BPN}/ipmi-fru-read.yaml
-    install -m 0644 -D olympus-nuvoton-ipmi-inventory-sensors.yaml \
-        ${D}${datadir}/${BPN}/ipmi-inventory-sensors.yaml
     install -m 0644 -D olympus-nuvoton-ipmi-sensors.yaml \
         ${D}${datadir}/${BPN}/ipmi-sensors.yaml
     install -m 0644 -D olympus-nuvoton-dbus-monitor-config.yaml \
@@ -34,7 +28,6 @@ do_install_olympus-nuvoton() {
 FILES_${PN}-dev = " \
     ${datadir}/${BPN}/ipmi-extra-properties.yaml \
     ${datadir}/${BPN}/ipmi-fru-read.yaml \
-    ${datadir}/${BPN}/ipmi-inventory-sensors.yaml \
     ${datadir}/${BPN}/ipmi-sensors.yaml \
     ${datadir}/phosphor-dbus-monitor/dbus-monitor-config.yaml \
     "

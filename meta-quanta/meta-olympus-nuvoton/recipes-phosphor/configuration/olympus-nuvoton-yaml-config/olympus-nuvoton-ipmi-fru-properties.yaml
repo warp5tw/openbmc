@@ -281,3 +281,4 @@
         Cached: 'true'
     xyz.openbmc_project.Inventory.Item:
         Present: 'true'
+
