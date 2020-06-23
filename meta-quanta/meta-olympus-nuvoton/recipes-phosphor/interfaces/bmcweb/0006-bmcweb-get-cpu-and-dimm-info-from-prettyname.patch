@@ -1,4 +1,4 @@
-From 1ea077281e0ef45af34231938afc533a4511fc65 Mon Sep 17 00:00:00 2001
+From da624caec4811e8c965badd91f5d83c5bfab0c67 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Tue, 19 Nov 2019 14:44:10 +0800
 Subject: [PATCH] bmcweb: get cpu and dimm info from prettyname
@@ -10,18 +10,18 @@ Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
  2 files changed, 123 insertions(+), 23 deletions(-)
 
 diff --git a/redfish-core/lib/cpudimm.hpp b/redfish-core/lib/cpudimm.hpp
-index ce36a0b..e7817f4 100644
+index 2e49b996..07129867 100644
 --- a/redfish-core/lib/cpudimm.hpp
 +++ b/redfish-core/lib/cpudimm.hpp
-@@ -77,6 +77,7 @@ void getCpuDataByInterface(std::shared_ptr<AsyncResp> aResp,
+@@ -79,6 +79,7 @@ void getCpuDataByInterface(std::shared_ptr<AsyncResp> aResp,
      {
-         for (const auto &property : interface.second)
+         for (const auto& property : interface.second)
          {
 +#if 0
              if (property.first == "ProcessorCoreCount")
              {
-                 const uint16_t *coresCount =
-@@ -98,6 +99,50 @@ void getCpuDataByInterface(std::shared_ptr<AsyncResp> aResp,
+                 const uint16_t* coresCount =
+@@ -100,6 +101,50 @@ void getCpuDataByInterface(std::shared_ptr<AsyncResp> aResp,
  
                  aResp->res.jsonValue["TotalCores"] = *coresCount;
              }
@@ -72,7 +72,7 @@ index ce36a0b..e7817f4 100644
              else if (property.first == "ProcessorType")
              {
                  aResp->res.jsonValue["Name"] = property.second;
-@@ -122,14 +167,6 @@ void getCpuDataByInterface(std::shared_ptr<AsyncResp> aResp,
+@@ -124,14 +169,6 @@ void getCpuDataByInterface(std::shared_ptr<AsyncResp> aResp,
                      }
                  }
              }
@@ -86,8 +86,8 @@ index ce36a0b..e7817f4 100644
 -            }
              else if (property.first == "Model")
              {
-                 const std::string *value =
-@@ -205,6 +242,7 @@ void getCpuDataByService(std::shared_ptr<AsyncResp> aResp,
+                 const std::string* value =
+@@ -219,6 +256,7 @@ void getCpuDataByService(std::shared_ptr<AsyncResp> aResp,
                  if (object.first.str == objPath)
                  {
                      getCpuDataByInterface(aResp, object.second);
@@ -95,7 +95,7 @@ index ce36a0b..e7817f4 100644
                  }
                  else if (boost::starts_with(object.first.str, corePath))
                  {
-@@ -383,7 +421,7 @@ void getDimmDataByService(std::shared_ptr<AsyncResp> aResp,
+@@ -401,7 +439,7 @@ void getDimmDataByService(std::shared_ptr<AsyncResp> aResp,
              }
              aResp->res.jsonValue["Id"] = dimmId;
              aResp->res.jsonValue["Name"] = "DIMM Slot";
@@ -104,7 +104,7 @@ index ce36a0b..e7817f4 100644
              const auto memorySizeProperty = properties.find("MemorySizeInKB");
              if (memorySizeProperty != properties.end())
              {
-@@ -406,26 +444,44 @@ void getDimmDataByService(std::shared_ptr<AsyncResp> aResp,
+@@ -424,26 +462,44 @@ void getDimmDataByService(std::shared_ptr<AsyncResp> aResp,
                  }
                  aResp->res.jsonValue["CapacityMiB"] = (*memorySize >> 10);
              }
@@ -112,10 +112,11 @@ index ce36a0b..e7817f4 100644
              aResp->res.jsonValue["Status"]["State"] = "Enabled";
              aResp->res.jsonValue["Status"]["Health"] = "OK";
  
-             for (const auto &property : properties)
+             for (const auto& property : properties)
              {
 -                if (property.first == "MemoryDataWidth")
--                {
++                if (property.first == "PrettyName")
+                 {
 -                    aResp->res.jsonValue["DataWidthBits"] = property.second;
 -                }
 -                else if (property.first == "PartNumber")
@@ -123,8 +124,7 @@ index ce36a0b..e7817f4 100644
 -                    aResp->res.jsonValue["PartNumber"] = property.second;
 -                }
 -                else if (property.first == "SerialNumber")
-+                if (property.first == "PrettyName")
-                 {
+-                {
 -                    aResp->res.jsonValue["SerialNumber"] = property.second;
 +                    const auto *value =
 +                        std::get_if<std::string>(&property.second);
@@ -161,7 +161,7 @@ index ce36a0b..e7817f4 100644
                  }
                  else if (property.first == "MemoryType")
                  {
-@@ -440,6 +496,19 @@ void getDimmDataByService(std::shared_ptr<AsyncResp> aResp,
+@@ -458,6 +514,19 @@ void getDimmDataByService(std::shared_ptr<AsyncResp> aResp,
                          }
                      }
                  }
@@ -182,12 +182,12 @@ index ce36a0b..e7817f4 100644
          },
          service, objPath, "org.freedesktop.DBus.Properties", "GetAll", "");
 diff --git a/redfish-core/lib/systems.hpp b/redfish-core/lib/systems.hpp
-index 93eb403..13363a5 100644
+index a68e8def..28994745 100644
 --- a/redfish-core/lib/systems.hpp
 +++ b/redfish-core/lib/systems.hpp
-@@ -215,8 +215,35 @@ void getComputerSystem(std::shared_ptr<AsyncResp> aResp,
-                                                              VariantType>
-                                                  &property : properties)
+@@ -222,8 +222,35 @@ void getComputerSystem(std::shared_ptr<AsyncResp> aResp,
+                                                              VariantType>&
+                                                  property : properties)
                                          {
 +                                            if (property.first == "PrettyName")
 +                                            {
@@ -222,7 +222,7 @@ index 93eb403..13363a5 100644
                                              {
                                                  continue;
                                              }
-@@ -254,6 +281,7 @@ void getComputerSystem(std::shared_ptr<AsyncResp> aResp,
+@@ -260,6 +287,7 @@ void getComputerSystem(std::shared_ptr<AsyncResp> aResp,
                                                  .jsonValue["MemorySummary"]
                                                            ["Status"]["State"] =
                                                  "Enabled";
@@ -230,7 +230,7 @@ index 93eb403..13363a5 100644
                                          }
                                      }
                                      else
-@@ -289,8 +317,11 @@ void getComputerSystem(std::shared_ptr<AsyncResp> aResp,
+@@ -295,8 +323,11 @@ void getComputerSystem(std::shared_ptr<AsyncResp> aResp,
                                  },
                                  connection.first, path,
                                  "org.freedesktop.DBus.Properties", "GetAll",

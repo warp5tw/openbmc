@@ -7,9 +7,7 @@ SNOOP_DEVICE = "npcm7xx-lpc-bpc0"
 
 DEPENDS += "nlohmann-json"
 
-do_install() {
-        oe_runmake install DESTDIR=${D}
-
+do_install_append() {
         install -d ${D}${sysconfdir}/default/obmc/bios/
         install -m 0644 ${WORKDIR}/bios_defs.json ${D}/${sysconfdir}/default/obmc/bios/
 }

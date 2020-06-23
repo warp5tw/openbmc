@@ -1,18 +1,19 @@
-From 62017bb2c9bb407282911b71fb853fafbc49559e Mon Sep 17 00:00:00 2001
+From 6ef274abe424fb6cbe1c26d49e470f860c89850a Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Fri, 25 Oct 2019 15:40:34 +0800
 Subject: [PATCH] Redfish: Add power metrics support
 
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---
  redfish-core/lib/power.hpp   | 76 +++++++++++++++++++++++++++++++++++-
  redfish-core/lib/sensors.hpp |  2 +-
  2 files changed, 76 insertions(+), 2 deletions(-)
 
 diff --git a/redfish-core/lib/power.hpp b/redfish-core/lib/power.hpp
-index 8c3927b8..838a75db 100644
+index a159ed64..28aa8e94 100644
 --- a/redfish-core/lib/power.hpp
 +++ b/redfish-core/lib/power.hpp
-@@ -207,13 +207,87 @@ class Power : public Node
+@@ -307,13 +307,87 @@ class Power : public Node
                          // null if the limit is not enabled.
                          value = powerCap * std::pow(10, scale);
                      }
@@ -37,7 +38,7 @@ index 8c3927b8..838a75db 100644
 +                                if (!property.first.compare("IntervalInMin"))
 +                                {
 +                                    const uint64_t* i =
-+                                    sdbusplus::message::variant_ns::get_if<uint64_t>(
++                                    std::get_if<uint64_t>(
 +                                        &property.second);
 +
 +                                    if (i)
@@ -50,7 +51,7 @@ index 8c3927b8..838a75db 100644
 +                                else if (!property.first.compare("MinConsumedWatts"))
 +                                {
 +                                    const uint16_t* i =
-+                                    sdbusplus::message::variant_ns::get_if<uint16_t>(
++                                    std::get_if<uint16_t>(
 +                                        &property.second);
 +                                    if (i)
 +                                    {
@@ -62,7 +63,7 @@ index 8c3927b8..838a75db 100644
 +                                else if (!property.first.compare("MaxConsumedWatts"))
 +                                {
 +                                    const uint16_t* i =
-+                                    sdbusplus::message::variant_ns::get_if<uint16_t>(
++                                    std::get_if<uint16_t>(
 +                                        &property.second);
 +                                    if (i)
 +                                    {
@@ -74,7 +75,7 @@ index 8c3927b8..838a75db 100644
 +                                else if (!property.first.compare("AverageConsumedWatts"))
 +                                {
 +                                    const uint16_t* i =
-+                                    sdbusplus::message::variant_ns::get_if<uint16_t>(
++                                    std::get_if<uint16_t>(
 +                                        &property.second);
 +                                    if (i)
 +                                    {
@@ -102,7 +103,7 @@ index 8c3927b8..838a75db 100644
  
          crow::connections::systemBus->async_method_call(
 diff --git a/redfish-core/lib/sensors.hpp b/redfish-core/lib/sensors.hpp
-index 76c304f7..172e0573 100644
+index f5ad839f..22851705 100644
 --- a/redfish-core/lib/sensors.hpp
 +++ b/redfish-core/lib/sensors.hpp
 @@ -35,7 +35,7 @@ using GetSubTreeType = std::vector<

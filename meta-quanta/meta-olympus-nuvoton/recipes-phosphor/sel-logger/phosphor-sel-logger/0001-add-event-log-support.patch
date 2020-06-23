@@ -1,15 +1,15 @@
-From f6be59fab2afdb465942410671c96a151eddfcbf Mon Sep 17 00:00:00 2001
-From: Brian Ma <chma0@nuvoton.com>
-Date: Thu, 2 Jan 2020 14:40:52 +0800
+From dd2fa6e95723dd219b8abd2125555472f45fc4b5 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Tue, 23 Jun 2020 18:13:38 +0800
 Subject: [PATCH] add event log support
 
 ---
  CMakeLists.txt                |  12 +++
- include/event_log_monitor.hpp |  61 ++++++++++++++
+ include/event_log_monitor.hpp |  60 ++++++++++++++
  include/sel_logger.hpp        |   3 +
- include/watchdog_timeout.hpp  | 153 ++++++++++++++++++++++++++++++++++
+ include/watchdog_timeout.hpp  | 152 ++++++++++++++++++++++++++++++++++
  src/sel_logger.cpp            |   6 ++
- 5 files changed, 235 insertions(+)
+ 5 files changed, 233 insertions(+)
  create mode 100644 include/event_log_monitor.hpp
  create mode 100644 include/watchdog_timeout.hpp
 
@@ -46,16 +46,15 @@ index 5fc1ae2..a4f84d8 100644
 +target_link_libraries (${PROJECT_NAME} phosphor_dbus)
 diff --git a/include/event_log_monitor.hpp b/include/event_log_monitor.hpp
 new file mode 100644
-index 0000000..1e9f65f
+index 0000000..ad8d6e7
 --- /dev/null
 +++ b/include/event_log_monitor.hpp
-@@ -0,0 +1,61 @@
+@@ -0,0 +1,60 @@
 +#pragma once
 +#include <sdbusplus/asio/object_server.hpp>
 +#include <watchdog_timeout.hpp>
 +
 +namespace mesg = sdbusplus::message;
-+namespace variant_ns = mesg::variant_ns;
 +namespace MatchRules = sdbusplus::bus::match::rules;
 +
 +static constexpr auto LOGGING_PATH = "/xyz/openbmc_project/logging";
@@ -68,7 +67,7 @@ index 0000000..1e9f65f
 +    auto eventLogMatcherCallback = [](sdbusplus::message::message &msg) {
 +        mesg::object_path objPath;
 +        std::map<std::string, std::map<std::string,
-+                mesg::variant<std::string, std::vector<std::string> >>>
++                std::variant<std::string, std::vector<std::string> >>>
 +                interfaces;
 +        // TODO move debug log to DEBUG or comment
 +        log<level::DEBUG>("eventLogMatcherCallback start read message");
@@ -93,7 +92,7 @@ index 0000000..1e9f65f
 +            auto message = entry.find("Message");
 +            if (message != entry.end())
 +            {
-+                auto value = variant_ns::get<std::string>(message->second);
++                auto value = std::get<std::string>(message->second);
 +                if (value == EVENT_WATCHDOG_TIMEOUT)
 +                {
 +                    handleWatchdogInfo(entry);
@@ -124,10 +123,10 @@ index bd40dff..ca3c04c 100644
 +static void toHexStr(const std::vector<uint8_t> &data, std::string &hexStr);
 diff --git a/include/watchdog_timeout.hpp b/include/watchdog_timeout.hpp
 new file mode 100644
-index 0000000..5c1e5a2
+index 0000000..7b71c33
 --- /dev/null
 +++ b/include/watchdog_timeout.hpp
-@@ -0,0 +1,153 @@
+@@ -0,0 +1,152 @@
 +#include <xyz/openbmc_project/State/Watchdog/server.hpp>
 +//#include "phosphor-logging/elog-errors.hpp"
 +
@@ -146,9 +145,8 @@ index 0000000..5c1e5a2
 +using namespace phosphor::logging;
 +using namespace sdbusplus;
 +namespace mesg = sdbusplus::message;
-+namespace variant_ns = mesg::variant_ns;
 +using LogEntry = std::map<std::string,
-+                mesg::variant<std::string, std::vector<std::string>>>;
++                std::variant<std::string, std::vector<std::string>>>;
 +
 +static constexpr auto WATCHDOG_ACTION = "WATCHDOG_ACTION";
 +static constexpr auto WATCHDOG_INTERVAL = "WATCHDOG_INTERVAL";
@@ -213,7 +211,7 @@ index 0000000..5c1e5a2
 +    auto addition = logEntry.find("AdditionalData");
 +    if (addition != logEntry.end())
 +    {
-+        auto data = variant_ns::get<std::vector<std::string>>(addition->second);
++        auto data = std::get<std::vector<std::string>>(addition->second);
 +        for (const auto& property : data)
 +        {
 +            if (property.find(WATCHDOG_ACTION) == 0)

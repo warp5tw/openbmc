@@ -1,4 +1,4 @@
-From 3711c472110b5b2da8a1768d1c386f4be0ca4b88 Mon Sep 17 00:00:00 2001
+From a6c6ddc30d7f2e5f046783fff7da60cf34f613c1 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Fri, 15 Nov 2019 17:09:56 +0800
 Subject: [PATCH] bmcweb: chassis: add indicatorLED support
@@ -9,10 +9,10 @@ Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
  1 file changed, 104 insertions(+), 6 deletions(-)
 
 diff --git a/redfish-core/lib/chassis.hpp b/redfish-core/lib/chassis.hpp
-index b08ab257..f5a60051 100644
+index 2b098a93..1ae59e02 100644
 --- a/redfish-core/lib/chassis.hpp
 +++ b/redfish-core/lib/chassis.hpp
-@@ -115,6 +115,74 @@ void getIntrusionByService(std::shared_ptr<AsyncResp> aResp,
+@@ -117,6 +117,74 @@ void getIntrusionByService(std::shared_ptr<AsyncResp> aResp,
          "xyz.openbmc_project.Chassis.Intrusion", "Status");
  }
  
@@ -87,7 +87,7 @@ index b08ab257..f5a60051 100644
  /**
   * Retrieves physical security properties over dbus
   */
-@@ -292,9 +360,41 @@ class Chassis : public Node
+@@ -289,9 +357,41 @@ class Chassis : public Node
  
                      auto health = std::make_shared<HealthPopulate>(asyncResp);
  
@@ -125,13 +125,13 @@ index b08ab257..f5a60051 100644
 +
                      crow::connections::systemBus->async_method_call(
 -                        [health](const boost::system::error_code ec,
--                                 std::variant<std::vector<std::string>> &resp) {
+-                                 std::variant<std::vector<std::string>>& resp) {
 +                        [asyncResp](const boost::system::error_code ec,
 +                                std::variant<std::vector<std::string>> &resp) {
                              if (ec)
                              {
                                  return; // no sensors = no failures
-@@ -305,15 +405,13 @@ class Chassis : public Node
+@@ -302,15 +402,13 @@ class Chassis : public Node
                              {
                                  return;
                              }
@@ -148,7 +148,7 @@ index b08ab257..f5a60051 100644
 -
                      if (connectionNames.size() < 1)
                      {
-                         BMCWEB_LOG_ERROR << "Only got "
+                         BMCWEB_LOG_ERROR << "Got 0 Connection names";
 -- 
 2.17.1
 
