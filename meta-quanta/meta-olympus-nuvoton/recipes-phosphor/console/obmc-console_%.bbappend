@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS_prepend_olympus-nuvoton := "${THISDIR}/${PN}:"
 
 SRC_URI_append_olympus-nuvoton = " file://80-olympus-nuvoton-sol.rules"
 

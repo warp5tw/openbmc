@@ -11,7 +11,7 @@ inherit autotools obmc-phosphor-utils pkgconfig
 inherit systemd
 
 SRC_URI += "git://github.com/openbmc/openpower-proc-control"
-SRCREV = "75912e83445c48de616fdb71dd4d7696beadf48e"
+SRCREV = "3ae7ed4f5174a12c198e4c428c7bb3f804b36215"
 
 DEPENDS += " \
         autoconf-archive-native \
