@@ -1,53 +1,52 @@
-From df18095270d791d35c74380df7a037fbe1665948 Mon Sep 17 00:00:00 2001
+From 500ef1dd3faeb93537a83bbc28f429b3d9198b6f Mon Sep 17 00:00:00 2001
 From: kwliu <kwliu@nuvoton.com>
 Date: Mon, 8 Jul 2019 10:05:09 +0800
-Subject: [PATCH 02/34] add tps53622 and tps53659
+Subject: [PATCH] add tps53622 and tps53659
 
 ---
- drivers/hwmon/pmbus/Kconfig    |  19 ++++++
+ drivers/hwmon/pmbus/Kconfig    |  18 ++++++
  drivers/hwmon/pmbus/Makefile   |   2 +
  drivers/hwmon/pmbus/tps53622.c | 111 +++++++++++++++++++++++++++++++++
  drivers/hwmon/pmbus/tps53659.c | 111 +++++++++++++++++++++++++++++++++
- 4 files changed, 243 insertions(+)
+ 4 files changed, 242 insertions(+)
  create mode 100644 drivers/hwmon/pmbus/tps53622.c
  create mode 100644 drivers/hwmon/pmbus/tps53659.c
 
 diff --git a/drivers/hwmon/pmbus/Kconfig b/drivers/hwmon/pmbus/Kconfig
-index 61062632b22b..791449bc5946 100644
+index 9350ca57ea77..b0743c74a86e 100644
 --- a/drivers/hwmon/pmbus/Kconfig
 +++ b/drivers/hwmon/pmbus/Kconfig
-@@ -230,4 +230,23 @@ config SENSORS_ZL6100
- 	  This driver can also be built as a module. If so, the module will
- 	  be called zl6100.
+@@ -245,4 +245,22 @@ config SENSORS_MAX16600
  
-+config SENSORS_TPS53659
-+    tristate "TI TPS53659"
-+    help
-+      If you say yes here you get hardware monitoring support for TI
-+      TPS53659.
+ 	  This driver can also be built as a module. If so, the module will
+ 	  be called max16600
 +
-+      This driver can also be built as a module. If so, the module will
-+      be called tps53659.
++config SENSORS_TPS53659
++	tristate "TI TPS53659"
++	help
++	  If you say yes here you get hardware monitoring support for TI TPS53659.
++	  
++	  This driver can also be built as a module. If so, the module will
++	  be called tps53659.
 +
 +config SENSORS_TPS53622
-+    tristate "TI TPS53622"
-+    help
-+      If you say yes here you get hardware monitoring support for TI
-+      TPS53622.
++	tristate "TI TPS53622"
++	help
++	  If you say yes here you get hardware monitoring support for TI TPS53622.
 +
-+      This driver can also be built as a module. If so, the module will
-+      be called tps53622.
++	  This driver can also be built as a module. If so, the module will
++	  be called tps53622.
 +
 +
  endif # PMBUS
 diff --git a/drivers/hwmon/pmbus/Makefile b/drivers/hwmon/pmbus/Makefile
-index 03bacfcfd660..b4b18a271aca 100644
+index fe7e4b42cdb4..0afc9926ee21 100644
 --- a/drivers/hwmon/pmbus/Makefile
 +++ b/drivers/hwmon/pmbus/Makefile
-@@ -26,3 +26,5 @@ obj-$(CONFIG_SENSORS_TPS53679)	+= tps53679.o
- obj-$(CONFIG_SENSORS_UCD9000)	+= ucd9000.o
- obj-$(CONFIG_SENSORS_UCD9200)	+= ucd9200.o
+@@ -28,3 +28,5 @@ obj-$(CONFIG_SENSORS_UCD9200)	+= ucd9200.o
  obj-$(CONFIG_SENSORS_ZL6100)	+= zl6100.o
+ obj-$(CONFIG_SENSORS_PM6764TR)	+= pm6764tr.o
+ obj-$(CONFIG_SENSORS_MAX16600)	+= max16600.o
 +obj-$(CONFIG_SENSORS_TPS53622)  += tps53622.o
 +obj-$(CONFIG_SENSORS_TPS53659)  += tps53659.o
 diff --git a/drivers/hwmon/pmbus/tps53622.c b/drivers/hwmon/pmbus/tps53622.c
@@ -285,5 +284,5 @@ index 000000000000..b0faba80dad7
 +MODULE_DESCRIPTION("PMBus driver for Texas Instruments TPS53659");
 +MODULE_LICENSE("GPL");
 -- 
-2.17.1
+2.25.1
 
