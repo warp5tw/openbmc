@@ -1,12 +1,6 @@
-KBRANCH ?= "Poleg-5.4-OpenBMC"
-LINUX_VERSION ?= "5.4.16"
+KBRANCH ?= "dev-5.4"
+LINUX_VERSION ?= "5.4.32"
 
-SRCREV="317aef891ad9d3d054e8f8999be2897bf4b23505"
+SRCREV="7dc9442bbe7d0d1512c64a97b7cc58fed2b38ba4"
 
 require linux-nuvoton.inc
-
-SRC_URI_append_nuvoton = " file://0001-Revert-mtd-spi-nor-fix-options-for-mx66l51235f.patch"
-SRC_URI_append_nuvoton = " file://0002-add-tps53622-and-tps53659.patch"
-SRC_URI_append_nuvoton = " file://0003-i2c-nuvoton-npcm750-runbmc-integrate-the-slave-mqueu.patch"
-SRC_URI_append_nuvoton = " file://0004-driver-ncsi-replace-del-timer-sync.patch"
-SRC_URI_append_nuvoton = " file://0008-WAR-skip-clear-fault-for-flexpower.patch"
