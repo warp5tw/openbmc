@@ -1,0 +1,67 @@
+From 58fd74290878eabce3cc8f247bac8212fb39e5b3 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Mon, 20 Jul 2020 16:56:05 +0800
+Subject: [PATCH] catch the exception in sendAttention
+
+---
+ host-cmd-manager.cpp | 31 +++++++++++++++++++++----------
+ 1 file changed, 21 insertions(+), 10 deletions(-)
+
+diff --git a/host-cmd-manager.cpp b/host-cmd-manager.cpp
+index ae0d009..100be3e 100644
+--- a/host-cmd-manager.cpp
++++ b/host-cmd-manager.cpp
+@@ -174,29 +174,40 @@ void Manager::clearQueueOnPowerOn(sdbusplus::message::message& msg)
+     if (server::Host::convertTransitionFromString(requestedState) ==
+         server::Host::Transition::On)
+     {
+-        clearQueue();
++        if (!this->workQueue.empty())
++            clearQueue();
+     }
+ }
+ 
+ void Manager::sendAttention(Attention attention)
+ {
++    std::string service;
+     log<level::DEBUG>("Asserting SMS Attention:", entry("ATN=%u", attention));
+ 
+     std::string IPMI_PATH("/xyz/openbmc_project/Ipmi/Channel/kcs1");
+     std::string IPMI_INTERFACE("xyz.openbmc_project.Ipmi.Channel.SMS");
+-
+-    auto host = ::ipmi::getService(this->bus, IPMI_INTERFACE, IPMI_PATH);
+     auto atn = attention==Attention::Set ?
+         SMS_SET_ATTENTION : SMS_CLEAR_ATTENTION;
+-    auto method =
+-            this->bus.new_method_call(host.c_str(), IPMI_PATH.c_str(),
+-                                      IPMI_INTERFACE.c_str(), atn);
+-    auto reply = this->bus.call(method);
+ 
+-    if (reply.is_method_error())
++    try
++    {
++        service = ::ipmi::getService(this->bus, IPMI_INTERFACE, IPMI_PATH);
++        auto method =
++            this->bus.new_method_call(service.c_str(), IPMI_PATH.c_str(),
++                    IPMI_INTERFACE.c_str(), atn);
++        auto reply = this->bus.call(method);
++
++        if (reply.is_method_error())
++        {
++            log<level::ERR>("Error in setting SMS attention, ", entry("ATN=%s", atn));
++            elog<InternalFailure>();
++        }
++    }
++    catch (sdbusplus::exception::SdBusError& e)
+     {
+-        log<level::ERR>("Error in setting SMS attention, ", entry("ATN=%s", atn));
+-        elog<InternalFailure>();
++        log<level::ERR>("Unable to set/clear SMS attention",
++                        entry("ERROR=%s", e.what()),
++                        entry("ATN=%s", atn));
+     }
+ }
+ } // namespace command
+-- 
+2.17.1
+

@@ -15,6 +15,7 @@ EXTRA_OECONF_olympus-nuvoton = " \
     "
 
 SRC_URI_append_olympus-nuvoton = " file://phosphor-ipmi-host.service"
+SRC_URI_append_olympus-nuvoton = " file://0001-catch-the-exception-in-sendAttention.patch"
 
 SYSTEMD_SERVICE_${PN}_append_olympus-nuvoton = " phosphor-ipmi-host.service"
 SYSTEMD_LINK_${PN}_remove_olympus-nuvoton += "${@compose_list_zip(d, 'SOFT_FMT', 'OBMC_HOST_INSTANCES')}"
