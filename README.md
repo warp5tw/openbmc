@@ -45,10 +45,7 @@ then move to the next step. Additional examples can be found in the
 Machine | TEMPLATECONF
 --------|---------
 Olympus Nuvoton | ```meta-quanta/meta-olympus-nuvoton/conf```
-Palmetto | ```meta-ibm/meta-palmetto/conf```
-Zaius| ```meta-ingrasys/meta-zaius/conf```
-Witherspoon| ```meta-ibm/meta-witherspoon/conf```
-Romulus| ```meta-ibm/meta-romulus/conf```
+BUV RunBMC | ```meta-evb/meta-evb-nuvoton/meta-buv-runbmc/conf```
 
 As an example target Olympus Nuvoton
 ```
