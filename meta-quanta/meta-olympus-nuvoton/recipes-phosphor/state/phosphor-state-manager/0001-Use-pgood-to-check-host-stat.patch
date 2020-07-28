@@ -1,0 +1,98 @@
+From 5eb264abb985fa7a27ec5341180b06d9d3146f4f Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Tue, 28 Jul 2020 14:38:55 +0800
+Subject: [PATCH] Use pgood to check host stat
+
+In case the PCH is not connected BMC
+---
+ host_check_main.cpp | 63 ++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 48 insertions(+), 15 deletions(-)
+
+diff --git a/host_check_main.cpp b/host_check_main.cpp
+index e055abc..bf96bb9 100644
+--- a/host_check_main.cpp
++++ b/host_check_main.cpp
+@@ -122,7 +122,7 @@ int main()
+     std::string s = "type='signal',member='CommandComplete',path='"s +
+                     CONTROL_HOST_PATH + "',interface='" +
+                     CONTROL_HOST_INTERFACE + "'";
+-
++#if 0
+     // Setup Signal Handler
+     sdbusplus::bus::match::match hostControlSignals(bus, s.c_str(),
+                                                     hostControlSignal, nullptr);
+@@ -137,24 +137,57 @@ int main()
+             break;
+         bus.wait();
+     }
++#endif
++    std::variant<int> pgood = -1;
++    auto method = bus.new_method_call(
++        "org.openbmc.control.Power", "/org/openbmc/control/power0",
++        "org.freedesktop.DBus.Properties", "Get");
+ 
+-    // If host running then create file
+-    if (hostRunning)
++    method.append("org.openbmc.control.Power", "pgood");
++    try
+     {
+-        log<level::INFO>("Host is running!");
+-        // Create file for host instance and create in filesystem to indicate
+-        // to services that host is running
+-        auto size = std::snprintf(nullptr, 0, HOST_RUNNING_FILE, 0);
+-        size++; // null
+-        std::unique_ptr<char[]> buf(new char[size]);
+-        std::snprintf(buf.get(), size, HOST_RUNNING_FILE, 0);
+-        std::ofstream outfile(buf.get());
+-        outfile.close();
++        auto reply = bus.call(method);
++        reply.read(pgood);
++
++        if (std::get<int>(pgood) == 1)
++            hostRunning = true;
++        else
++            hostRunning = false;
++
++
++        // If host running then create file
++        if (hostRunning)
++        {
++            log<level::INFO>("Host is running!");
++            // Create file for host instance and create in filesystem to indicate
++            // to services that host is running
++            auto size = std::snprintf(nullptr, 0, HOST_RUNNING_FILE, 0);
++            size++; // null
++            std::unique_ptr<char[]> buf(new char[size]);
++            std::snprintf(buf.get(), size, HOST_RUNNING_FILE, 0);
++            std::ofstream outfile(buf.get());
++            outfile.close();
++        }
++        else
++        {
++            log<level::INFO>("Host is not running!");
++        }
+     }
+-    else
++    catch (const SdBusError& e)
+     {
+-        log<level::INFO>("Host is not running!");
+-    }
++        // It's acceptable for the pgood state service to not be available
++        // since it will notify us of the pgood state when it comes up.
++        if (e.name() != nullptr &&
++            strcmp("org.freedesktop.DBus.Error.ServiceUnknown", e.name()) == 0)
++        {
++            goto fail;
++        }
+ 
++        // Only log for unexpected error types.
++        log<level::ERR>("Error performing call to get pgood",
++                        entry("ERROR=%s", e.what()));
++        goto fail;
++    }
++fail:
+     return 0;
+ }
+-- 
+2.25.1
+
