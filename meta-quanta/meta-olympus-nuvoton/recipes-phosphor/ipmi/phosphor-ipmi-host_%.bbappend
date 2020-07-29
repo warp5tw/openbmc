@@ -1,7 +1,7 @@
 SRC_URI_remove_olympus-nuvoton = "git://github.com/openbmc/phosphor-host-ipmid"
 SRC_URI_prepend_olympus-nuvoton = "git://github.com/Nuvoton-Israel/phosphor-host-ipmid"
 
-SRCREV := "d137053dc488076b19562ef0cd62de8b07249abe"
+SRCREV := "ccfac3579ba666af39072bd2c5273598e57d59b3"
 
 FILESEXTRAPATHS_append_olympus-nuvoton := "${THISDIR}/${PN}:"
 
@@ -15,7 +15,6 @@ EXTRA_OECONF_olympus-nuvoton = " \
     "
 
 SRC_URI_append_olympus-nuvoton = " file://phosphor-ipmi-host.service"
-SRC_URI_append_olympus-nuvoton = " file://0001-catch-the-exception-in-sendAttention.patch"
 
 SYSTEMD_SERVICE_${PN}_append_olympus-nuvoton = " phosphor-ipmi-host.service"
 SYSTEMD_LINK_${PN}_remove_olympus-nuvoton += "${@compose_list_zip(d, 'SOFT_FMT', 'OBMC_HOST_INSTANCES')}"

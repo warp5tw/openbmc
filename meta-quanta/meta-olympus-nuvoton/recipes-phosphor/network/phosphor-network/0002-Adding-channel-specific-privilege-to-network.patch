@@ -176,7 +176,7 @@ index f8086a4..b66a70f 100644
  #include "xyz/openbmc_project/Network/IP/Create/server.hpp"
  #include "xyz/openbmc_project/Network/Neighbor/CreateStatic/server.hpp"
  
- #include <experimental/filesystem>
+ #include <filesystem>
 +#include <nlohmann/json.hpp>
  #include <sdbusplus/bus.hpp>
 +#include <sdbusplus/bus/match.hpp>
@@ -206,7 +206,7 @@ index f8086a4..b66a70f 100644
 +using DbusVariant =
 +    std::variant<std::string, std::vector<std::string>>;
 +
- namespace fs = std::experimental::filesystem;
+ namespace fs = std::filesystem;
  
  class Manager; // forward declaration of network manager.
 @@ -217,6 +226,14 @@ class EthernetInterface : public Ifaces
@@ -248,9 +248,10 @@ index f8086a4..b66a70f 100644
 +     */
 +    int writeJsonFile(const std::string& configFile,
 +                      const nlohmann::json& jsonData);
- };
  
- } // namespace network
+  private:
+    /** @brief Determines if DHCP is active for the IP::Protocol supplied.
+     *  @param[in] protocol - Either IPv4 or IPv6
 diff --git a/network_manager.cpp b/network_manager.cpp
 index c55c9bb..da76676 100644
 --- a/network_manager.cpp

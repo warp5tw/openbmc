@@ -1,6 +1,6 @@
-From dd2fa6e95723dd219b8abd2125555472f45fc4b5 Mon Sep 17 00:00:00 2001
-From: Joseph Liu <kwliu@nuvoton.com>
-Date: Tue, 23 Jun 2020 18:13:38 +0800
+From 8150fe00b5737c5c48634b8b900ab5e86b25b422 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Wed, 29 Jul 2020 09:28:07 +0800
 Subject: [PATCH] add event log support
 
 ---
@@ -111,13 +111,13 @@ index 0000000..ad8d6e7
 +    return eventLogMatcher;
 +}
 diff --git a/include/sel_logger.hpp b/include/sel_logger.hpp
-index bd40dff..ca3c04c 100644
+index 35f8b95..31e8f35 100644
 --- a/include/sel_logger.hpp
 +++ b/include/sel_logger.hpp
-@@ -41,3 +41,6 @@ static uint16_t
-     selAddSystemRecord(const std::string &message, const std::string &path,
-                        const std::vector<uint8_t> &selData, const bool &assert,
-                        const uint16_t &genId, T &&... metadata);
+@@ -42,3 +42,6 @@ static uint16_t
+     selAddSystemRecord(const std::string& message, const std::string& path,
+                        const std::vector<uint8_t>& selData, const bool& assert,
+                        const uint16_t& genId, T&&... metadata);
 +
 +static unsigned int getNewRecordId(void);
 +static void toHexStr(const std::vector<uint8_t> &data, std::string &hexStr);
@@ -280,18 +280,18 @@ index 0000000..7b71c33
 +}
 +
 diff --git a/src/sel_logger.cpp b/src/sel_logger.cpp
-index 7fe52fb..7a22a86 100644
+index 186072e..4ff8694 100644
 --- a/src/sel_logger.cpp
 +++ b/src/sel_logger.cpp
-@@ -27,6 +27,7 @@
+@@ -22,6 +22,7 @@
+ #include <sdbusplus/asio/object_server.hpp>
  #include <sel_logger.hpp>
- #include <sstream>
  #include <threshold_event_monitor.hpp>
 +#include <event_log_monitor.hpp>
  
- struct DBusInternalError final : public sdbusplus::exception_t
- {
-@@ -210,6 +211,11 @@ int main(int argc, char *argv[])
+ #include <filesystem>
+ #include <fstream>
+@@ -211,6 +212,11 @@ int main(int argc, char* argv[])
          startPulseEventMonitor(conn);
  #endif
  
