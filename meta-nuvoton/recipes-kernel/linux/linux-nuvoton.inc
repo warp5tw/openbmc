@@ -6,7 +6,7 @@ PROVIDES += "virtual/kernel"
 
 KCONFIG_MODE="--alldefconfig"
 
-KSRC ?= "git://github.com/Nuvoton-Israel/linux;protocol=git;branch=${KBRANCH}"
+KSRC ?= "git://github.com/openbmc/linux;protocol=git;branch=${KBRANCH}"
 SRC_URI = "${KSRC}"
 SRC_URI_append_npcm7xx = " file://defconfig"
 
@@ -18,4 +18,4 @@ inherit kernel
 require recipes-kernel/linux/linux-yocto.inc
 
 # From 4.16+ the COPYING file changed
-LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
+LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
