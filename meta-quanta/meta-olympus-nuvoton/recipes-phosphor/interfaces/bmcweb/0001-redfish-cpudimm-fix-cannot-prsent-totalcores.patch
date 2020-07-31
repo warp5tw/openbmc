@@ -1,0 +1,51 @@
+From de08d701fbdd6a94b36fe39ffa60d0b33552e47c Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Fri, 31 Jul 2020 20:02:15 +0800
+Subject: [PATCH] redfish: cpudimm: fix cannot prsent totalcores
+
+---
+ redfish-core/lib/cpudimm.hpp | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/redfish-core/lib/cpudimm.hpp b/redfish-core/lib/cpudimm.hpp
+index ed5e6417..c52aa7b8 100644
+--- a/redfish-core/lib/cpudimm.hpp
++++ b/redfish-core/lib/cpudimm.hpp
+@@ -213,13 +213,16 @@ void getCpuDataByService(std::shared_ptr<AsyncResp> aResp,
+             aResp->res.jsonValue["ProcessorType"] = "CPU";
+ 
+             std::string corePath = objPath + "/core";
++#if 0
+             size_t totalCores = 0;
++#endif
+             for (const auto& object : dbusData)
+             {
+                 if (object.first.str == objPath)
+                 {
+                     getCpuDataByInterface(aResp, object.second);
+                 }
++#if 0
+                 else if (boost::starts_with(object.first.str, corePath))
+                 {
+                     for (const auto& interface : object.second)
+@@ -245,7 +248,9 @@ void getCpuDataByService(std::shared_ptr<AsyncResp> aResp,
+                         }
+                     }
+                 }
++#endif
+             }
++#if 0
+             // In getCpuDataByInterface(), state and health are set
+             // based on the present and functional status. If core
+             // count is zero, then it has a higher precedence.
+@@ -256,6 +261,7 @@ void getCpuDataByService(std::shared_ptr<AsyncResp> aResp,
+                 aResp->res.jsonValue["Status"]["Health"] = "OK";
+             }
+             aResp->res.jsonValue["TotalCores"] = totalCores;
++#endif
+             return;
+         },
+         service, "/xyz/openbmc_project/inventory",
+-- 
+2.25.1
+
