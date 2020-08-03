@@ -54,6 +54,7 @@ Please submit any patches against the meta-runbmc-nuvoton layer to the maintaine
     + [Inventory](#inventory)
       + [IPMI FRU](#ipmi-fru)
       + [SMBIOS](#smbios)
+      + [Power Supply Unit Inventory](#power-supply-unit-inventory)
     + [Network](#network)
       + [VLAN](#vlan)
     + [BIOS POST Code](#bios-post-code)
@@ -72,8 +73,9 @@ Please submit any patches against the meta-runbmc-nuvoton layer to the maintaine
 - [OpenBMC Test Automation](#openbmc-test-automation)
 - [Features In Progressing](#features-in-progressing)
 - [Features Planned](#features-planned)
-- [IPMI Commands Verified](#ipmi-commands-verified)
-- [DCMI Commands Verified](#dcmi-commands-verified)
+- [IPMI Commands](#ipmi-commands)
+- [DCMI Commands](#dcmi-commands)
+- [Redfish APIs](#redfish-apis)
 - [Image Size](#image-size)
 - [Modifications](#modifications)
 
@@ -1080,22 +1082,102 @@ SMBIOS stands for System Management BIOS while DMI stands for Desktop Management
 
 In Nuvoton RunBMC Olympus, the raw DMI table are presented as binary attributes at `/sys/firmware/dmi/tables/DMI`. The format of DMI structures can be read in SMBIOS specification.
 
+  ```
+{
+    "@odata.id": "/redfish/v1/Systems/system/Processors/cpu0",
+    "@odata.type": "#Processor.v1_7_0.Processor",
+    "Id": "cpu0",
+    "InstructionSet": "x86-64",
+    "Manufacturer": "Intel",
+    "MaxSpeedMHz": 3600,
+    "Model": "",
+    "Name": "Central Processor",
+    "PartNumber": "",
+    "ProcessorArchitecture": "x86",
+    "ProcessorType": "CPU",
+    "SerialNumber": "",
+    "Status": {
+        "Health": "OK",
+        "State": "Enabled"
+    },
+    "TotalCores": 6,
+    "TotalThreads": 6
+}
+
+{
+    "@odata.id": "/redfish/v1/Systems/system/Memory/dimm4",
+    "@odata.type": "#Memory.v1_6_0.Memory",
+    "CapacityMiB": 8192,
+    "DataWidthBits": 64,
+    "Id": "dimm4",
+    "Manufacturer": "Samsung",
+    "MemoryDeviceType": "xyz.openbmc_project.Inventory.Item.Dimm.DeviceType.Other",
+    "Name": "DIMM Slot",
+    "PartNumber": "M393A1G43EB1-CRC    ",
+    "SerialNumber": "3961A231",
+    "Status": {
+        "Health": "OK",
+        "HealthRollup": "OK",
+        "State": "Enabled"
+    }
+}
+  ```
 **Source URL**
 
-This source code is implements SMBIOS MDR version 2 service [Intel-BMC/mdrv2](https://github.com/Intel-BMC/mdrv2) for Intel based platform  that get SMBIOS binary file `/var/lib/smbios/smbios2` in Nuvoton RunBMC then parse this table to update BIOS/CPU/DIMM informations through xyz.openbmc_project.Smbios.MDR_V2 this dbus interface and show on `WebUI`->`Health`->`Hardware status` page.
+This source code is implemented SMBIOS MDR version 2 service [Intel-BMC/mdrv2](https://github.com/Intel-BMC/mdrv2) for Intel based platform that gets SMBIOS binary file `/var/lib/smbios/smbios2` in Nuvoton RunBMC then parses SMBIOS table to update BIOS/CPU/DIMM informations through xyz.openbmc_project.Smbios.MDR_V2 dbus interface.
 
 **How to use**
 
 * Execute `xfer_mbox_mem host` tool in Nuvoton RunBMC Olympus side
 
-  This is a host tool [Nuvoton-BMC/xfer_mbox_mem](https://github.com/Nuvoton-Israel/openbmc-util/tree/master/xfer_mbox_mem) use to get smbios table from host then copy to mailbox shared memory for BMC to parse smbios binary file. The tool usage can refer to [xfer_mbox_mem](https://github.com/Nuvoton-Israel/openbmc-util/blob/master/xfer_mbox_mem/README.md).
+  This is a host tool [Nuvoton-BMC/xfer_mbox_mem](https://github.com/Nuvoton-Israel/openbmc-util/tree/master/xfer_mbox_mem) which is used to get SMBIOS table from host, it will copy SMBIOS table to mailbox shared memory for BMC to parse SMBIOS table. The tool usage you can refer to [xfer_mbox_mem](https://github.com/Nuvoton-Israel/openbmc-util/blob/master/xfer_mbox_mem/README.md).
 
 * Refresh `WebUI`
 
-  You will see the new items `BIOS`, `CPU` and `DIMM` are show on `Health`->`Hardware status` page.
+  After service started, you can see the new items `BIOS`, `CPU` and `DIMM` in `WebUI`->`Health`->`Hardware status` page.  
+  And you can get `CPU` and `DIMM` from /redfish/v1/Systems/system/Processors/ and /redfish/v1/Systems/system/Memory.
 
 **Maintainer**
 * Tim Lee
+
+### Power Supply Unit Inventory
+
+The PMBus protocol provides commands for the storage and retrieval of the device
+manufacturer’s inventory information.  
+Nuvoton provides a shell script based deaemon that can create `PSU` inventory during OpenBMC startup.
+
+```
+"PowerSupplies": [
+    {
+        "@odata.id": "/redfish/v1/Chassis/chassis/Power#/PowerSupplies/0",
+        "EfficiencyPercent": 90,
+        "Manufacturer": "FlexPower",
+        "MemberId": "powersupply0",
+        "Model": "MIS-S-1020",
+        "Name": "powersupply0",
+        "PartNumber": "FPS-213-D0000293-101",
+        "PowerInputWatts": 59.0,
+        "PowerOutputWatts": 44.0,
+        "SerialNumber": "",
+        "Status": {
+            "Health": "OK",
+            "State": "Enabled"
+        }
+    }
+],
+```
+**Source URL**
+
+[https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-quanta/meta-olympus-nuvoton/recipes-phosphor/power/first-boot-set-psu](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-quanta/meta-olympus-nuvoton/recipes-phosphor/power/first-boot-set-psu)
+
+**How to use**
+
+After service started, you can see a new item `Powersupply 0` in `WebUI`->`Health`->`Hardware status` page.  
+And you can get `Powersupply 0` inventory information from /redfish/v1/Chassis/chassis/Power#/PowerSupplies/0.
+
+
+**Maintainer**
+* Joseph Liu
 
 ### Network
 
@@ -1963,198 +2045,14 @@ Please download the test report in the link below
 * MCTP
 * PLDM
 
-# IPMI Commands Verified
+# IPMI Commands
+[IPMI.md](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-quanta/meta-olympus-nuvoton/IPMI.md)
 
-| Command | KCS | RMCP+ | IPMB |
-| :--- | :---: | :---: | :---: |
-| **IPM Device Global Commands** |  |  |  |
-| Device ID | V | V | V |
-| Cold Reset | V | V | V |
-| Warm Reset | - | - | - |
-| Get Self Test Results | V | V | V |
-| Manufacturing Test On | - | - | - |
-| Set ACPI Power State | V | V | V |
-| Get ACPI Power State | V | V | V |
-| Get Device GUID | V | V | V |
-| Get NetFn Support | - | - | - |
-| Get Command Support | - | - | - |
-| Get Command Sub-function Support | - | - | - |
-| Get Configurable Commands | - | - | - |
-| Get Configurable Command Sub-functions | - | - | - |
-| Set Command Enables | - | - | - |
-| Get Command Enables | - | - | - |
-| Set Command Sub-function Enables | - | - | - |
-| Get Command Sub-function Enables | - | - | - |
-| Get OEM NetFn IANA Support | - | - | - |
-| **BMC Watchdog Timer Commands** |  |  |  |
-| Reset Watchdog Timer | V | V | V |
-| Set Watchdog Timer | V | V | V |
-| Get Watchdog Timer | V | V | V |
-| **BMC Device and Messaging Commands** |  |  |  |
-| Set BMC Global Enables | V | V | V |
-| Get BMC Global Enables | V | V | V |
-| Clear Message Flags | - | - | - |
-| Get Message Flags | V | V | V |
-| Enable Message Channel Receive | - | - | - |
-| Get Message | - | - | - |
-| Send Message | - | - | - |
-| Read Event Message Buffer | V | V | V |
-| Get BT Interface Capabilities | V | V | V |
-| Get System GUID | V | V | V |
-| Set System Info Parameters | V | V | V |
-| Get System Info Parameters | V | V | V |
-| Get Channel Authentication Capabilities | V | V | V |
-| Get Session Challenge | - | - | - |
-| Activate Session | - | - | - |
-| Set Session Privilege Level | - | - | - |
-| Close Session | - | - | - |
-| Get Session Info | - | - | - |
-| Get AuthCode | - | - | - |
-| Set Channel Access | V | V | V |
-| Get Channel Access | V | V | V |
-| Get Channel Info Command | V | V | V |
-| User Access Command | V | V | V |
-| Get User Access Command | V | V | V |
-| Set User Name | V | V | V |
-| Get User Name Command | V | V | V |
-| Set User Password Command | V | V | V |
-| Activate Payload | - | V | - |
-| Deactivate Payload | - | V | - |
-| Get Payload Activation Status | - | V | - |
-| Get Payload Instance Info | - | V | - |
-| Set User Payload Access | V | V | V |
-| Get User Payload Access | V | V | V |
-| Get Channel Payload Support | V | V | V |
-| Get Channel Payload Version | V | V | V |
-| Get Channel OEM Payload Info | - | - | - |
-| Master Write-Read | V | V | V |
-| Get Channel Cipher Suites | V | V| V |
-| Suspend/Resume Payload Encryption | - | - | - |
-| Set Channel Security Keys | - | - | - |
-| Get System Interface Capabilities | - | - | - |
-| Firmware Firewall Configuration | - | - | - |
-| **Chassis Device Commands** |  |  |  |
-| Get Chassis Capabilities | V | V | V |
-| Get Chassis Status | V | V | V |
-| Chassis Control | V | V | V |
-| Chassis Reset | - | - | - |
-| Chassis Identify | V | V | V |
-| Set Front Panel Button Enables | - | - | - |
-| Set Chassis Capabilities | V | V | V |
-| Set Power Restore Policy | V | V | V |
-| Set Power Cycle Interval | - | - | - |
-| Get System Restart Cause | - | - | - |
-| Set System Boot Options | V | V | V |
-| Get System Boot Options | V | V | V |
-| Get POH Counter | V | V | V |
-| **Event Commands** |  |  |  |
-| Set Event Receiver | - | - | - |
-| Get Event Receiver | - | - | - |
-| Platform Event | V | V | V |
-| **PEF and Alerting Commands** |  |  |  |
-| Get PEF Capabilities | - | - | - |
-| Arm PEF Postpone Timer | - | - | - |
-| Set PEF Configuration Parameters | - | - | - |
-| Get PEF Configuration Parameters | - | - | - |
-| Set Last Processed Event ID | - | - | - |
-| Get Last Processed Event ID | - | - | - |
-| Alert Immediate | - | - | - |
-| PET Acknowledge | - | - | - |
-| **Sensor Device Commands** |  |  |  |
-| Get Device SDR Info | V | V | V |
-| Get Device SDR | V | V | V |
-| Reserve Device SDR Repository | V | V | V |
-| Get Sensor Reading Factors | - | - | - |
-| Set Sensor Hysteresis | - | - | - |
-| Get Sensor Hysteresis | - | - | - |
-| Set Sensor Threshold | - | - | - |
-| Get Sensor Threshold | V | V | V |
-| Set Sensor Event Enable | - | - | - |
-| Get Sensor Event Enable | - | - | - |
-| Re-arm Sensor Events | - | - | - |
-| Get Sensor Event Status | - | - | - |
-| Get Sensor Reading | V | V | V |
-| Set Sensor Type | - | - | - |
-| Get Sensor Type | V | V | V |
-| Set Sensor Reading And Event Status | V | V | V |
-| **FRU Device Commands** |  |  |  |
-| Get FRU Inventory Area Info | V | V | V |
-| Read FRU Data | V | V | V |
-| Write FRU Data | V | V | V |
-| **SDR Device Commands** |  |  |  |
-| Get SDR Repository Info | V | V | V |
-| Get SDR Repository Allocation Info | - | - | - |
-| Reserve SDR Repository | V | V | V |
-| Get SDR | V | V | V |
-| Add SDR | - | - | - |
-| Partial Add SDR | - | - | - |
-| Delete SDR | - | - | - |
-| Clear SDR Repository | - | - | - |
-| Get SDR Repository Time | - | - | - |
-| Set SDR Repository Time | - | - | - |
-| Enter SDR Repository Update Mode | - | - | - |
-| Exit SDR Repository Update Mode | - | - | - |
-| Run Initialization Agent | - | - | - |
-| **SEL Device Commands** |  |  |  |
-| Get SEL Info | V | V | V |
-| Get SEL Allocation Info | - | - | - |
-| Reserve SEL | V | V | V |
-| Get SEL Entry | V | V | V |
-| Add SEL Entry | V | V | V |
-| Partial Add SEL Entry | - | - | - |
-| Delete SEL Entry | V | V | V |
-| Clear SEL | V | V | V |
-| Get SEL Time | V | V | V |
-| Set SEL Time | V | V | V |
-| Get Auxiliary Log Status | - | - | - |
-| Set Auxiliary Log Status | - | - | - |
-| Get SEL Time UTC Offset | - | - | - |
-| Set SEL Time UTC Offset | - | - | - |
-| **LAN Device Commands** |  |  |  |
-| Set LAN Configuration Parameters | V | V | V |
-| Get LAN Configuration Parameters | V | V | V |
-| Suspend BMC ARPs | - | - | - |
-| Get IP/UDP/RMCP Statistics | - | - | - |
-| **Serial/Modem Device Commands** |  |  |  |
-| Set Serial/Modem Mux | - | - | - |
-| Set Serial Routing Mux | - | - | - |
-| SOL Activating | - | V | - |
-| Set SOL Configuration Parameters | - | V | - |
-| Get SOL Configuration Parameters | - | V | - |
-| **Command Forwarding Commands** |  |  |  |
-| Forwarded Command | - | - | - |
-| Set Forwarded Commands | - | - | - |
-| Get Forwarded Commands | - | - | - |
-| Enable Forwarded Commands | - | - | - |
-> _V: Verified_  
-> _-: Unsupported_
+# DCMI Commands
+[DCMI.md](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-quanta/meta-olympus-nuvoton/DCMI.md)
 
-# DCMI Commands Verified
-| Command | Verified |
-| :--- | :---: | 
-| **DCMI Capabilities & Discovery Configuration Commands** |  |
-| Get DCMI Capabilities Info | V |
-| Set DCMI Configuration Parameters | V |
-| Get DCMI Configuration Parameters | V |
-| Get Management Controller Identifier String | V |
-| Set Management Controller Identifier String | V |
-| **Platform & Asset Identification Commands** |  |
-| Get Asset Tag | V |
-| Set Asset Tag | V |
-| **Sensor & SDR Commands** |  |
-| Get DCMI Sensor Info| V |
-| **Power Management** |  |
-| Get Power Reading | V |
-| Get Power Limit | V |
-| Set Power Limit | V |
-| Activate / Deactivate Power Limit | V |
-| **Thermal Management** |  |
-| Set Thermal Limit | - |
-| Get Thermal List | - |
-| Get Temperature Reading | V |
-
-> _V: Verified_  
-> _-: Unsupported_
+# Redfish APIs
+[REDFISH.md](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-quanta/meta-olympus-nuvoton/REDFISH.md)
 
 # Image Size
 Type          | Size    | Note                                                                                                     |
@@ -2186,3 +2084,5 @@ image-rwfs    |  0 MB  | middle layer of the overlayfs, rw files in this partiti
 * 2020.06.29 Add Crash Dump
 * 2020.07.21 Add SMBIOS
 * 2020.07.27 Update Time Synce and Table of Contents
+* 2020.08.03 Add Power Supply Unit Inventory
+* 2020.08.03 Add ipmi.md, dcmi.md and redfish.md
