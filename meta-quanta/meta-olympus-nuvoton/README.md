@@ -713,9 +713,9 @@ In order to automatically apply accurate and responsive correction to a fan cont
             "max": 255
         },
         {
-            "name": "Core_0_CPU0",
+            "name": "cpu0_core0_temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_0_CPU0",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/cpu0_core0_temp",
             "writePath": "",
             "min": 0,
             "max": 0,
@@ -748,9 +748,9 @@ In order to automatically apply accurate and responsive correction to a fan cont
                     }
                 },
                 {
-                    "name": "Core_0_CPU0",
+                    "name": "cpu0_core0_temp",
                     "type": "stepwise",
-                    "inputs": ["Core_0_CPU0"],
+                    "inputs": ["cpu0_core0_temp"],
                     "setpoint": 30.0,
                     "pid": {
                         "samplePeriod": 1.0,

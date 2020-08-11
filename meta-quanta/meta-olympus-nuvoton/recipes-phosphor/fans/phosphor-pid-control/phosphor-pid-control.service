@@ -4,7 +4,7 @@ After=obmc-chassis-poweron@0.target
 
 [Service]
 Type=simple
-ExecStartPre=/usr/bin/env mapper wait /xyz/openbmc_project/sensors/temperature/Core_0_CPU0
+ExecStartPre=/usr/bin/env mapper wait /xyz/openbmc_project/sensors/temperature/cpu0_core0_temp
 ExecStart=/usr/bin/swampd
 Restart=always
 RestartSec=5

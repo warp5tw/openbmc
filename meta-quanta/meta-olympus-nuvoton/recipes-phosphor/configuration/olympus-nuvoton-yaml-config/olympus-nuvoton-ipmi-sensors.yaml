@@ -545,70 +545,360 @@
   <<: *temperature
   entityID: 0x03
   entityInstance: 1
-  path: /xyz/openbmc_project/sensors/temperature/Core_0_CPU0
+  path: /xyz/openbmc_project/sensors/temperature/cpu0_core0_temp
 
 77:
   <<: *temperature
   entityID: 0x03
   entityInstance: 2
-  path: /xyz/openbmc_project/sensors/temperature/Core_1_CPU0
+  path: /xyz/openbmc_project/sensors/temperature/cpu0_core1_temp
 
 78:
   <<: *temperature
   entityID: 0x03
   entityInstance: 3
-  path: /xyz/openbmc_project/sensors/temperature/Core_2_CPU0
+  path: /xyz/openbmc_project/sensors/temperature/cpu0_core2_temp
 
 79:
   <<: *temperature
   entityID: 0x03
   entityInstance: 4
-  path: /xyz/openbmc_project/sensors/temperature/Core_3_CPU0
+  path: /xyz/openbmc_project/sensors/temperature/cpu0_core3_temp
 80:
   <<: *temperature
   entityID: 0x03
   entityInstance: 5
-  path: /xyz/openbmc_project/sensors/temperature/Core_4_CPU0
+  path: /xyz/openbmc_project/sensors/temperature/cpu0_core4_temp
 81:
   <<: *temperature
   entityID: 0x03
   entityInstance: 6
-  path: /xyz/openbmc_project/sensors/temperature/Core_5_CPU0
+  path: /xyz/openbmc_project/sensors/temperature/cpu0_core5_temp
 82:
   <<: *temperature
   entityID: 0x03
   entityInstance: 7
-  path: /xyz/openbmc_project/sensors/temperature/Core_0_CPU1
+  path: /xyz/openbmc_project/sensors/temperature/cpu1_core0_temp
 83:
   <<: *temperature
   entityID: 0x03
   entityInstance: 8
-  path: /xyz/openbmc_project/sensors/temperature/Core_1_CPU1
+  path: /xyz/openbmc_project/sensors/temperature/cpu1_core1_temp
 
 84:
   <<: *temperature
   entityID: 0x03
   entityInstance: 9
-  path: /xyz/openbmc_project/sensors/temperature/Core_2_CPU1
+  path: /xyz/openbmc_project/sensors/temperature/cpu1_core2_temp
 
 85:
   <<: *temperature
   entityID: 0x03
   entityInstance: 10
-  path: /xyz/openbmc_project/sensors/temperature/Core_3_CPU1
+  path: /xyz/openbmc_project/sensors/temperature/cpu1_core3_temp
 86:
   <<: *temperature
   entityID: 0x03
   entityInstance: 11
-  path: /xyz/openbmc_project/sensors/temperature/Core_4_CPU1
+  path: /xyz/openbmc_project/sensors/temperature/cpu1_core4_temp
 87:
   <<: *temperature
   entityID: 0x03
   entityInstance: 12
-  path: /xyz/openbmc_project/sensors/temperature/Core_5_CPU1
+  path: /xyz/openbmc_project/sensors/temperature/cpu1_core5_temp
 88:
   <<: *temperature
-  entityID: 0x03
+  entityID: 0x20
   entityInstance: 13
-  path: /xyz/openbmc_project/sensors/temperature/DIMM_C1_CPU0
+  path: /xyz/openbmc_project/sensors/temperature/dimm0_temp
+89:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 14
+  path: /xyz/openbmc_project/sensors/temperature/dimm1_temp
 
+90:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 15
+  path: /xyz/openbmc_project/sensors/temperature/dimm2_temp
+
+91:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 16
+  path: /xyz/openbmc_project/sensors/temperature/dimm3_temp
+
+92:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 17
+  path: /xyz/openbmc_project/sensors/temperature/dimm4_temp
+
+93:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 18
+  path: /xyz/openbmc_project/sensors/temperature/dimm5_temp
+94:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 19
+  path: /xyz/openbmc_project/sensors/temperature/dimm6_temp
+95:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 20
+  path: /xyz/openbmc_project/sensors/temperature/dimm7_temp
+
+96:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 21
+  path: /xyz/openbmc_project/sensors/temperature/dimm8_temp
+
+97:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 22
+  path: /xyz/openbmc_project/sensors/temperature/dimm9_temp
+
+98:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 23
+  path: /xyz/openbmc_project/sensors/temperature/dimm10_temp
+
+99:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 24
+  path: /xyz/openbmc_project/sensors/temperature/dimm11_temp
+
+100:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 25
+  path: /xyz/openbmc_project/sensors/temperature/dimm12_temp
+101:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 26
+  path: /xyz/openbmc_project/sensors/temperature/dimm13_temp
+
+102:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 27
+  path: /xyz/openbmc_project/sensors/temperature/dimm14_temp
+
+103:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 28
+  path: /xyz/openbmc_project/sensors/temperature/dimm15_temp
+
+104:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 29
+  path: /xyz/openbmc_project/sensors/temperature/dimm16_temp
+
+105:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 30
+  path: /xyz/openbmc_project/sensors/temperature/dimm17_temp
+
+106:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 31
+  path: /xyz/openbmc_project/sensors/temperature/dimm18_temp
+107:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 32
+  path: /xyz/openbmc_project/sensors/temperature/dimm19_temp
+
+108:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 33
+  path: /xyz/openbmc_project/sensors/temperature/dimm20_temp
+
+109:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 34
+  path: /xyz/openbmc_project/sensors/temperature/dimm21_temp
+
+110:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 35
+  path: /xyz/openbmc_project/sensors/temperature/dimm22_temp
+
+111:
+  <<: *temperature
+  entityID: 0x20
+  entityInstance: 36
+  path: /xyz/openbmc_project/sensors/temperature/dimm23_temp
+
+112: &cpu_present
+  entityID: 0x03
+  entityInstance: 1
+  sensorType: 0x07
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/cpu0
+  sensorReadingType: 0x6F
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: assertion
+  sensorNamePattern: nameLeaf
+  interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+
+113:
+  <<: *cpu_present
+  entityInstance: 2
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/cpu1
+
+114: &dimm_present
+  entityID: 0x20
+  sensorType: 0x0C
+  entityInstance: 1
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm0
+  sensorReadingType: 0x6F
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: assertion
+  sensorNamePattern: nameLeaf
+  interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+
+115:
+  <<: *dimm_present
+  entityInstance: 2
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm1
+
+116:
+  <<: *dimm_present
+  entityInstance: 3
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm2
+
+117:
+  <<: *dimm_present
+  entityInstance: 4
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm3
+
+118:
+  <<: *dimm_present
+  entityInstance: 5
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm4
+
+119:
+  <<: *dimm_present
+  entityInstance: 6
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm5
+
+120:
+  <<: *dimm_present
+  entityInstance: 7
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm6
+
+121:
+  <<: *dimm_present
+  entityInstance: 8
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm7
+
+122:
+  <<: *dimm_present
+  entityInstance: 9
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm8
+
+123:
+  <<: *dimm_present
+  entityInstance: 10
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm9
+
+124:
+  <<: *dimm_present
+  entityInstance: 11
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm10
+
+125:
+  <<: *dimm_present
+  entityInstance: 12
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm11
+
+126:
+  <<: *dimm_present
+  entityInstance: 13
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm12
+
+127:
+  <<: *dimm_present
+  entityInstance: 14
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm13
+
+128:
+  <<: *dimm_present
+  entityInstance: 15
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm14
+
+129:
+  <<: *dimm_present
+  entityInstance: 16
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm15
+
+130:
+  <<: *dimm_present
+  entityInstance: 17
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm16
+
+131:
+  <<: *dimm_present
+  entityInstance: 18
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm17
+
+132:
+  <<: *dimm_present
+  entityInstance: 19
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm18
+
+133:
+  <<: *dimm_present
+  entityInstance: 20
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm19
+
+134:
+  <<: *dimm_present
+  entityInstance: 21
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm20
+
+135:
+  <<: *dimm_present
+  entityInstance: 22
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm21
+
+136:
+  <<: *dimm_present
+  entityInstance: 23
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm22
+
+137:
+  <<: *dimm_present
+  entityInstance: 24
+  path: /xyz/openbmc_project/inventory/system/chassis/motherboard/dimm23

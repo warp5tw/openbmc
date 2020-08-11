@@ -9,108 +9,108 @@
             "max": 255
         },
         {
-            "name": "Core_0_CPU0",
+            "name": "cpu0_core0_temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_0_CPU0",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/cpu0_core0_temp",
             "writePath": "",
             "min": 0,
             "max": 0,
             "timeout": 0
         },
         {
-            "name": "Core_0_CPU1",
+            "name": "cpu1_core0_temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_0_CPU1",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/cpu1_core0_temp",
             "writePath": "",
             "min": 0,
             "max": 0,
             "timeout": 0
         },
         {
-            "name": "Core_1_CPU0",
+            "name": "cpu0_core1_temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_1_CPU0",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/cpu0_core1_temp",
             "writePath": "",
             "min": 0,
             "max": 0,
             "timeout": 0
         },
         {
-            "name": "Core_1_CPU1",
+            "name": "cpu1_core1_temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_1_CPU1",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/cpu1_core1_temp",
             "writePath": "",
             "min": 0,
             "max": 0,
             "timeout": 0
         },
         {
-            "name": "Core_2_CPU0",
+            "name": "cpu0_core2_temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_2_CPU0",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/cpu0_core2_temp",
             "writePath": "",
             "min": 0,
             "max": 0,
             "timeout": 0
         },
         {
-            "name": "Core_2_CPU1",
+            "name": "cpu1_core2_temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_2_CPU1",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/cpu1_core2_temp",
             "writePath": "",
             "min": 0,
             "max": 0,
             "timeout": 0
         },
         {
-            "name": "Core_3_CPU0",
+            "name": "cpu0_core3_temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_3_CPU0",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/cpu0_core3_temp",
             "writePath": "",
             "min": 0,
             "max": 0,
             "timeout": 0
         },
         {
-            "name": "Core_3_CPU1",
+            "name": "cpu1_core3_temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_3_CPU1",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/cpu1_core3_temp",
             "writePath": "",
             "min": 0,
             "max": 0,
             "timeout": 0
         },
         {
-            "name": "Core_4_CPU0",
+            "name": "cpu0_core4_temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_4_CPU0",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/cpu0_core4_temp",
             "writePath": "",
             "min": 0,
             "max": 0,
             "timeout": 0
         },
         {
-            "name": "Core_4_CPU1",
+            "name": "cpu1_core4_temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_4_CPU1",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/cpu1_core4_temp",
             "writePath": "",
             "min": 0,
             "max": 0,
             "timeout": 0
         },
         {
-            "name": "Core_5_CPU0",
+            "name": "cpu0_core5_temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_5_CPU0",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/cpu0_core5_temp",
             "writePath": "",
             "min": 0,
             "max": 0,
             "timeout": 0
         },
         {
-            "name": "Core_5_CPU1",
+            "name": "cpu1_core5_temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_5_CPU1",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/cpu1_core5_temp",
             "writePath": "",
             "min": 0,
             "max": 0,
@@ -143,9 +143,9 @@
                     }
                 },
                 {
-                    "name": "Core_0_CPU0",
+                    "name": "cpu0_core0_temp",
                     "type": "stepwise",
-                    "inputs": ["Core_0_CPU0"],
+                    "inputs": ["cpu0_core0_temp"],
                     "setpoint": 30.0,
                     "pid": {
                         "samplePeriod": 1.0,
@@ -199,9 +199,9 @@
                     }
                 },
                 {
-                    "name": "Core_0_CPU1",
+                    "name": "cpu1_core0_temp",
                     "type": "stepwise",
-                    "inputs": ["Core_0_CPU1"],
+                    "inputs": ["cpu1_core0_temp"],
                     "setpoint": 30.0,
                     "pid": {
                         "samplePeriod": 1.0,
@@ -255,9 +255,9 @@
                     }
                 },
                 {
-                    "name": "Core_1_CPU0",
+                    "name": "cpu0_core1_temp",
                     "type": "stepwise",
-                    "inputs": ["Core_1_CPU0"],
+                    "inputs": ["cpu0_core1_temp"],
                     "setpoint": 30.0,
                     "pid": {
                         "samplePeriod": 1.0,
@@ -311,9 +311,9 @@
                     }
                 },
                 {
-                    "name": "Core_1_CPU1",
+                    "name": "cpu1_core1_temp",
                     "type": "stepwise",
-                    "inputs": ["Core_1_CPU1"],
+                    "inputs": ["cpu1_core1_temp"],
                     "setpoint": 30.0,
                     "pid": {
                         "samplePeriod": 1.0,
@@ -367,9 +367,9 @@
                     }
                 },
                 {
-                    "name": "Core_2_CPU0",
+                    "name": "cpu0_core2_temp",
                     "type": "stepwise",
-                    "inputs": ["Core_2_CPU0"],
+                    "inputs": ["cpu0_core2_temp"],
                     "setpoint": 30.0,
                     "pid": {
                         "samplePeriod": 1.0,
@@ -423,9 +423,9 @@
                     }
                 },
                 {
-                    "name": "Core_2_CPU1",
+                    "name": "cpu1_core2_temp",
                     "type": "stepwise",
-                    "inputs": ["Core_2_CPU1"],
+                    "inputs": ["cpu1_core2_temp"],
                     "setpoint": 30.0,
                     "pid": {
                         "samplePeriod": 1.0,
@@ -479,9 +479,9 @@
                     }
                 },
                 {
-                    "name": "Core_3_CPU0",
+                    "name": "cpu0_core3_temp",
                     "type": "stepwise",
-                    "inputs": ["Core_3_CPU0"],
+                    "inputs": ["cpu0_core3_temp"],
                     "setpoint": 30.0,
                     "pid": {
                         "samplePeriod": 1.0,
@@ -535,9 +535,9 @@
                     }
                 },
                 {
-                    "name": "Core_3_CPU1",
+                    "name": "cpu1_core3_temp",
                     "type": "stepwise",
-                    "inputs": ["Core_3_CPU1"],
+                    "inputs": ["cpu1_core3_temp"],
                     "setpoint": 30.0,
                     "pid": {
                         "samplePeriod": 1.0,
@@ -591,9 +591,9 @@
                     }
                 },
                 {
-                    "name": "Core_4_CPU0",
+                    "name": "cpu0_core4_temp",
                     "type": "stepwise",
-                    "inputs": ["Core_4_CPU0"],
+                    "inputs": ["cpu0_core4_temp"],
                     "setpoint": 30.0,
                     "pid": {
                         "samplePeriod": 1.0,
@@ -647,9 +647,9 @@
                     }
                 },
                 {
-                    "name": "Core_4_CPU1",
+                    "name": "cpu1_core4_temp",
                     "type": "stepwise",
-                    "inputs": ["Core_4_CPU1"],
+                    "inputs": ["cpu1_core4_temp"],
                     "setpoint": 30.0,
                     "pid": {
                         "samplePeriod": 1.0,
@@ -703,9 +703,9 @@
                     }
                 },
                 {
-                    "name": "Core_5_CPU0",
+                    "name": "cpu0_core5_temp",
                     "type": "stepwise",
-                    "inputs": ["Core_5_CPU0"],
+                    "inputs": ["cpu0_core5_temp"],
                     "setpoint": 30.0,
                     "pid": {
                         "samplePeriod": 1.0,
@@ -759,9 +759,9 @@
                     }
                 },
                 {
-                    "name": "Core_5_CPU1",
+                    "name": "cpu1_core5_temp",
                     "type": "stepwise",
-                    "inputs": ["Core_5_CPU1"],
+                    "inputs": ["cpu1_core5_temp"],
                     "setpoint": 30.0,
                     "pid": {
                         "samplePeriod": 1.0,
