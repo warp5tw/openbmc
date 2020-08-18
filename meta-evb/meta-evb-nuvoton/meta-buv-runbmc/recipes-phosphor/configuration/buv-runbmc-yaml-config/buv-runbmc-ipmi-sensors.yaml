@@ -1,0 +1,181 @@
+1: &temperature
+  entityID: 0x07
+  entityInstance: 1
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/BMC_Temp
+  sensorReadingType: 0x01
+  multiplierM: 1
+  offsetB: 0
+  bExp: 0
+  rExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+2:
+  <<: *temperature
+  entityInstance: 2
+  path: /xyz/openbmc_project/sensors/temperature/Outlet_Temp
+
+3: &voltage
+  entityID: 0x07
+  entityInstance: 3
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/ADC1
+  sensorReadingType: 0x01
+  multiplierM: 8
+  offsetB: 0
+  bExp: 0
+  rExp: -2
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+4:
+  <<: *voltage
+  entityInstance: 4
+  path: /xyz/openbmc_project/sensors/voltage/ADC2
+
+5:
+  <<: *voltage
+  entityInstance: 5
+  path: /xyz/openbmc_project/sensors/voltage/ADC3
+
+6:
+  <<: *voltage
+  entityInstance: 6
+  path: /xyz/openbmc_project/sensors/voltage/ADC4
+
+7:
+  <<: *voltage
+  entityInstance: 7
+  path: /xyz/openbmc_project/sensors/voltage/ADC5
+
+8:
+  <<: *voltage
+  entityInstance: 8
+  path: /xyz/openbmc_project/sensors/voltage/ADC6
+
+9:
+  <<: *voltage
+  entityInstance: 9
+  path: /xyz/openbmc_project/sensors/voltage/ADC7
+
+10:
+  <<: *voltage
+  entityInstance: 10
+  path: /xyz/openbmc_project/sensors/voltage/ADC8
+
+11:
+  <<: *voltage
+  entityInstance: 11
+  path: /xyz/openbmc_project/sensors/voltage/MB_P12V_INA219_Output_Voltage
+
+12:
+  <<: *voltage
+  entityInstance: 12
+  path: /xyz/openbmc_project/sensors/voltage/MB_P3V3_INA219_Output_Voltage
+
+13: &current
+  entityID: 0x07
+  entityInstance: 13
+  sensorType: 0x03
+  path: /xyz/openbmc_project/sensors/current/MB_P12V_INA219_Output_Current
+  sensorReadingType: 0x01
+  multiplierM: 40
+  offsetB: 10
+  bExp: 0
+  rExp: -3
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Amperes
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+14:
+  <<: *current
+  entityInstance: 14
+  path: /xyz/openbmc_project/sensors/current/MB_P3V3_INA219_Output_Current
+
+15: &power
+  entityID: 0x07
+  entityInstance: 15
+  sensorType: 0x08
+  path: /xyz/openbmc_project/sensors/power/MB_P12V_INA219_Output_Power
+  sensorReadingType: 0x01
+  multiplierM: 48
+  offsetB: 0
+  bExp: 0
+  rExp: -3
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Watts
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+16:
+  <<: *power
+  entityInstance: 16
+  path: /xyz/openbmc_project/sensors/power/MB_P12V_INA219_Output_Power
+
+17: &fan_tach
+  entityID: 0x1D
+  entityInstance: 1
+  sensorType: 0x04
+  path: /xyz/openbmc_project/sensors/fan_tach/Fan1
+  sensorReadingType: 0x01
+  multiplierM: 100
+  offsetB: 0
+  bExp: 0
+  rExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+18:
+  <<: *fan_tach
+  entityInstance: 2
+  path: /xyz/openbmc_project/sensors/fan_tach/Fan2
+
+19:
+  <<: *fan_tach
+  entityInstance: 3
+  path: /xyz/openbmc_project/sensors/fan_tach/Fan3
+
+20:
+  <<: *fan_tach
+  entityInstance: 4
+  path: /xyz/openbmc_project/sensors/fan_tach/Fan4

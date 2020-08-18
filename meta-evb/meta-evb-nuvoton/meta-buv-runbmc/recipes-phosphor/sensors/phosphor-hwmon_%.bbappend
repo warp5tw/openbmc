@@ -5,7 +5,7 @@ NAMES = " \
         i2c@8d000/tmp75@4a \
         i2c@8c000/tmp75@48 \
         i2c@8b000/ina219@40 \
-        i2c@8b000/ina219@40 \
+        i2c@8b000/ina219@41 \
         "
 
 ITEMSFMT = "ahb/apb/{0}.conf"

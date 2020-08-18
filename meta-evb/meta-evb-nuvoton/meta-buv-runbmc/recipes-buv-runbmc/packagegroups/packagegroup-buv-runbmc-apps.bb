@@ -22,4 +22,6 @@ RDEPENDS_${PN}-buv-system = " \
     dhcpcd \
     phosphor-sel-logger \
     intel-ipmi-oem \
+    phosphor-ipmi-fru \
+    iperf3 \
     "

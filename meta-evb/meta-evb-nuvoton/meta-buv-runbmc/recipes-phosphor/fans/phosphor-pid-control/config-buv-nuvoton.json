@@ -1,50 +1,50 @@
 {
     "sensors" : [
         {
-            "name": "fan1",
+            "name": "Fan1",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/fan1",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan1",
             "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/**/pwm1",
             "min": 0,
             "max": 255
         },
         {
-            "name": "fan2",
+            "name": "Fan2",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/fan2",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan2",
             "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/**/pwm2",
             "min": 0,
             "max": 255
         },
         {
-            "name": "fan3",
+            "name": "Fan3",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/fan3",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan3",
             "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/**/pwm3",
             "min": 0,
             "max": 255
         },
         {
-            "name": "fan4",
+            "name": "Fan4",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/fan4",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan4",
             "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/**/pwm4",
             "min": 0,
             "max": 255
         },
         {
-            "name": "bmc_card_tmp75",
+            "name": "BMC_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/bmc_card_tmp75",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/BMC_Temp",
             "writePath": "",
             "min": 0,
             "max": 0,
             "timeout": 0
         },
         {
-            "name": "lm75",
+            "name": "Outlet_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/lm75",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/Outlet_Temp",
             "writePath": "",
             "min": 0,
             "max": 0,
@@ -58,9 +58,9 @@
             "failsafePercent": 100.0,
             "pids": [
                 {
-                    "name": "fan1",
+                    "name": "Fan1",
                     "type": "fan",
-                    "inputs": ["fan1", "fan2"],
+                    "inputs": ["Fan1", "Fan2"],
                     "setpoint": 40.0,
                     "pid": {
                         "samplePeriod": 1.0,
@@ -77,9 +77,9 @@
                     }
                 },
                 {
-                    "name": "bmc_card_tmp75",
+                    "name": "BMC_Temp",
                     "type": "stepwise",
-                    "inputs": ["bmc_card_tmp75"],
+                    "inputs": ["BMC_Temp"],
                     "setpoint": 30.0,
                     "pid": {
                         "samplePeriod": 1.0,
@@ -132,9 +132,9 @@
             "failsafePercent": 100.0,
             "pids": [
                 {
-                    "name": "fan3-4",
+                    "name": "Fan3-4",
                     "type": "fan",
-                    "inputs": ["fan3" , "fan4"],
+                    "inputs": ["Fan3" , "Fan4"],
                     "setpoint": 90.0,
                     "pid": {
                         "samplePeriod": 0.1,
@@ -151,9 +151,9 @@
                     }
                 },
                  {
-                    "name": "lm75",
+                    "name": "Outlet_Temp",
                     "type": "stepwise",
-                    "inputs": ["lm75"],
+                    "inputs": ["Outlet_Temp"],
                     "setpoint": 30.0,
                     "pid": {
                         "samplePeriod": 1.0,
