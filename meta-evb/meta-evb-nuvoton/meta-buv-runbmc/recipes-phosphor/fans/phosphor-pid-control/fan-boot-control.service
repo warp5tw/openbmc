@@ -1,6 +1,7 @@
 [Unit]
 Description=Set Fan to Default Duty as Booting Up
 DefaultDependencies=no
+ConditionPathExists=/sys/class/hwmon/hwmon4/pwm1
 
 [Service]
 Type=simple
