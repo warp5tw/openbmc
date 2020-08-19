@@ -1,19 +1,4 @@
 # NPCM750 RunBMC BUV hardware rework
-This is the Nuvoton RunBMC BUV hardware layer.
-
-BUV board can plug the RunBMC card.
-
-# Contacts for Patches
-
-Please submit any patches against the meta-runbmc-nuvoton layer to the maintainer of nuvoton:
-
-* Joseph Liu, <KWLIU@nuvoton.com>
-* Medad CChien, <CTCCHIEN@nuvoton.com>
-* Tyrone Ting, <KFTING@nuvoton.com>
-* Stanley Chu, <YSCHU@nuvoton.com>
-* Tim Lee, <CHLI30@nuvoton.com>
-* Brian Ma, <CHMA0@nuvoton.com>
-* Jim Liu, <JJLIU0@nuvoton.com>
 
 # Table of Contents
 
