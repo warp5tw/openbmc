@@ -4,7 +4,8 @@ DefaultDependencies=no
 ConditionPathExists=/sys/class/hwmon/hwmon4/pwm1
 
 [Service]
-Type=simple
+Type=oneshot
+RemainAfterExit=true
 ExecStart=/usr/bin/fan-default-speed.sh
 
 [Install]
