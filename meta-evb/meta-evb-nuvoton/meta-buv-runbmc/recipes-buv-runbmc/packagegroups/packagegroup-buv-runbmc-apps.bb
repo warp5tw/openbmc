@@ -19,6 +19,7 @@ RDEPENDS_${PN}-buv-common-utils = " \
     phosphor-sel-logger \
     rsyslog \
     phosphor-host-postd \
+    obmc-ikvm \
     "
 
 SUMMARY_${PN}-buv-system = "BUV NUVOTON System"
