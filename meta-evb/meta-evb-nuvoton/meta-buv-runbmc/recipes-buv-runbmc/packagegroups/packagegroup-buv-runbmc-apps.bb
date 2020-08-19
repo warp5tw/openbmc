@@ -15,14 +15,16 @@ RDEPENDS_${PN}-buv-common-utils = " \
     phosphor-webui \
     phosphor-host-postd \
     loadsvf \
+    obmc-console \
+    phosphor-sel-logger \
+    rsyslog \
+    phosphor-host-postd \
     "
 
 SUMMARY_${PN}-buv-system = "BUV NUVOTON System"
 RDEPENDS_${PN}-buv-system = " \
     dhcpcd \
-    phosphor-sel-logger \
     intel-ipmi-oem \
     phosphor-ipmi-fru \
     iperf3 \
-    obmc-console \
     "
