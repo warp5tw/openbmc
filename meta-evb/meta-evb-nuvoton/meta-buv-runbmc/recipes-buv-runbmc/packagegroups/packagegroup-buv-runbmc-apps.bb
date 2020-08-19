@@ -24,4 +24,5 @@ RDEPENDS_${PN}-buv-system = " \
     intel-ipmi-oem \
     phosphor-ipmi-fru \
     iperf3 \
+    obmc-console \
     "
