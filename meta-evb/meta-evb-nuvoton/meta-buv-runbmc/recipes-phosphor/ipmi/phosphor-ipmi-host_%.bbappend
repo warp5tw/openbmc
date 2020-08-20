@@ -5,6 +5,7 @@ SRCREV := "ccfac3579ba666af39072bd2c5273598e57d59b3"
 DEPENDS_append_buv-runbmc = " buv-runbmc-yaml-config"
 
 EXTRA_OECONF_buv-runbmc = " \
+    --with-journal-sel \
     SENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/buv-runbmc-yaml-config/ipmi-sensors.yaml \
     FRU_YAML_GEN=${STAGING_DIR_HOST}${datadir}/buv-runbmc-yaml-config/ipmi-fru-read.yaml \
     "
