@@ -12,7 +12,7 @@
 # Rework for RunBMC BUV
 
 ## Runbmc card
-Runbmc card work on buv board.
+If you meet runbmc card cannot boot with buv board.
 1. remove R206 0k ohm
 2. short R422 for control GPIO09 to set 7 segment display and avoid reset U23
 <img align="left" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/runbmc_buv_p1.png">
@@ -39,7 +39,7 @@ RunBMC can support Nist feature
 <img align="left" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/runbmc_buv_nist.png">
 <img align="center" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/runbmc_buv_nist2.png"> 
   
-## LED
+## 7 segment display
 Add R722 66ohm for led E2
 
 <img align="center" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/runbmc_buv_led.png">
