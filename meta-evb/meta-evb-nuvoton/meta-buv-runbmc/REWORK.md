@@ -1,25 +1,25 @@
-# NPCM750 RunBMC BUV hardware rework
+# NPCM750 RunBMC BUV Hardware Rework
 
 # Table of Contents
-
-- [Contacts for Patches](#contacts-for-patches)
-- [Rework for RunBMC BUV](#Rework-for-RunBMC-BUV)
-  * [Runbmc card](#Runbmc-card)
-  * [Secure boot](#Secure-boot)
-  * [Nist](#Nist)
-  * [LED](#LED)
+- [Rework for RunBMC BUV](#rework-for-runbmc-buv)
+  * [7 segment display](#7-segment-display)
+  * [Secure boot](#secure-boot)
+  * [NIST Secure Feature](#nist-secure-feature)
 
 # Rework for RunBMC BUV
 
-## Runbmc card
-If you meet runbmc card cannot boot with buv board.
-1. remove R206 0k ohm
-2. short R422 for control GPIO09 to set 7 segment display and avoid reset U23
-<img align="left" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/runbmc_buv_p1.png">
-<img align="center" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/runbmc_buv_p1.png">
-<img align="center" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/runbmc_buv_p3.png">
- 
+## 7 segment display
 
+1. Add R722 66ohm on BUV Board for E2
+
+<img align="center" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/runbmc_buv_led.png">
+
+2. Remove R206 0k ohm on RunBMC Card to avoid BMC keep reset
+3. Short R422 on RunBMC Card for control GPIO09 to set 7 segment display
+
+<img align="left" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/runbmc_buv_p1.png">
+<img align="center" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/runbmc_buv_p2.png">
+<img align="center" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/runbmc_buv_p3.png">
 
 ## Secure boot
 The NPCM7xx is a BMC that authenticates it's code before it runs and so can become the Root of Trust for th BMC subsystem.
@@ -30,7 +30,7 @@ NPCM750 RunBMC can support normal mode and secure mode
 <img align="center" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/runbmc_buv_secure2.png">
 <img align="center" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/runbmc_buv_secure3.png">
 
-## Nist
+## NIST Secure Feature
 RunBMC can support Nist feature
 1. remove runbmc R175
 2. mount 0k ohm on R186
@@ -38,8 +38,3 @@ RunBMC can support Nist feature
   
 <img align="left" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/runbmc_buv_nist.png">
 <img align="center" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/runbmc_buv_nist2.png"> 
-  
-## 7 segment display
-Add R722 66ohm for led E2
-
-<img align="center" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/runbmc_buv_led.png">
