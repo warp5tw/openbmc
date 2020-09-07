@@ -1,0 +1,652 @@
+From 3e4ed85ef18bda067322304ac3ff3f98f43b2d4d Mon Sep 17 00:00:00 2001
+From: kfting <kfting@nuvoton.com>
+Date: Wed, 23 Sep 2020 16:55:04 +0800
+Subject: [PATCH] Nuvoton PCIE support for Intel MCTP library
+
+Signed-off-by: kfting <kfting@nuvoton.com>
+---
+ CMakeLists.txt       |   4 +-
+ Makefile.am          |   5 +
+ Makefile.inc         |   2 +-
+ configure.ac         |   1 +
+ core.c               |   7 +-
+ libmctp-nupcie.h     |  72 ++++++++++
+ linux/nuvoton-mctp.h |  27 ++++
+ nupcie.c             | 312 +++++++++++++++++++++++++++++++++++++++++++
+ nupcie.h             | 108 +++++++++++++++
+ 9 files changed, 533 insertions(+), 5 deletions(-)
+ create mode 100644 libmctp-nupcie.h
+ create mode 100644 linux/nuvoton-mctp.h
+ create mode 100644 nupcie.c
+ create mode 100644 nupcie.h
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5afeb75..914f8ba 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -9,7 +9,7 @@ add_definitions (-DMCTP_DEFAULT_ALLOC)
+ # TODO: Remove, when API for response is added
+ add_definitions (-DMCTP_ASTPCIE_RESPONSE_WA)
+ 
+-add_library (mctp_intel STATIC alloc.c astlpc.c core.c log.c libmctp.h serial.c astpcie.c smbus.c)
++add_library (mctp_intel STATIC alloc.c astlpc.c core.c log.c libmctp.h serial.c astpcie.c nupcie.c smbus.c)
+ 
+ target_include_directories (mctp_intel PUBLIC
+                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+@@ -53,4 +53,4 @@ add_executable (mctp_astpcie_discovery utils/mctp-astpcie-discovery.c)
+ target_link_libraries (mctp_astpcie_discovery mctp_intel)
+ 
+ install (TARGETS mctp_intel DESTINATION lib)
+-install (FILES libmctp.h libmctp-cmds.h libmctp-vdpci.h libmctp-smbus.h libmctp-astpcie.h libmctp-msgtypes.h DESTINATION include)
++install (FILES libmctp.h libmctp-cmds.h libmctp-vdpci.h libmctp-smbus.h libmctp-astpcie.h libmctp-nupcie.h libmctp-msgtypes.h DESTINATION include)
+diff --git a/Makefile.am b/Makefile.am
+index 550eae6..74d3749 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -16,6 +16,11 @@ libmctp_la_SOURCES += astlpc.c
+ include_HEADERS += libmctp-astlpc.h
+ endif
+ 
++if LIBMCTP_BINDING_nupcie
++libmctp_la_SOURCES += nupcie.c
++include_HEADERS += libmctp-nupcie.h
++endif
++
+ if HAVE_SYSTEMD
+ systemdsystemunit_DATA = \
+ 	mctp-demux.service
+diff --git a/Makefile.inc b/Makefile.inc
+index 1ee555d..e46dd11 100644
+--- a/Makefile.inc
++++ b/Makefile.inc
+@@ -1,6 +1,6 @@
+ LIBMCTP_DIR ?= libmctp/
+ LIBMCTP_OBJS = core.o alloc.o log.o
+-LIBMCTP_BINDINGS ?= serial astlpc
++LIBMCTP_BINDINGS ?= serial astlpc nupcie
+ 
+ LIBMCTP_OBJS += $(LIBMCTP_BINDINGS:%=%.o)
+ 
+diff --git a/configure.ac b/configure.ac
+index 539a1a9..e7a4826 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -52,6 +52,7 @@ AC_DEFINE([MCTP_DEFAULT_ALLOC], [1],
+ AM_CONDITIONAL([LIBMCTP_BINDING_serial], [true])
+ AM_CONDITIONAL([LIBMCTP_BINDING_astlpc], [true])
+ AM_CONDITIONAL([LIBMCTP_BINDING_astpcie], [true])
++AM_CONDITIONAL([LIBMCTP_BINDING_nupcie], [true])
+ 
+ AX_CODE_COVERAGE
+ m4_ifdef([_AX_CODE_COVERAGE_RULES],
+diff --git a/core.c b/core.c
+index 239a410..c45bc71 100644
+--- a/core.c
++++ b/core.c
+@@ -167,7 +167,9 @@ void *mctp_pktbuf_alloc_end(struct mctp_pktbuf *pkt, size_t size)
+ int mctp_pktbuf_push(struct mctp_pktbuf *pkt, void *data, size_t len)
+ {
+ 	void *p;
+-
++  //fprintf(stderr, "end:0x%x\r\n", pkt->end);
++  //fprintf(stderr, "len:0x%x\r\n", len);
++  //fprintf(stderr, "size:0x%x\r\n", pkt->size);
+ 	if (pkt->end + len > pkt->size)
+ 		return -1;
+ 
+@@ -368,7 +370,8 @@ static inline bool mctp_ctrl_msg_is_request(void *buf, size_t len)
+ 	assert(len >= sizeof(struct mctp_ctrl_msg_hdr));
+ 
+ 	struct mctp_ctrl_msg_hdr *hdr = buf;
+-
++  //fprintf(stderr,"Is CTRL MSG TYPE: %d\r\n", (hdr->ic_msg_type == MCTP_CTRL_HDR_MSG_TYPE));
++  //fprintf(stderr,"Is CTRL FLAG REQUEST: %d\r\n", (hdr->rq_dgram_inst & MCTP_CTRL_HDR_FLAG_REQUEST));
+ 	return hdr->ic_msg_type == MCTP_CTRL_HDR_MSG_TYPE &&
+ 	       hdr->rq_dgram_inst & MCTP_CTRL_HDR_FLAG_REQUEST;
+ }
+diff --git a/libmctp-nupcie.h b/libmctp-nupcie.h
+new file mode 100644
+index 0000000..fc36ab6
+--- /dev/null
++++ b/libmctp-nupcie.h
+@@ -0,0 +1,72 @@
++/* SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later */
++/* Copyright (c) 2020 Nuvoton Technology Corporation */
++
++#ifndef _LIBMCTP_NUPCIE_H
++#define _LIBMCTP_NUPCIE_H
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
++
++#include <assert.h>
++#include <stdbool.h>
++#include <stdlib.h>
++#include <string.h>
++#include <limits.h>
++
++#include "libmctp.h"
++
++struct mctp_binding_nupcie;
++
++struct mctp_binding_nupcie *mctp_binding_nupcie_init(void);
++
++struct mctp_binding *mctp_binding_nupcie_core(struct mctp_binding_nupcie *b);
++
++int mctp_binding_nupcie_poll(struct mctp_binding_nupcie *nupcie,
++			      int timeout);
++
++int mctp_binding_nupcie_rx(struct mctp_binding_nupcie *nupcie);
++
++void mctp_binding_nupcie_free(struct mctp_binding_nupcie *b);
++
++/*
++ * Routing types
++ */
++enum pcie_message_routing {
++	PCIE_ROUTE_TO_RC = 0,
++	PCIE_RESERVED = 1,
++	PCIE_ROUTE_BY_ID = 2,
++	PCIE_BROADCAST_FROM_RC = 3
++};
++
++/*
++ * Extended data for transport layer control
++ */
++struct pcie_pkt_private {
++	enum pcie_message_routing routing;
++	/* source (rx)/target (tx) endpoint bdf */
++	uint16_t remote_id;
++
++#ifdef MCTP_ASTPCIE_RESPONSE_WA
++	/*
++	 * FIXME: In libmctp core there is no support for response, which means
++	 * that we are not able to send MCTP packet with TO bit = 0b and MsgTag
++	 * matching the request.
++	 * Temporarily, as a workaround, we will store flags_seq_tag of the
++	 * request's mctp_hdr in pcie_pkt_private to be able set both fields
++	 * correctly in response time.
++	 * Remove, when dedicated API for response is added.
++	 */
++	uint8_t flags_seq_tag;
++#endif
++};
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* _LIBMCTP_NUPCIE_H */
+diff --git a/linux/nuvoton-mctp.h b/linux/nuvoton-mctp.h
+new file mode 100644
+index 0000000..81ed3e6
+--- /dev/null
++++ b/linux/nuvoton-mctp.h
+@@ -0,0 +1,27 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright (c) 2020 Intel Corporation */
++/* Copyright (c) 2020 Nuvoton Technology Corporation */
++
++#ifndef _UAPI_LINUX_NUVOTON_MCTP_H
++#define _UAPI_LINUX_NUVOTON_MCTP_H
++
++#include <linux/ioctl.h>
++#include <linux/types.h>
++
++/*
++ * nuvoton-mctp is a simple device driver exposing a read/write interface:
++ *  +----------------------+
++ *  | PCIe VDM Header      | 16 bytes (Big Endian)
++ *  +----------------------+
++ *  | MCTP Message Payload | 64/128/256/512 bytes (Little Endian)
++ *  +----------------------+
++ *
++ * MCTP packet description can be found in DMTF DSP0238,
++ * MCTP PCIe VDM Transport Specification.
++ *
++ */
++
++#define NUVOTON_MCTP_PCIE_VDM_HDR_SIZE 16
++
++
++#endif /* _UAPI_LINUX_NUVOTON_MCTP_H */
+diff --git a/nupcie.c b/nupcie.c
+new file mode 100644
+index 0000000..bb1ac89
+--- /dev/null
++++ b/nupcie.c
+@@ -0,0 +1,312 @@
++/* SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later */
++/* Copyright (c) 2020 Nuvoton Technology Corporation */
++
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
++
++#include <byteswap.h>
++#include <endian.h>
++#include <assert.h>
++#include <errno.h>
++#include <fcntl.h>
++#include <poll.h>
++#include <stdbool.h>
++#include <sys/ioctl.h>
++#include <unistd.h>
++#include <linux/nuvoton-mctp.h>
++
++#include "container_of.h"
++#include "libmctp-alloc.h"
++#include "libmctp-nupcie.h"
++#include "libmctp-log.h"
++#include "nupcie.h"
++#include <stdio.h>
++
++#undef pr_fmt
++#define pr_fmt(fmt) "nupcie: " fmt
++
++/*
++ * PCIe header template in "network format" - Big Endian
++ */
++static const struct mctp_pcie_hdr mctp_pcie_hdr_template_be = {
++	.fmt_type = MSG_4DW_HDR,
++	.mbz_attr_length = MCTP_PCIE_VDM_ATTR,
++	.code = MSG_CODE_VDM_TYPE_1,
++	.vendor = VENDOR_ID_DMTF_VDM
++};
++#if 0
++static int mctp_binding_astpcie_get_bdf(struct mctp_binding_astpcie *astpcie)
++{
++	struct aspeed_mctp_get_bdf bdf;
++	int rc;
++
++	rc = ioctl(astpcie->fd, ASPEED_MCTP_IOCTL_GET_BDF, &bdf);
++	if (!rc)
++		astpcie->bdf = bdf.bdf;
++
++	return rc;
++}
++#endif
++static int mctp_binding_nupcie_open(struct mctp_binding_nupcie *nupcie)
++{
++	int fd = open(NU_DRV_FILE, O_RDWR);
++
++	if (fd < 0) {
++		mctp_prerr("Cannot open: %s, errno = %d", NU_DRV_FILE, errno);
++
++		return fd;
++	}
++
++	nupcie->fd = fd;
++	return 0;
++}
++
++/*
++ * Start function. Opens driver and read bdf
++ */
++static int mctp_binding_nupcie_start(struct mctp_binding *b)
++{
++	struct mctp_binding_nupcie *nupcie = binding_to_nupcie(b);
++	int rc;
++
++	assert(nupcie);
++
++	rc = mctp_binding_nupcie_open(nupcie);
++#if 0
++	if (!rc)
++		rc = mctp_binding_astpcie_get_bdf(astpcie);
++#endif
++	return rc;
++}
++
++/*
++ * Structures in libmctp (i.e. struct mctp_hdr) are defined in "network format"
++ * (big endian), which means that we need to convert PCIe VDM header from LE
++ * (host) to BE and make sure that any operations on data types larger than
++ * one byte need to be done in BE (for set) or LE (for get).
++ *
++ * TODO: Remove if the kernel implementation is changed.
++ */
++static void mctp_nupcie_swap_pcie_vdm_hdr(uint32_t *data)
++{
++	int i;
++
++	for (i = 0; i < PCIE_VDM_HDR_SIZE_DW; i++)
++		data[i] = bswap_32(data[i]);
++}
++
++static uint8_t mctp_nupcie_tx_get_pad_len(struct mctp_pktbuf *pkt)
++{
++	size_t sz = mctp_pktbuf_size(pkt);
++
++	return PCIE_PKT_ALIGN(sz) - sz;
++}
++
++static uint16_t mctp_nupcie_tx_get_payload_size_dw(struct mctp_pktbuf *pkt)
++{
++	size_t sz = mctp_pktbuf_size(pkt);
++
++	return PCIE_PKT_ALIGN(sz) / sizeof(uint32_t) - MCTP_HDR_SIZE_DW;
++}
++/*
++ * Tx function which writes single packet to device driver
++ */
++static int mctp_binding_nupcie_tx(struct mctp_binding *b,
++				   struct mctp_pktbuf *pkt)
++{
++	struct pcie_pkt_private *pkt_prv =
++		(struct pcie_pkt_private *)pkt->msg_binding_private;
++	struct mctp_binding_nupcie *nupcie = binding_to_nupcie(b);
++	struct mctp_pcie_hdr *hdr = (struct mctp_pcie_hdr *)pkt->data;
++	struct mctp_hdr *mctp_hdr = mctp_pktbuf_hdr(pkt);
++	uint16_t payload_len_dw = mctp_nupcie_tx_get_payload_size_dw(pkt);
++	uint8_t pad = mctp_nupcie_tx_get_pad_len(pkt);
++	ssize_t write_len, len;
++
++	memcpy(hdr, &mctp_pcie_hdr_template_be, sizeof(*hdr));
++
++#ifdef MCTP_ASTPCIE_RESPONSE_WA
++	if (!(pkt_prv->flags_seq_tag & MCTP_HDR_FLAG_TO))
++		mctp_hdr->flags_seq_tag = pkt_prv->flags_seq_tag;
++#endif
++
++	mctp_prdebug("TX, len: %d, pad: %d", payload_len_dw, pad);
++
++	PCIE_SET_ROUTING(hdr, pkt_prv->routing);
++	PCIE_SET_DATA_LEN(hdr, payload_len_dw);
++	PCIE_SET_REQ_ID(hdr, nupcie->bdf);
++	PCIE_SET_TARGET_ID(hdr, pkt_prv->remote_id);
++	PCIE_SET_PAD_LEN(hdr, pad);
++
++	/*
++	 * XXX: npcm7xx-vdm driver expects data with the same format it
++	 * was sent to userspace
++	 */
++	//mctp_nupcie_swap_pcie_vdm_hdr((uint32_t *)pkt->data);
++
++	len = (payload_len_dw * sizeof(uint32_t)) +
++	      NUVOTON_MCTP_PCIE_VDM_HDR_SIZE;
++
++	write_len = write(nupcie->fd, pkt->data, len);
++	if (write_len < 0) {
++		mctp_prerr("TX error");
++		return -1;
++	}
++
++	return 0;
++}
++
++static size_t mctp_nupcie_rx_get_payload_size(struct mctp_pcie_hdr *hdr)
++{
++  //fprintf(stderr, "PCIE_GET_DATA_LEN: 0x%x\r\n", hdr->mbz_attr_length);
++	size_t len = PCIE_GET_DATA_LEN(hdr) * sizeof(uint32_t);
++  //fprintf(stderr, "len: 0x%x\r\n", len);
++	uint8_t pad = PCIE_GET_PAD_LEN(hdr);
++  //fprintf(stderr, "pad: 0x%x\r\n", pad);
++
++	return len - pad;
++}
++
++/*
++ * Simple poll implementation for use
++ */
++int mctp_binding_nupcie_poll(struct mctp_binding_nupcie *nupcie, int timeout)
++{
++	struct pollfd fds[1];
++	int rc;
++
++	fds[0].fd = nupcie->fd;
++	fds[0].events = POLLIN | POLLOUT;
++
++	rc = poll(fds, 1, timeout);
++
++	if (rc > 0) {
++    if ( (fds[0].revents & POLLIN) == POLLIN )
++        mctp_binding_nupcie_rx(nupcie);
++		return fds[0].revents;
++  }
++
++	if (rc < 0) {
++		mctp_prwarn("Poll returned error status (errno=%d)", errno);
++
++		return -1;
++	}
++
++	return 0;
++}
++
++int mctp_binding_nupcie_rx(struct mctp_binding_nupcie *nupcie)
++{
++	uint32_t data[MCTP_NUPCIE_BINDING_DEFAULT_BUFFER];
++	struct pcie_pkt_private pkt_prv;
++	struct mctp_pktbuf *pkt;
++	struct mctp_pcie_hdr *hdr;
++	struct mctp_hdr *mctp_hdr;
++	size_t read_len, payload_len;
++	int rc;
++
++	read_len = read(nupcie->fd, &data, sizeof(data));
++  //fprintf(stderr,"rx data\r\n");
++	if (read_len < 0) {
++		mctp_prerr("Reading RX data failed (errno = %d)", errno);
++		return -1;
++	}
++
++  //fprintf(stderr,"rx data read_len:0x%x\r\n", read_len);
++  //if (read_len != NUPCIE_PACKET_SIZE(MCTP_BTU)) {
++  //	mctp_prerr("Incorrect packet size: %zd", read_len);
++  //	return -1;
++  //}
++
++	/* XXX: Needs to be converted to BE */
++	//mctp_nupcie_swap_pcie_vdm_hdr(data);
++  //{
++  //	char i;
++  //  uint8_t *p = (uint8_t *)data;
++
++  //for (i = 0; i < read_len; i++)
++  //    fprintf(stderr, "i:0x%x data:0x%x\r\n", i, p[i]);
++
++  //}
++
++	hdr = (struct mctp_pcie_hdr *)data;
++	payload_len = mctp_nupcie_rx_get_payload_size(hdr);
++
++	pkt_prv.routing = PCIE_GET_ROUTING(hdr);
++	pkt_prv.remote_id = PCIE_GET_REQ_ID(hdr);
++
++	pkt = mctp_pktbuf_alloc(&nupcie->binding, 0);
++	if (!pkt) {
++		mctp_prerr("pktbuf allocation failed");
++		return -1;
++	}
++
++	rc = mctp_pktbuf_push(pkt, data + PCIE_HDR_SIZE_DW,
++			      payload_len + sizeof(struct mctp_hdr));
++
++	if (rc) {
++		mctp_prerr("Cannot push to pktbuf");
++		mctp_pktbuf_free(pkt);
++		return -1;
++	}
++
++	mctp_hdr = mctp_pktbuf_hdr(pkt);
++#ifdef MCTP_ASTPCIE_RESPONSE_WA
++	pkt_prv.flags_seq_tag = mctp_hdr->flags_seq_tag;
++#endif
++	memcpy(pkt->msg_binding_private, &pkt_prv, sizeof(pkt_prv));
++
++	mctp_bus_rx(&nupcie->binding, pkt);
++
++	return 0;
++}
++
++/*
++ * Initializes PCIe binding structure
++ */
++struct mctp_binding_nupcie *mctp_binding_nupcie_init(void)
++{
++	struct mctp_binding_nupcie *nupcie;
++
++	nupcie = __mctp_alloc(sizeof(*nupcie));
++	if (!nupcie)
++		return NULL;
++
++	memset(nupcie, 0, sizeof(*nupcie));
++
++	nupcie->binding.name = "nupcie";
++	nupcie->binding.version = 1;
++	nupcie->binding.tx = mctp_binding_nupcie_tx;
++	nupcie->binding.start = mctp_binding_nupcie_start;
++	nupcie->binding.pkt_size = MCTP_PACKET_SIZE(MCTP_BTU);
++
++	/* where mctp_hdr starts in in/out comming data
++	 * note: there are two approaches: first (used here) that core
++	 * allocates pktbuf to contain all binding metadata or this is handled
++	 * other way by only by binding.
++	 * This might change as smbus binding implements support for medium
++	 * specific layer */
++	nupcie->binding.pkt_pad = sizeof(struct mctp_pcie_hdr);
++	nupcie->binding.pkt_priv_size = sizeof(struct pcie_pkt_private);
++
++	return nupcie;
++}
++
++/*
++ * Closes file descriptor and releases binding memory
++ */
++void mctp_binding_nupcie_free(struct mctp_binding_nupcie *b)
++{
++	close(b->fd);
++	__mctp_free(b);
++}
++
++/*
++ * Returns generic binder handler from PCIe binding handler
++ */
++struct mctp_binding *
++mctp_binding_nupcie_core(struct mctp_binding_nupcie *nupcie)
++{
++	return &nupcie->binding;
++}
+diff --git a/nupcie.h b/nupcie.h
+new file mode 100644
+index 0000000..1b060d2
+--- /dev/null
++++ b/nupcie.h
+@@ -0,0 +1,108 @@
++/* SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later */
++/* Copyright (c) 2020 Nuvoton Technology Corporation */
++
++/* This is a private header file defining binding structure for PCIe binding */
++
++#ifndef _NUPCIE_H
++#define _NUPCIE_H
++
++#include "libmctp.h"
++
++#define MCTP_NUPCIE_BINDING_DEFAULT_BUFFER 1024
++
++struct mctp_binding_nupcie {
++	struct mctp_binding binding;
++	uint16_t bdf;
++	int fd;
++};
++
++/* returns pointer to structure holding this generic binding */
++#define binding_to_nupcie(b)                                                  \
++	container_of(b, struct mctp_binding_nupcie, binding)
++
++#define NUPCIE_PACKET_SIZE(x) (NUVOTON_MCTP_PCIE_VDM_HDR_SIZE + x)
++
++/* driver device file */
++#define NU_DRV_FILE "/dev/npcm7xx-vdm"
++
++struct mctp_pcie_hdr {
++	uint8_t fmt_type;
++	uint8_t mbz;
++	uint16_t mbz_attr_length;
++	uint16_t requester;
++	uint8_t tag;
++	uint8_t code;
++	uint16_t target;
++	uint16_t vendor;
++} __attribute__((packed));
++
++/*
++ * MCTP PCIe template values
++ * The following non-zero values are defined by DSP0238 DMTF Spec as constants:
++ * .fmt_type:
++ * ----------
++ * [4:0]: Type[4:3] = 10b to indicate a message.
++ * [6:5]: Fmt = 11b to indicate 4 dword header with data.
++ * ----------
++ * .mbz_attr_length:
++ * [5:4]: Attr[1:0] = 01b for all MCTP over PCIe VDM
++ * ----------
++ * .code
++ * ----------
++ * [7:0]: Message Code = 0111_1111b to indicate a Type 1 VDM
++ * ----------
++ * .vendor
++ * ----------
++ * byte2[7:0]: Vendor ID MSB = 0x1a - DMTF VDMs
++ * byte3[7:0]: Vendor ID LSB = 0xb4 - DMTF VDMs
++ *
++ * See more details in Table 1 of DSP0238 DMTF Spec.
++ */
++#define MSG_4DW_HDR 0x70
++#define MCTP_PCIE_VDM_ATTR 0x0010
++#define MSG_CODE_VDM_TYPE_1 0x7f
++#define VENDOR_ID_DMTF_VDM 0xb41a
++
++#define PCIE_HDR_ROUTING_SHIFT 0
++#define PCIE_HDR_ROUTING_MASK 0x7
++
++#define PCIE_GET_ROUTING(x)                                                    \
++	((x->fmt_type >> PCIE_HDR_ROUTING_SHIFT) & PCIE_HDR_ROUTING_MASK)
++#define PCIE_SET_ROUTING(x, val)                                               \
++	(x->fmt_type |=                                                        \
++	 ((val & PCIE_HDR_ROUTING_MASK) << PCIE_HDR_ROUTING_SHIFT))
++
++#define PCIE_HDR_DATA_LEN_SHIFT 0
++#define PCIE_HDR_DATA_LEN_MASK 0xff03
++
++#define PCIE_GET_DATA_LEN(x)                                                   \
++	be16toh(((x->mbz_attr_length >> PCIE_HDR_DATA_LEN_SHIFT) &             \
++		 PCIE_HDR_DATA_LEN_MASK))
++
++#define PCIE_SET_DATA_LEN(x, val)                                              \
++	(x->mbz_attr_length |=                                                 \
++	 ((htobe16(val) & PCIE_HDR_DATA_LEN_MASK) << PCIE_HDR_DATA_LEN_SHIFT))
++
++#define PCIE_GET_REQ_ID(x) (be16toh(x->requester))
++#define PCIE_SET_REQ_ID(x, val) (x->requester |= (htobe16(val)))
++
++#define PCIE_HDR_PAD_LEN_SHIFT 4
++#define PCIE_HDR_PAD_LEN_MASK 0x3
++#define PCIE_GET_PAD_LEN(x)                                                    \
++	((x->tag >> PCIE_HDR_PAD_LEN_SHIFT) & PCIE_HDR_PAD_LEN_MASK)
++#define PCIE_SET_PAD_LEN(x, val)                                               \
++	(x->tag |= ((val & PCIE_HDR_PAD_LEN_MASK) << PCIE_HDR_PAD_LEN_SHIFT))
++
++#define PCIE_GET_TARGET_ID(x) (be16toh(x->target))
++#define PCIE_SET_TARGET_ID(x, val) (x->target |= (htobe16(val)))
++
++#define ALIGN_MASK(x, mask) (((x) + (mask)) & ~(mask))
++#define ALIGN(x, a) ALIGN_MASK(x, (a)-1)
++/* All PCIe packets are dword aligned */
++#define PCIE_PKT_ALIGN(x) ALIGN(x, sizeof(uint32_t))
++
++#define PCIE_HDR_SIZE_DW (sizeof(struct mctp_pcie_hdr) / sizeof(uint32_t))
++#define MCTP_HDR_SIZE_DW (sizeof(struct mctp_hdr) / sizeof(uint32_t))
++#define PCIE_VDM_HDR_SIZE_DW (PCIE_HDR_SIZE_DW + MCTP_HDR_SIZE_DW)
++
++#endif
+-- 
+2.17.1
+

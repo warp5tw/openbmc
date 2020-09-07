@@ -1,0 +1,92 @@
+From b9ab6f272458f7ad8ae0d509cba376980ccb196a Mon Sep 17 00:00:00 2001
+From: kfting <kfting@nuvoton.com>
+Date: Wed, 23 Sep 2020 16:43:52 +0800
+Subject: [PATCH] Add MCTP support for Olympus
+
+Signed-off-by: kfting <kfting@nuvoton.com>
+---
+ include/PCIeBinding.hpp |  7 +++++--
+ src/PCIeBinding.cpp     | 14 +++++++++++---
+ 2 files changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/include/PCIeBinding.hpp b/include/PCIeBinding.hpp
+index 3795e59..4492d61 100644
+--- a/include/PCIeBinding.hpp
++++ b/include/PCIeBinding.hpp
+@@ -2,7 +2,8 @@
+ 
+ #include "MCTPBinding.hpp"
+ 
+-#include <libmctp-astpcie.h>
++//#include <libmctp-astpcie.h>
++#include <libmctp-nupcie.h>
+ 
+ #include <xyz/openbmc_project/MCTP/Binding/PCIe/server.hpp>
+ 
+@@ -18,9 +19,11 @@ class PCIeBinding : public MctpBinding
+                 boost::asio::io_context& ioc);
+     virtual ~PCIeBinding();
+     virtual void initializeBinding(ConfigurationVariant& conf) override;
++    void recur();
+ 
+   private:
+     uint16_t bdf;
+     pcie_binding::DiscoveryFlags discoveredFlag{};
+-    struct mctp_binding_astpcie* pcie = nullptr;
++    //struct mctp_binding_astpcie* pcie = nullptr;
++    struct mctp_binding_nupcie* pcie = nullptr;
+ };
+diff --git a/src/PCIeBinding.cpp b/src/PCIeBinding.cpp
+index 5006a65..ee962e7 100644
+--- a/src/PCIeBinding.cpp
++++ b/src/PCIeBinding.cpp
+@@ -1,6 +1,7 @@
+ #include "PCIeBinding.hpp"
+ 
+ #include <phosphor-logging/log.hpp>
++#include <boost/bind.hpp>
+ 
+ PCIeBinding::PCIeBinding(
+     std::shared_ptr<sdbusplus::asio::object_server>& objServer,
+@@ -43,7 +44,7 @@ PCIeBinding::PCIeBinding(
+ void PCIeBinding::initializeBinding(ConfigurationVariant& /*conf*/)
+ {
+     initializeMctp();
+-    pcie = mctp_binding_astpcie_init();
++    pcie = mctp_binding_nupcie_init();
+     if (pcie == nullptr)
+     {
+         phosphor::logging::log<phosphor::logging::level::ERR>(
+@@ -51,7 +52,7 @@ void PCIeBinding::initializeBinding(ConfigurationVariant& /*conf*/)
+         throw std::system_error(
+             std::make_error_code(std::errc::not_enough_memory));
+     }
+-    struct mctp_binding* binding = mctp_binding_astpcie_core(pcie);
++    struct mctp_binding* binding = mctp_binding_nupcie_core(pcie);
+     if (binding == nullptr)
+     {
+         phosphor::logging::log<phosphor::logging::level::ERR>(
+@@ -62,12 +63,19 @@ void PCIeBinding::initializeBinding(ConfigurationVariant& /*conf*/)
+     mctp_register_bus(mctp, binding, ownEid);
+     mctp_set_rx_all(mctp, rxMessage, nullptr);
+     mctp_binding_set_tx_enabled(binding, true);
++    recur();
++}
++
++void PCIeBinding::recur()
++{
++    mctp_binding_nupcie_poll(pcie, 1);
++    boost::asio::post(io, boost::bind(&PCIeBinding::recur,this));
+ }
+ 
+ PCIeBinding::~PCIeBinding()
+ {
+     if (pcie)
+     {
+-        mctp_binding_astpcie_free(pcie);
++        mctp_binding_nupcie_free(pcie);
+     }
+ }
+-- 
+2.17.1
+

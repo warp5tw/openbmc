@@ -69,6 +69,6 @@ RDEPENDS_${PN}-system = " \
         loadmcu \
         usb-network \
         pldm \
-        mctp \
-        dbus-sensors \
+        mctpd \
+        phosphor-vdm-test \
         "
