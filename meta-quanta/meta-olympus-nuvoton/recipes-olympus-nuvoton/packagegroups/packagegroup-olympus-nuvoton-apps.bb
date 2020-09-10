@@ -67,4 +67,5 @@ RDEPENDS_${PN}-system = " \
         mac-address \
         smbios-mdrv2 \
         loadmcu \
+        usb-network \
         "
