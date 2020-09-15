@@ -20,12 +20,16 @@ RDEPENDS_${PN}-buv-common-utils = " \
     rsyslog \
     phosphor-host-postd \
     obmc-ikvm \
+    iperf3 \
+    iperf2 \
+    dhcpcd \
+    phosphor-ipmi-fru \
+    usb-network \
+    nmon \
+    memtester \
     "
 
 SUMMARY_${PN}-buv-system = "BUV NUVOTON System"
 RDEPENDS_${PN}-buv-system = " \
-    dhcpcd \
     intel-ipmi-oem \
-    phosphor-ipmi-fru \
-    iperf3 \
     "
