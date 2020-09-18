@@ -394,7 +394,7 @@ This is a secure flash update mechanism to update BMC firmware via WebUI.
     ```
     root@buv-runbmc:~# ipmitool sdr elist
     BMC_Temp         | 01h | ok  |  7.1 | 35 degrees C
-    Outlet_Temp      | 02h | ok  |  7.2 | 22 degrees C
+    BUV_Temp      | 02h | ok  |  7.2 | 22 degrees C
     ADC1             | 03h | ok  |  7.3 | 1.92 Volts
     ADC2             | 04h | ok  |  7.4 | 1.68 Volts
     ADC3             | 05h | ok  |  7.5 | 1.12 Volts

@@ -341,7 +341,7 @@
             "Bus": 12,
             "EntityId": 7,
             "EntityInstance": 3,
-            "Name": "Outlet_Temp",
+            "Name": "BUV_Temp",
             "Thresholds": [
                 {
                     "Direction": "greater than",
@@ -681,11 +681,11 @@
         {
             "Class": "temp",
             "Inputs": [
-                "Outlet_Temp"
+                "BUV_Temp"
             ],
             "EntityId": 30,
             "EntityInstance": 9,
-            "Name": "MB_OUTLET_TEMP_STP",
+            "Name": "MB_BUV_Temp_STP",
             "NegativeHysteresis": 0,
             "Output": [
                 10.0,

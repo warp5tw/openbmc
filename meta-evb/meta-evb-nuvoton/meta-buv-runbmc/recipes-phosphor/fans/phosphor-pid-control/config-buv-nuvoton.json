@@ -42,9 +42,9 @@
             "timeout": 0
         },
         {
-            "name": "Outlet_Temp",
+            "name": "BUV_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/Outlet_Temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/BUV_Temp",
             "writePath": "",
             "min": 0,
             "max": 0,
@@ -151,9 +151,9 @@
                     }
                 },
                  {
-                    "name": "Outlet_Temp",
+                    "name": "BUV_Temp",
                     "type": "stepwise",
-                    "inputs": ["Outlet_Temp"],
+                    "inputs": ["BUV_Temp"],
                     "setpoint": 30.0,
                     "pid": {
                         "samplePeriod": 1.0,

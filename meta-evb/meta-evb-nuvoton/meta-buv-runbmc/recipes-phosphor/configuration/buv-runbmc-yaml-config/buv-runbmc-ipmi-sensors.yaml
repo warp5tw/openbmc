@@ -30,7 +30,7 @@
 2:
   <<: *temperature
   entityInstance: 2
-  path: /xyz/openbmc_project/sensors/temperature/Outlet_Temp
+  path: /xyz/openbmc_project/sensors/temperature/BUV_Temp
 
 3: &voltage
   entityID: 0x07
@@ -38,8 +38,8 @@
   sensorType: 0x02
   path: /xyz/openbmc_project/sensors/voltage/ADC1
   sensorReadingType: 0x01
-  multiplierM: 156
-  offsetB: 220
+  multiplierM: 157
+  offsetB: 0
   bExp: 0
   rExp: -4
   mutability: Mutability::Write|Mutability::Read
@@ -109,7 +109,7 @@
   sensorType: 0x04
   path: /xyz/openbmc_project/sensors/fan_tach/Fan1
   sensorReadingType: 0x01
-  multiplierM: 81
+  multiplierM: 80
   offsetB: 0
   bExp: 0
   rExp: 0
@@ -139,36 +139,60 @@
   entityInstance: 4
   path: /xyz/openbmc_project/sensors/fan_tach/Fan4
 
-17: &fan_pwm
-  entityID: 0x1D
-  sensorType: 0x04
-  entityInstance: 5
-  path: /xyz/openbmc_project/sensors/fan_tach/Fan1
+17: &power
+  entityID: 0x07
+  entityInstance: 13
+  sensorType: 0x0B
+  path: /xyz/openbmc_project/sensors/power/MB_P12V_INA219_Output_Power
   sensorReadingType: 0x01
-  multiplierM: 1
+  multiplierM: 94
   offsetB: 0
   bExp: 0
-  mutability: Mutability::Write
+  rExp: -3
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Watts
+  mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
+  sensorNamePattern: nameLeaf
   interfaces:
-    xyz.openbmc_project.Control.FanPwm:
-      Target:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
         Offsets:
           0xFF:
-            type: uint64_t
-
+            type: double
 18:
-  <<: *fan_pwm
-  entityInstance: 6
-  path: /xyz/openbmc_project/sensors/fan_tach/Fan2
+  <<: *power
+  entityInstance: 14
+  path: /xyz/openbmc_project/sensors/power/MB_P3V3_INA219_Output_Power
+  multiplierM: 16
+  offsetB: 0
+  rExp: -3
 
-19:
-  <<: *fan_pwm
-  entityInstance: 7
-  path: /xyz/openbmc_project/sensors/fan_tach/Fan3
-
+19: &current
+  entityID: 0x07
+  entityInstance: 15
+  sensorType: 0x03
+  path: /xyz/openbmc_project/sensors/current/MB_P12V_INA219_Output_Current
+  sensorReadingType: 0x01
+  multiplierM: 12
+  offsetB: 0
+  rExp: -3
+  bExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Amperes
+  mutability: Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
 20:
-  <<: *fan_pwm
-  entityInstance: 8
-  path: /xyz/openbmc_project/sensors/fan_tach/Fan4
+  <<: *current
+  entityInstance: 16
+  path: /xyz/openbmc_project/sensors/current/MB_P3V3_INA219_Output_Current
+  multiplierM: 4
+  offsetB: 0
+  rExp: -3

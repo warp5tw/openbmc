@@ -1,0 +1,213 @@
+From 8b6d7884931845dfc3429fd08b838b4659c3d7ef Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Tue, 15 Sep 2020 10:05:50 +0800
+Subject: [PATCH 3/4] buv dts fix
+
+---
+ .../boot/dts/nuvoton-npcm750-buv-runbmc.dts   | 183 +++++++++---------
+ 1 file changed, 92 insertions(+), 91 deletions(-)
+
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts b/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts
+index dbf31562e3e7..ce749575ae39 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts
++++ b/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts
+@@ -148,97 +148,6 @@ sha:sha@f085a000 {
+ 			status = "okay";
+ 		};
+ 
+-		fiu0: fiu@fb000000 {
+-			pinctrl-names = "default";
+-			pinctrl-0 = <&spi0cs1_pins>;
+-			status = "okay";
+-			spi-nor@0 {
+-				compatible = "jedec,spi-nor";
+-				#address-cells = <1>;
+-				#size-cells = <1>;
+-				reg = <0>;
+-				spi-max-frequency = <5000000>;
+-				spi-rx-bus-width = <2>;
+-				partitions@80000000 {
+-					compatible = "fixed-partitions";
+-					#address-cells = <1>;
+-					#size-cells = <1>;
+-					bmc@0{
+-						label = "bmc";
+-						reg = <0x000000 0x2000000>;
+-					};
+-					u-boot@0 {
+-						label = "u-boot";
+-						reg = <0x0000000 0xC0000>;
+-						read-only;
+-					};
+-					u-boot-env@100000{
+-						label = "u-boot-env";
+-						reg = <0x00100000 0x40000>;
+-					};
+-					kernel@200000 {
+-						label = "kernel";
+-						reg = <0x0200000 0x600000>;
+-					};
+-					rofs@800000 {
+-						label = "rofs";
+-						reg = <0x800000 0x3500000>;
+-					};
+-					rwfs@1d00000 {
+-						label = "rwfs";
+-						reg = <0x3d00000 0x300000>;
+-					};
+-				};
+-			};
+-			spi-nor@1 {
+-				compatible = "jedec,spi-nor";
+-				#address-cells = <1>;
+-				#size-cells = <1>;
+-				reg = <1>;
+-				spi-max-frequency = <5000000>;
+-				spi-rx-bus-width = <2>;
+-				partitions@88000000 {
+-					compatible = "fixed-partitions";
+-					#address-cells = <1>;
+-					#size-cells = <1>;
+-					spare1@0 {
+-						label = "spi0-cs1-spare1";
+-						reg = <0x0 0x800000>;
+-					};
+-					spare2@800000 {
+-						label = "spi0-cs1-spare2";
+-						reg = <0x800000 0x0>;
+-					};
+-				};
+-			};
+-		};
+-
+-		fiu3: fiu@c0000000 {
+-			pinctrl-0 = <&spi3_pins>;
+-			status = "okay";
+-			spi-nor@0 {
+-				compatible = "jedec,spi-nor";
+-				#address-cells = <1>;
+-				#size-cells = <1>;
+-				reg = <0>;
+-				spi-max-frequency = <5000000>;
+-				spi-rx-bus-width = <2>;
+-				partitions@A0000000 {
+-					compatible = "fixed-partitions";
+-					#address-cells = <1>;
+-					#size-cells = <1>;
+-					system1@0 {
+-						label = "bios";
+-						reg = <0x0 0x0>;
+-					};
+-					system2@800000 {
+-						label = "spi3-system2";
+-						reg = <0x800000 0x0>;
+-					};
+-				};
+-			};
+-		};
+-
+ 		sdhci0: sdhci@f0842000 {
+ 			status = "okay";
+ 		};
+@@ -551,6 +460,98 @@ identify {
+ 
+ };
+ 
++
++&fiu0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&spi0cs1_pins>;
++	status = "okay";
++	spi-nor@0 {
++		compatible = "jedec,spi-nor";
++		#address-cells = <1>;
++		#size-cells = <1>;
++		reg = <0>;
++		spi-max-frequency = <5000000>;
++		spi-rx-bus-width = <2>;
++		partitions@80000000 {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++			bmc@0{
++				label = "bmc";
++				reg = <0x000000 0x2000000>;
++			};
++			u-boot@0 {
++				label = "u-boot";
++				reg = <0x0000000 0xC0000>;
++				read-only;
++			};
++			u-boot-env@100000{
++				label = "u-boot-env";
++				reg = <0x00100000 0x40000>;
++			};
++			kernel@200000 {
++				label = "kernel";
++				reg = <0x0200000 0x600000>;
++			};
++			rofs@800000 {
++				label = "rofs";
++				reg = <0x800000 0x3500000>;
++			};
++			rwfs@1d00000 {
++				label = "rwfs";
++				reg = <0x3d00000 0x300000>;
++			};
++		};
++	};
++	spi-nor@1 {
++		compatible = "jedec,spi-nor";
++		#address-cells = <1>;
++		#size-cells = <1>;
++		reg = <1>;
++		spi-max-frequency = <5000000>;
++		spi-rx-bus-width = <2>;
++		partitions@88000000 {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++			spare1@0 {
++				label = "spi0-cs1-spare1";
++				reg = <0x0 0x800000>;
++			};
++			spare2@800000 {
++				label = "spi0-cs1-spare2";
++				reg = <0x800000 0x0>;
++			};
++		};
++	};
++};
++
++&fiu3 {
++	pinctrl-0 = <&spi3_pins>;
++	status = "okay";
++	spi-nor@0 {
++		compatible = "jedec,spi-nor";
++		#address-cells = <1>;
++		#size-cells = <1>;
++		reg = <0>;
++		spi-max-frequency = <5000000>;
++		spi-rx-bus-width = <2>;
++		partitions@A0000000 {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++			system1@0 {
++				label = "bios";
++				reg = <0x0 0x0>;
++			};
++			system2@800000 {
++				label = "spi3-system2";
++				reg = <0x800000 0x0>;
++			};
++		};
++	};
++};
++
+ &gcr {
+ 	serial_port_mux: mux-controller {
+ 	compatible = "mmio-mux";
+-- 
+2.25.1
+
