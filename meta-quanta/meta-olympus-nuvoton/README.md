@@ -595,11 +595,10 @@ Management operations:
       bmc_card         | 01h | ok  |  7.1 | 36 degrees C
       inlet            | 02h | ok  |  7.2 | 27 degrees C
       outlet           | 03h | ok  |  7.3 | 27 degrees C
-      MB0_Temp         | 04h | ok  |  7.4 | 23 degrees C
-      MB0_Vin          | 05h | ok  |  7.5 | 12.32 Volts
-      MB0_Vout         | 06h | ok  |  7.6 | 12.32 Volts
-      MB0_Pin          | 07h | ok  |  7.7 | 4 Watts
-      MB0_Iout         | 08h | ok  |  7.8 | 0.09 Amps
+      hotswap_vin          | 05h | ok  |  7.5 | 12.32 Volts
+      hotswap_vout         | 06h | ok  |  7.6 | 12.32 Volts
+      hotswap_pout          | 07h | ok  |  7.7 | 4 Watts
+      hotswap_iout         | 08h | ok  |  7.8 | 0.09 Amps
       p0_dimm_vr0_temp | 09h | ok  | 32.1 | 0 degrees C
       p0_dimm_vr1_temp | 0Ah | ok  | 32.2 | 0 degrees C
       p1_dimm_vr0_temp | 0Bh | ok  | 32.3 | 0 degrees C

@@ -153,17 +153,23 @@
                     "/xyz/openbmc_project/sensors/power/cpu_power",
                     "/xyz/openbmc_project/sensors/power/memory_power",
                     "/xyz/openbmc_project/sensors/current/p0_dimm_vr0_current",
-                    "/xyz/openbmc_project/sensors/current/p0_dimm_vr0_lin",
+                    "/xyz/openbmc_project/sensors/current/p0_dimm_vr0_iin",
                     "/xyz/openbmc_project/sensors/current/p0_dimm_vr1_current",
-                    "/xyz/openbmc_project/sensors/current/p0_dimm_vr1_lin",
+                    "/xyz/openbmc_project/sensors/current/p0_dimm_vr1_iin",
                     "/xyz/openbmc_project/sensors/current/p0_vccin_vr_current",
                     "/xyz/openbmc_project/sensors/current/p0_vccio_vr_current",
                     "/xyz/openbmc_project/sensors/current/p1_dimm_vr0_current",
-                    "/xyz/openbmc_project/sensors/current/p1_dimm_vr0_lin",
+                    "/xyz/openbmc_project/sensors/current/p1_dimm_vr0_iin",
                     "/xyz/openbmc_project/sensors/current/p1_dimm_vr1_current",
-                    "/xyz/openbmc_project/sensors/current/p1_dimm_vr1_lin",
+                    "/xyz/openbmc_project/sensors/current/p1_dimm_vr1_iin",
                     "/xyz/openbmc_project/sensors/current/p1_vccin_vr_current",
-                    "/xyz/openbmc_project/sensors/current/p1_vccio_vr_current"
+                    "/xyz/openbmc_project/sensors/current/p1_vccio_vr_current",
+                    "/xyz/openbmc_project/sensors/current/hotswap_iout",
+                    "/xyz/openbmc_project/sensors/power/hotswap_pout",
+                    "/xyz/openbmc_project/sensors/temperature/hotswap_temp",
+                    "/xyz/openbmc_project/sensors/voltage/hotswap_vin",
+                    "/xyz/openbmc_project/sensors/voltage/hotswap_vout"
+
                 ]
             }
         ]
@@ -680,15 +686,15 @@
                     "/xyz/openbmc_project/sensors/power/p1_vccio_vr_pin",
                     "/xyz/openbmc_project/sensors/power/p1_vccio_vr_pout",
                     "/xyz/openbmc_project/sensors/current/p0_dimm_vr0_current",
-                    "/xyz/openbmc_project/sensors/current/p0_dimm_vr0_lin",
+                    "/xyz/openbmc_project/sensors/current/p0_dimm_vr0_iin",
                     "/xyz/openbmc_project/sensors/current/p0_dimm_vr1_current",
-                    "/xyz/openbmc_project/sensors/current/p0_dimm_vr1_lin",
+                    "/xyz/openbmc_project/sensors/current/p0_dimm_vr1_iin",
                     "/xyz/openbmc_project/sensors/current/p0_vccin_vr_current",
                     "/xyz/openbmc_project/sensors/current/p0_vccio_vr_current",
                     "/xyz/openbmc_project/sensors/current/p1_dimm_vr0_current",
-                    "/xyz/openbmc_project/sensors/current/p1_dimm_vr0_lin",
+                    "/xyz/openbmc_project/sensors/current/p1_dimm_vr0_iin",
                     "/xyz/openbmc_project/sensors/current/p1_dimm_vr1_current",
-                    "/xyz/openbmc_project/sensors/current/p1_dimm_vr1_lin",
+                    "/xyz/openbmc_project/sensors/current/p1_dimm_vr1_iin",
                     "/xyz/openbmc_project/sensors/current/p1_vccin_vr_current",
                     "/xyz/openbmc_project/sensors/current/p1_vccio_vr_current",
                     "/xyz/openbmc_project/sensors/fan_tach/fan1",
@@ -753,7 +759,12 @@
                     "/xyz/openbmc_project/sensors/temperature/dimm22_temp",
                     "/xyz/openbmc_project/sensors/temperature/dimm23_temp",
                     "/xyz/openbmc_project/sensors/temperature/cpu0_die_temp",
-                    "/xyz/openbmc_project/sensors/temperature/cpu1_die_temp"
+                    "/xyz/openbmc_project/sensors/temperature/cpu1_die_temp",
+                    "/xyz/openbmc_project/sensors/current/hotswap_iout",
+                    "/xyz/openbmc_project/sensors/power/hotswap_pout",
+                    "/xyz/openbmc_project/sensors/temperature/hotswap_temp",
+                    "/xyz/openbmc_project/sensors/voltage/hotswap_vin",
+                    "/xyz/openbmc_project/sensors/voltage/hotswap_vout"
                 ]
             }
         ]

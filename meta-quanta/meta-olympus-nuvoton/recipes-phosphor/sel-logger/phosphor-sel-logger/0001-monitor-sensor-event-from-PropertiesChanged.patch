@@ -1,0 +1,278 @@
+From 0f89d5199e6c525f8d70991e1c56362838df5688 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Thu, 20 Aug 2020 18:06:10 +0800
+Subject: [PATCH] monitor sensor event from PropertiesChanged
+
+---
+ include/threshold_event_monitor.hpp | 124 ++++++++++++++++------------
+ src/sel_logger.cpp                  |   2 +-
+ 2 files changed, 73 insertions(+), 53 deletions(-)
+
+diff --git a/include/threshold_event_monitor.hpp b/include/threshold_event_monitor.hpp
+index f1df9bd..8215c0c 100644
+--- a/include/threshold_event_monitor.hpp
++++ b/include/threshold_event_monitor.hpp
+@@ -17,7 +17,6 @@
+ #pragma once
+ #include <sel_logger.hpp>
+ #include <sensorutils.hpp>
+-
+ #include <string_view>
+ #include <variant>
+ 
+@@ -34,35 +33,31 @@ static constexpr const uint8_t thresholdEventDataTriggerReadingByte3 = (1 << 4);
+ 
+ static const std::string openBMCMessageRegistryVersion("0.1");
+ 
+-inline static sdbusplus::bus::match::match startThresholdAssertMonitor(
++inline static sdbusplus::bus::match::match startThresholdEventMonitor(
+     std::shared_ptr<sdbusplus::asio::connection> conn)
+ {
+-    auto thresholdAssertMatcherCallback = [conn](sdbusplus::message::message&
+-                                                     msg) {
++    auto thresholdEventMatcherCallback = [conn](
++                                             sdbusplus::message::message &msg) {
+         // This static set of std::pair<path, event> tracks asserted events to
+         // avoid duplicate logs or deasserts logged without an assert
+         static boost::container::flat_set<std::pair<std::string, std::string>>
+             assertedEvents;
+-        std::vector<uint8_t> eventData(selEvtDataMaxSize,
+-                                       selEvtDataUnspecified);
++        // SEL event data is three bytes where 0xFF means unspecified
++        std::vector<uint8_t> eventData(selEvtDataMaxSize, 0xFF);
+ 
+         // Get the event type and assertion details from the message
+-        std::string sensorName;
+         std::string thresholdInterface;
+-        std::string event;
+-        bool assert;
+-        double assertValue;
+-        try
++        boost::container::flat_map<std::string, std::variant<bool>>
++            propertiesChanged;
++        msg.read(thresholdInterface, propertiesChanged);
++        std::string event = propertiesChanged.begin()->first;
++        bool *pval = std::get_if<bool>(&propertiesChanged.begin()->second);
++        if (!pval)
+         {
+-            msg.read(sensorName, thresholdInterface, event, assert,
+-                     assertValue);
+-        }
+-        catch (sdbusplus::exception_t&)
+-        {
+-            std::cerr << "error getting assert signal data from "
+-                      << msg.get_path() << "\n";
++            std::cerr << "threshold event direction has invalid type\n";
+             return;
+         }
++        bool assert = *pval;
+ 
+         // Check the asserted events to determine if we should log this event
+         std::pair<std::string, std::string> pathAndEvent(
+@@ -126,7 +121,7 @@ inline static sdbusplus::bus::match::match startThresholdAssertMonitor(
+                 conn->call(getSensorValue);
+             getSensorValueResp.read(sensorValue);
+         }
+-        catch (sdbusplus::exception_t&)
++        catch (sdbusplus::exception_t &)
+         {
+             std::cerr << "error getting sensor value from " << msg.get_path()
+                       << "\n";
+@@ -144,15 +139,30 @@ inline static sdbusplus::bus::match::match startThresholdAssertMonitor(
+         {
+             min = std::visit(ipmi::VariantToDoubleVisitor(), findMin->second);
+         }
++        double sensorVal = 0;
++        auto findVal = sensorValue.find("Value");
++        if (findVal != sensorValue.end())
++        {
++            sensorVal =
++                std::visit(ipmi::VariantToDoubleVisitor(), findVal->second);
++        }
++        double scale = 0;
++        auto findScale = sensorValue.find("Scale");
++        if (findScale != sensorValue.end())
++        {
++            scale =
++                std::visit(ipmi::VariantToDoubleVisitor(), findScale->second);
+ 
++            sensorVal *= std::pow(10, scale);
++        }
+         try
+         {
+-            eventData[1] = ipmi::getScaledIPMIValue(assertValue, max, min);
++            eventData[1] = ipmi::getScaledIPMIValue(sensorVal, max, min);
+         }
+-        catch (const std::exception& e)
++        catch (const std::exception &e)
+         {
+             std::cerr << e.what();
+-            eventData[1] = selEvtDataUnspecified;
++            eventData[1] = 0xFF;
+         }
+ 
+         // Get the threshold value to put in the event data
+@@ -175,7 +185,7 @@ inline static sdbusplus::bus::match::match startThresholdAssertMonitor(
+                 conn->call(getThreshold);
+             getThresholdResp.read(thresholdValue);
+         }
+-        catch (sdbusplus::exception_t&)
++        catch (sdbusplus::exception_t &)
+         {
+             std::cerr << "error getting sensor threshold from "
+                       << msg.get_path() << "\n";
+@@ -183,41 +193,42 @@ inline static sdbusplus::bus::match::match startThresholdAssertMonitor(
+         }
+         double thresholdVal =
+             std::visit(ipmi::VariantToDoubleVisitor(), thresholdValue);
+-
+-        double scale = 0;
+-        auto findScale = sensorValue.find("Scale");
+         if (findScale != sensorValue.end())
+         {
+-            scale =
+-                std::visit(ipmi::VariantToDoubleVisitor(), findScale->second);
+             thresholdVal *= std::pow(10, scale);
+         }
+         try
+         {
+             eventData[2] = ipmi::getScaledIPMIValue(thresholdVal, max, min);
+         }
+-        catch (const std::exception& e)
++        catch (const std::exception &e)
+         {
+             std::cerr << e.what();
+-            eventData[2] = selEvtDataUnspecified;
++            eventData[2] = 0xFF;
+         }
+ 
++        // Construct a human-readable message of this event for the log
++        std::string_view sensorName(msg.get_path());
++        sensorName.remove_prefix(
++            std::min(sensorName.find_last_of("/") + 1, sensorName.size()));
++
+         std::string threshold;
+         std::string direction;
+-        std::string redfishMessageID =
+-            "OpenBMC." + openBMCMessageRegistryVersion;
++        std::string redfishMessageID;
+         if (event == "CriticalLow")
+         {
+             threshold = "critical low";
+             if (assert)
+             {
+                 direction = "low";
+-                redfishMessageID += ".SensorThresholdCriticalLowGoingLow";
++                redfishMessageID = "OpenBMC." + openBMCMessageRegistryVersion +
++                                   ".SensorThresholdCriticalLowGoingLow";
+             }
+             else
+             {
+                 direction = "high";
+-                redfishMessageID += ".SensorThresholdCriticalLowGoingHigh";
++                redfishMessageID = "OpenBMC." + openBMCMessageRegistryVersion +
++                                   ".SensorThresholdCriticalLowGoingHigh";
+             }
+         }
+         else if (event == "WarningLow")
+@@ -226,12 +237,14 @@ inline static sdbusplus::bus::match::match startThresholdAssertMonitor(
+             if (assert)
+             {
+                 direction = "low";
+-                redfishMessageID += ".SensorThresholdWarningLowGoingLow";
++                redfishMessageID = "OpenBMC." + openBMCMessageRegistryVersion +
++                                   ".SensorThresholdWarningLowGoingLow";
+             }
+             else
+             {
+                 direction = "high";
+-                redfishMessageID += ".SensorThresholdWarningLowGoingHigh";
++                redfishMessageID = "OpenBMC." + openBMCMessageRegistryVersion +
++                                   ".SensorThresholdWarningLowGoingHigh";
+             }
+         }
+         else if (event == "WarningHigh")
+@@ -240,12 +253,14 @@ inline static sdbusplus::bus::match::match startThresholdAssertMonitor(
+             if (assert)
+             {
+                 direction = "high";
+-                redfishMessageID += ".SensorThresholdWarningHighGoingHigh";
++                redfishMessageID = "OpenBMC." + openBMCMessageRegistryVersion +
++                                   ".SensorThresholdWarningHighGoingHigh";
+             }
+             else
+             {
+                 direction = "low";
+-                redfishMessageID += ".SensorThresholdWarningHighGoingLow";
++                redfishMessageID = "OpenBMC." + openBMCMessageRegistryVersion +
++                                   ".SensorThresholdWarningHighGoingLow";
+             }
+         }
+         else if (event == "CriticalHigh")
+@@ -254,30 +269,35 @@ inline static sdbusplus::bus::match::match startThresholdAssertMonitor(
+             if (assert)
+             {
+                 direction = "high";
+-                redfishMessageID += ".SensorThresholdCriticalHighGoingHigh";
++                redfishMessageID = "OpenBMC." + openBMCMessageRegistryVersion +
++                                   ".SensorThresholdCriticalHighGoingHigh";
+             }
+             else
+             {
+                 direction = "low";
+-                redfishMessageID += ".SensorThresholdCriticalHighGoingLow";
++                redfishMessageID = "OpenBMC." + openBMCMessageRegistryVersion +
++                                   ".SensorThresholdCriticalHighGoingLow";
+             }
+         }
+ 
+         std::string journalMsg(std::string(sensorName) + " sensor crossed a " +
+                                threshold + " threshold going " + direction +
+-                               ". Reading=" + std::to_string(assertValue) +
++                               ". Reading=" + std::to_string(sensorVal) +
+                                " Threshold=" + std::to_string(thresholdVal) +
+                                ".");
+ 
+-        selAddSystemRecord(
+-            journalMsg, std::string(msg.get_path()), eventData, assert,
+-            selBMCGenID, "REDFISH_MESSAGE_ID=%s", redfishMessageID.c_str(),
+-            "REDFISH_MESSAGE_ARGS=%.*s,%f,%f", sensorName.length(),
+-            sensorName.data(), assertValue, thresholdVal);
++        selAddSystemRecord(journalMsg, std::string(msg.get_path()), eventData,
++                           assert, selBMCGenID, "REDFISH_MESSAGE_ID=%.*s",
++                           redfishMessageID.length(), redfishMessageID.data(),
++                           "REDFISH_MESSAGE_ARG_1=%.*s", sensorName.length(),
++                           sensorName.data(), "REDFISH_MESSAGE_ARG_2=%f",
++                           sensorVal, "REDFISH_MESSAGE_ARG_3=%f", thresholdVal);
+     };
+-    sdbusplus::bus::match::match thresholdAssertMatcher(
+-        static_cast<sdbusplus::bus::bus&>(*conn),
+-        "type='signal', member='ThresholdAsserted'",
+-        std::move(thresholdAssertMatcherCallback));
+-    return thresholdAssertMatcher;
+-}
++    sdbusplus::bus::match::match thresholdEventMatcher(
++        static_cast<sdbusplus::bus::bus &>(*conn),
++        "type='signal',interface='org.freedesktop.DBus.Properties',member='"
++        "PropertiesChanged',arg0namespace='xyz.openbmc_project.Sensor."
++        "Threshold'",
++        std::move(thresholdEventMatcherCallback));
++    return thresholdEventMatcher;
++}
+\ No newline at end of file
+diff --git a/src/sel_logger.cpp b/src/sel_logger.cpp
+index 4ff8694..2beba04 100644
+--- a/src/sel_logger.cpp
++++ b/src/sel_logger.cpp
+@@ -204,7 +204,7 @@ int main(int argc, char* argv[])
+ 
+ #ifdef SEL_LOGGER_MONITOR_THRESHOLD_EVENTS
+     sdbusplus::bus::match::match thresholdAssertMonitor =
+-        startThresholdAssertMonitor(conn);
++        startThresholdEventMonitor(conn);
+ #endif
+ 
+ #ifdef REDFISH_LOG_MONITOR_PULSE_EVENTS
+-- 
+2.25.1
+
