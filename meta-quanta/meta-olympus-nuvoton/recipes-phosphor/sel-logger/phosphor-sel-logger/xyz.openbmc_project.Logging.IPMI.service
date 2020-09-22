@@ -1,6 +1,8 @@
 [Unit]
 Description=IPMI SEL Logging Service
 After=olympus-reload-sensor.service
+Wants=rsyslog.service
+After=rsyslog.service
 
 [Service]
 Restart=always

@@ -2,7 +2,8 @@ FILESEXTRAPATHS_append_olympus-nuvoton := "${THISDIR}/${PN}:"
 
 DEPENDS_append_olympus-nuvoton = " phosphor-dbus-interfaces"
 
-SRC_URI_append_olympus-nuvoton = " file://0001-monitor-sensor-event-from-PropertiesChanged.patch"
+SRCREV := "761bf202ba9db9fe644f8f400a5e768abe1a70cf"
+
 SRC_URI_append_olympus-nuvoton = " file://0001-add-event-log-support.patch"
 SRC_URI_append_olympus-nuvoton = " file://xyz.openbmc_project.Logging.IPMI.service"
 
