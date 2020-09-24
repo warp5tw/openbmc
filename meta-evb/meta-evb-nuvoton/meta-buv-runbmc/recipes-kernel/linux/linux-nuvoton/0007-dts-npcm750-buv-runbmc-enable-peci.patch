@@ -1,0 +1,39 @@
+From 1bda230f8252f8e630d922d121f686cac7644af3 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Thu, 24 Sep 2020 09:24:00 +0800
+Subject: [PATCH] dts: npcm750-buv-runbmc: enable peci
+
+---
+ .../boot/dts/nuvoton-npcm750-buv-runbmc.dts    | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts b/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts
+index 3aa5a46846ec..eaf058cd3bdc 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts
++++ b/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts
+@@ -580,3 +580,21 @@
+ 	};
+ };
+ 
++&peci0 {
++	cmd-timeout-ms = <1000>;
++	pull-down = <0>;
++	host-neg-bit-rate = <15>;
++	status = "okay";
++
++	intel-peci-dimmtemp@30 {
++		compatible = "intel,peci-client";
++		reg = <0x30>;
++		status = "okay";
++	};
++
++	intel-peci-dimmtemp@31 {
++		compatible = "intel,peci-client";
++		reg = <0x31>;
++		status = "okay";
++	};
++};
+\ No newline at end of file
+-- 
+2.25.1
+

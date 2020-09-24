@@ -277,7 +277,7 @@ index 000000000000..dbf31562e3e7
 +					#size-cells = <1>;
 +					bmc@0{
 +						label = "bmc";
-+						reg = <0x000000 0x2000000>;
++						reg = <0x000000 0x4000000>;
 +					};
 +					u-boot@0 {
 +						label = "u-boot";
