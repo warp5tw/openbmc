@@ -490,6 +490,16 @@
   <<: *power
   entityID: 0x0A
   entityInstance: 4
+  path: /xyz/openbmc_project/sensors/power/ps0_input_power
+  multiplierM: 6
+  offsetB: 0
+  bExp: 0
+  rExp: 0
+
+71:
+  <<: *power
+  entityID: 0x0A
+  entityInstance: 5
   path: /xyz/openbmc_project/sensors/power/ps0_output_power
   multiplierM: 6
   offsetB: 0
