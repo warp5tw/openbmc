@@ -1,12 +1,10 @@
 FILESEXTRAPATHS_prepend_olympus-nuvoton := "${THISDIR}/${PN}:"
 
 SRC_URI_append_olympus-nuvoton = " file://0003-Redfish-Add-power-metrics-support.patch"
-#SRC_URI_append_olympus-nuvoton = " file://0004-bmcweb-sensors-get-sensor-list-also-form-path-with-s.patch"
 SRC_URI_append_olympus-nuvoton = " file://0005-bmcweb-chassis-add-indicatorLED-support.patch"
-#SRC_URI_append_olympus-nuvoton = " file://0006-bmcweb-get-cpu-and-dimm-info-from-prettyname.patch"
-
-SRC_URI_append_olympus-nuvoton = " file://0001-redfish-cpudimm-fix-cannot-prsent-totalcores.patch"
 SRC_URI_append_olympus-nuvoton = " file://0010-bmcweb-fix-segmentation-fault-in-update-service.patch"
+SRC_URI_append_olympus-nuvoton = " file://0011-redfish-cpudimm-fix-cannot-prsent-totalcores.patch"
+SRC_URI_append_olympus-nuvoton = " file://0012-redfish-corrects-MemoryDeviceType-value.patch"
 
 # Enable CPU Log and Raw PECI support
 EXTRA_OECMAKE += "-DBMCWEB_ENABLE_REDFISH_CPU_LOG=ON"

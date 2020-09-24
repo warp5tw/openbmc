@@ -1,0 +1,34 @@
+From c13dede1b372fd55c9f8ff7607d1fc2531d084ea Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Thu, 24 Sep 2020 18:15:54 +0800
+Subject: [PATCH] redfish: corrects MemoryDeviceType value
+
+To fix Redfish.Dmtf Tools.Redfish Service Validator error:
+MemoryDeviceType: Invalid Enum value 'xyz.openbmc_project.Inventory.Item.Dimm.DeviceType.DDR4' found, expected ['DDR', 'DDR2', 'DDR3', 'DDR4', 'DDR4_SDRAM', 'DDR4E_SDRAM', 'LPDDR4_SDRAM', 'DDR3_SDRAM', 'LPDDR3_SDRAM', 'DDR2_SDRAM', 'DDR2_SDRAM_FB_DIMM', 'DDR2_SDRAM_FB_DIMM_PROBE', 'DDR_SGRAM', 'DDR_SDRAM', 'ROM', 'SDRAM', 'EDO', 'FastPageMode', 'PipelinedNibble', 'Logical', 'HBM', 'HBM2']
+
+Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
+---
+ redfish-core/lib/cpudimm.hpp | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/redfish-core/lib/cpudimm.hpp b/redfish-core/lib/cpudimm.hpp
+index c52aa7b8..5dc4cea2 100644
+--- a/redfish-core/lib/cpudimm.hpp
++++ b/redfish-core/lib/cpudimm.hpp
+@@ -508,8 +508,11 @@ void getDimmDataByService(std::shared_ptr<AsyncResp> aResp,
+                         std::get_if<std::string>(&property.second);
+                     if (value != nullptr)
+                     {
+-                        aResp->res.jsonValue["MemoryDeviceType"] = *value;
+-                        if (boost::starts_with(*value, "DDR"))
++                        std::string type = *value;
++                        std::string toErase = "xyz.openbmc_project.Inventory.Item.Dimm.DeviceType.";
++                        type.erase(0, toErase.length());
++                        aResp->res.jsonValue["MemoryDeviceType"] = type;
++                        if (boost::starts_with(type , "DDR"))
+                         {
+                             aResp->res.jsonValue["MemoryType"] = "DRAM";
+                         }
+-- 
+2.17.1
+
