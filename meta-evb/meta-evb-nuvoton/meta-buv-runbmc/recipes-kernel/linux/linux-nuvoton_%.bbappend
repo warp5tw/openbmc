@@ -8,4 +8,5 @@ SRC_URI_append_buv-runbmc = " \
   file://0005-misc-Character-device-driver.patch \
   file://0006-driver-SPI-add-w25q01jv-support.patch \
   file://0007-dts-npcm750-buv-runbmc-enable-peci.patch \
+  file://0008-dts-buv-runbmc-disable-udc9.patch \
   "

@@ -1,0 +1,35 @@
+From 016a5d67e3ecadbc7d40497993d92bfc1b0dae39 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Fri, 25 Sep 2020 09:33:50 +0800
+Subject: [PATCH] dts: buv-runbmc: disable udc9
+
+---
+ arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts b/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts
+index 597f92fdd432..1c6c2b8ca024 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts
++++ b/arch/arm/boot/dts/nuvoton-npcm750-buv-runbmc.dts
+@@ -25,7 +25,6 @@
+ 		udc6 = &udc6;
+ 		udc7 = &udc7;
+ 		udc8 = &udc8;
+-		udc9 = &udc9;
+ 		emmc0 = &sdhci0;
+ 		vdma = &vdma;
+ 		i2c1 = &i2c1;
+@@ -155,10 +154,6 @@
+ 			status = "okay";
+ 		};
+ 
+-		udc9:udc@f0839000 {
+-			status = "okay";
+-		};
+-
+ 		aes:aes@f0858000 {
+ 			status = "okay";
+ 		};
+-- 
+2.17.1
+
