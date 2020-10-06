@@ -68,4 +68,5 @@ RDEPENDS_${PN}-system = " \
         smbios-mdrv2 \
         loadmcu \
         usb-network \
+        nuvoton-ipmi-oem \
         "
