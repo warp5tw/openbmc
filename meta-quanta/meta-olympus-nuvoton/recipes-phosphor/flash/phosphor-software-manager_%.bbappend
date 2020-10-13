@@ -1,5 +1,5 @@
 SRC_URI = "git://github.com/Nuvoton-Israel/phosphor-bmc-code-mgmt.git"
-SRCREV = "4401a70b7021435748cf8e1332d17ba6fa9f42d2"
+SRCREV = "e83d663e1ab4daf4246df80aca6c353f17e50e14"
 
 FILES_${PN}-updater_append_olympus-nuvoton = " \
     ${datadir}/phosphor-bmc-code-mgmt/bios-release \
