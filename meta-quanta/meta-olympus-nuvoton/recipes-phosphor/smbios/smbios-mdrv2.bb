@@ -5,6 +5,7 @@ SRC_URI = "git://git@github.com/Intel-BMC/mdrv2.git;protocol=ssh"
 SRCREV = "5ae0c19064f010c9981cc90f4ddb2031887de4dc"
 
 SRC_URI += "file://0001-Notify-inventory-manager-that-a-interface-needs-adde.patch"
+SRC_URI += "file://0002-remove-fno-rtti-cxx-flags.patch"
 SRC_URI += "file://smbios2"
 
 S = "${WORKDIR}/git"
@@ -24,9 +25,7 @@ DEPENDS += " \
     boost \
     systemd \
     sdbusplus \
-    sdbusplus-native \
     phosphor-dbus-interfaces \
-    phosphor-dbus-interfaces-native \
     phosphor-logging \
     "
 

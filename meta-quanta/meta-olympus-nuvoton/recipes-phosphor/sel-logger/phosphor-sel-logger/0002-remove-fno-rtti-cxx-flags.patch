@@ -1,0 +1,41 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5fc1ae2..dd54df2 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -19,10 +19,18 @@ option (
+     OFF
+ )
+ 
++option(
++    REDFISH_LOG_MONITOR_EVENTS_LOG
++    "Enable logger to monitor and automatically
++     log dbus event log as SEL records"
++)
++
+ target_compile_definitions (
+     sel-logger PRIVATE
+     $<$<BOOL:${SEL_LOGGER_MONITOR_THRESHOLD_EVENTS}>: -DSEL_LOGGER_MONITOR_THRESHOLD_EVENTS>
+     $<$<BOOL:${REDFISH_LOG_MONITOR_PULSE_EVENTS}>: -DREDFISH_LOG_MONITOR_PULSE_EVENTS>
++    $<$<BOOL:${REDFISH_LOG_MONITOR_EVENTS_LOG}>: -DREDFISH_LOG_MONITOR_EVENTS_LOG>
++#    _GLIBCXX_USE_CXX11_ABI=0
+ )
+ 
+ target_include_directories (sel-logger PRIVATE ${CMAKE_SOURCE_DIR})
+@@ -45,11 +53,15 @@ add_definitions (-DBOOST_ALL_NO_LIB)
+ add_definitions (-DBOOST_NO_RTTI)
+ add_definitions (-DBOOST_NO_TYPEID)
+ 
+-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
+-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-rtti")
++#set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
++#set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-rtti")
+ 
+ set (
+     SERVICE_FILES
+     ${PROJECT_SOURCE_DIR}/service_files/xyz.openbmc_project.Logging.IPMI.service
+ )
+ install (FILES ${SERVICE_FILES} DESTINATION /lib/systemd/system/)
++
++find_package (PkgConfig REQUIRED)
++pkg_check_modules (DBUSINTERFACE phosphor-dbus-interfaces REQUIRED)
++target_link_libraries (${PROJECT_NAME} phosphor_dbus)

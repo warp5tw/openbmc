@@ -1,21 +1,20 @@
-From f0892e8e4b7182246a54d693f7a4cfe6f5bccca9 Mon Sep 17 00:00:00 2001
-From: Joseph Liu <kwliu@nuvoton.com>
-Date: Tue, 22 Sep 2020 13:35:34 +0800
+From a5482365d9195d03dbdf9f65bac3f5b97a1cd0b6 Mon Sep 17 00:00:00 2001
+From: Stanley Chu <yschu@nuvoton.com>
+Date: Fri, 16 Oct 2020 14:49:24 +0800
 Subject: [PATCH] add event log support
 
-Signed-off-by: Joseph Liu <kwliu@nuvoton.com>
 ---
- CMakeLists.txt                |  12 +++
+ CMakeLists.txt                |  16 +++-
  include/event_log_monitor.hpp |  60 ++++++++++++++
  include/sel_logger.hpp        |   9 +-
  include/watchdog_timeout.hpp  | 152 ++++++++++++++++++++++++++++++++++
- src/sel_logger.cpp            |   6 ++
- 5 files changed, 236 insertions(+), 3 deletions(-)
+ src/sel_logger.cpp            |   8 +-
+ 5 files changed, 239 insertions(+), 6 deletions(-)
  create mode 100644 include/event_log_monitor.hpp
  create mode 100644 include/watchdog_timeout.hpp
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 5fc1ae2..a4f84d8 100644
+index 5fc1ae2..dd54df2 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -19,10 +19,18 @@ option (
@@ -37,7 +36,17 @@ index 5fc1ae2..a4f84d8 100644
  )
  
  target_include_directories (sel-logger PRIVATE ${CMAKE_SOURCE_DIR})
-@@ -53,3 +61,7 @@ set (
+@@ -45,11 +53,15 @@ add_definitions (-DBOOST_ALL_NO_LIB)
+ add_definitions (-DBOOST_NO_RTTI)
+ add_definitions (-DBOOST_NO_TYPEID)
+ 
+-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
+-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-rtti")
++#set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
++#set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-rtti")
+ 
+ set (
+     SERVICE_FILES
      ${PROJECT_SOURCE_DIR}/service_files/xyz.openbmc_project.Logging.IPMI.service
  )
  install (FILES ${SERVICE_FILES} DESTINATION /lib/systemd/system/)
@@ -287,7 +296,7 @@ index 0000000..7b71c33
 +}
 +
 diff --git a/src/sel_logger.cpp b/src/sel_logger.cpp
-index 7fe52fb..7a22a86 100644
+index 7fe52fb..6474bf4 100644
 --- a/src/sel_logger.cpp
 +++ b/src/sel_logger.cpp
 @@ -27,6 +27,7 @@
@@ -298,6 +307,15 @@ index 7fe52fb..7a22a86 100644
  
  struct DBusInternalError final : public sdbusplus::exception_t
  {
+@@ -173,7 +174,7 @@ static uint16_t selAddOemRecord(const std::string &message,
+ int main(int argc, char *argv[])
+ {
+     // setup connection to dbus
+-    boost::asio::io_service io;
++    boost::asio::io_context io;
+     auto conn = std::make_shared<sdbusplus::asio::connection>(io);
+ 
+     // IPMI SEL Object
 @@ -210,6 +211,11 @@ int main(int argc, char *argv[])
          startPulseEventMonitor(conn);
  #endif
@@ -311,5 +329,5 @@ index 7fe52fb..7a22a86 100644
  
      return 0;
 -- 
-2.25.1
+2.17.1
 
