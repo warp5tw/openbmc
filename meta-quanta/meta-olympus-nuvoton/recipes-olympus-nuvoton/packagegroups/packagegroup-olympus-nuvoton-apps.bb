@@ -43,7 +43,6 @@ RDEPENDS_${PN}-system = " \
         phosphor-webui \
         obmc-ikvm \
         obmc-console \
-        dhcpcd \
         phosphor-ipmi-fru \
         phosphor-host-postd \
         phosphor-ipmi-ipmb \
