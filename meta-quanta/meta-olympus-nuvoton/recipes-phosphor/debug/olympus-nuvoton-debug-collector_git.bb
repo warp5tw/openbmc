@@ -7,14 +7,16 @@ PV = "1.0+git${SRCPV}"
 inherit autotools \
         pkgconfig \
         obmc-phosphor-systemd \
-        phosphor-dbus-yaml
+        phosphor-dbus-yaml \
+        python3native
 
 require ${PN}.inc
 
 DEPENDS += " \
         phosphor-logging \
         autoconf-archive-native \
-        sdbusplus-native \
+        phosphor-dbus-interfaces \
+        ${PYTHON_PN}-sdbus++-native \
         "
 S = "${WORKDIR}/git"
 
