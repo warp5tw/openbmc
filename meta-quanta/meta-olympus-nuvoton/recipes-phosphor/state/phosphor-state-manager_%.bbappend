@@ -10,10 +10,10 @@ HOST_WARMREBOOT_TGTFMT = "obmc-host-warm-reboot@{0}.target"
 HOST_SHUT_FMT = "../${HOST_SHUT_TMPL}:${HOST_WARMREBOOT_TGTFMT}.requires/${HOST_SHUT_TMPL}"
 SYSTEMD_LINK_${PN}-host += "${@compose_list(d, 'HOST_SHUT_FMT', 'OBMC_HOST_INSTANCES')}"
 
-HOST_WARM_REBOOT_TGTFMT = "obmc-host-warm-reboot@{0}.target"
-HOST_WARM_REBOOT_SOFT_SVC = "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service"
-HOST_WARM_REBOOT_SOFT_SVC_FMT = "../${HOST_WARM_REBOOT_SOFT_SVC}:${HOST_WARM_REBOOT_TGTFMT}.requires/${HOST_WARM_REBOOT_SOFT_SVC}"
-SYSTEMD_LINK_${PN}-host_remove = "${@compose_list_zip(d, 'HOST_WARM_REBOOT_SOFT_SVC_FMT', 'OBMC_HOST_INSTANCES')}"
+pkg_postinst_${PN}-obmc-targets_append() {
+    LINK="$D$systemd_system_unitdir/obmc-host-warm-reboot@0.target.requires/xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service"
+    rm $LINK
+}
 
 DEPENDS += "i2c-tools"
 
