@@ -1,7 +1,7 @@
 FILESEXTRAPATHS_prepend_olympus-nuvoton := "${THISDIR}/${PN}:"
 
 SRC_URI = "git://github.com/Nuvoton-Israel/phosphor-bmc-code-mgmt.git"
-SRCREV = "b368beed067996c18bbee6e4fe8683f401fa157b"
+SRCREV = "3bdf22dde6ea11bbcc797c9f9ed62776fcebbd79"
 
 SRC_URI_append_olympus-nuvoton = " file://mcu-release"
 
