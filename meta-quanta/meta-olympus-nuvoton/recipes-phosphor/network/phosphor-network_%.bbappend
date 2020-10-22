@@ -1,4 +1,4 @@
-EXTRA_OECONF_olympus-nuvoton += " --disable-link-local-autoconfiguration"
+EXTRA_OECONF_olympus-nuvoton += " --disable-link-local-autoconfiguration --with-uboot-env"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
