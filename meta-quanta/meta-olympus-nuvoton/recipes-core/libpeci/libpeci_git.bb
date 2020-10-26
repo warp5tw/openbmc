@@ -1,17 +1,13 @@
+SUMMARY = "PECI Library"
+DESCRIPTION = "PECI Library"
+
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=7becf906c8f8d03c237bad13bc3dac53"
 inherit cmake
 
-SRC_URI = "git://github.com/Intel-BMC/provingground.git;protocol=ssh"
+SRC_URI = "git://github.com/openbmc/libpeci"
 
 PV = "0.1+git${SRCPV}"
-SRCREV = "5a03fdc6a119b65ecf320622ce2809e340749fa9"
+SRCREV = "c965e72c6765e054531c1ab91e7fa13f04651f21"
 
-S = "${WORKDIR}/git/libpeci"
-
-# linux-libc-headers guides this way to include custom uapi headers
-CFLAGS_append = " -I ${STAGING_KERNEL_DIR}/include/uapi"
-CFLAGS_append = " -I ${STAGING_KERNEL_DIR}/include"
-CXXFLAGS_append = " -I ${STAGING_KERNEL_DIR}/include/uapi"
-CXXFLAGS_append = " -I ${STAGING_KERNEL_DIR}/include"
-do_configure[depends] += "virtual/kernel:do_shared_workdir"
+S = "${WORKDIR}/git"

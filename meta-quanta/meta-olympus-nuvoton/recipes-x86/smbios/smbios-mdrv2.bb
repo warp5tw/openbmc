@@ -37,9 +37,4 @@ do_install_append() {
     install -m 0644 ${WORKDIR}/smbios2 ${D}${localstatedir_nativesdk}/${base_libdir_nativesdk}/smbios
 }
 
-# linux-libc-headers guides this way to include custom uapi headers
-CFLAGS_append = " -I ${STAGING_KERNEL_DIR}/include/uapi"
-CFLAGS_append = " -I ${STAGING_KERNEL_DIR}/include"
-CXXFLAGS_append = " -I ${STAGING_KERNEL_DIR}/include/uapi"
-CXXFLAGS_append = " -I ${STAGING_KERNEL_DIR}/include"
 EXTRA_OECMAKE = "-DYOCTO=1"

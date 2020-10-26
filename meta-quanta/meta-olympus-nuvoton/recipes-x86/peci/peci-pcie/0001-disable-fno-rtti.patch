@@ -1,0 +1,25 @@
+From 651a568b4cd257b35e2e7ac889bb4910ca008153 Mon Sep 17 00:00:00 2001
+From: Joseph Liu <kwliu@nuvoton.com>
+Date: Mon, 26 Oct 2020 09:40:15 +0800
+Subject: [PATCH] disable -fno-rtti
+
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 83d2dcd..0cf8df6 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -46,7 +46,7 @@ add_definitions (-DBOOST_NO_RTTI)
+ add_definitions (-DBOOST_NO_TYPEID)
+ add_definitions (-DBOOST_ASIO_DISABLE_THREADS)
+ 
+-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
++#set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
+ set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-rtti")
+ 
+ set (SERVICE_FILES
+-- 
+2.17.1
+

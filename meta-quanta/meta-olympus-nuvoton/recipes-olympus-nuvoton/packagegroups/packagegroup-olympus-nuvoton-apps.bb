@@ -68,4 +68,5 @@ RDEPENDS_${PN}-system = " \
         loadmcu \
         usb-network \
         nuvoton-ipmi-oem \
+        peci-pcie \
         "

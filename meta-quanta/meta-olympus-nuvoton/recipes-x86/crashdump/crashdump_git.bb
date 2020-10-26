@@ -7,13 +7,13 @@ DESCRIPTION = "CPU utilities for dumping CPU Crashdump and registers over PECI"
 DEPENDS = "boost cjson sdbusplus safec gtest libpeci"
 inherit cmake
 
-EXTRA_OECMAKE = "-DCRASHDUMP_BUILD_UT=ON"
+EXTRA_OECMAKE = "-DYOCTO_DEPENDENCIES=ON -DCRASHDUMP_BUILD_UT=OFF"
 
 LICENSE = "Proprietary"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=26bb6d0733830e7bab774914a8f8f20a"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=43c09494f6b77f344027eea0a1c22830"
 
 SRC_URI = "git://git@github.com/Intel-BMC/crashdump;protocol=ssh;nobranch=1"
-SRCREV = "0.4"
+SRCREV = "wht-1.0"
 
 S = "${WORKDIR}/git"
 
