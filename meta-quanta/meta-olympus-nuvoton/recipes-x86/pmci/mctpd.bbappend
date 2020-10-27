@@ -3,7 +3,7 @@ FILESEXTRAPATHS_prepend_olympus-nuvoton := "${THISDIR}/${PN}:"
 SMBUS_BINDING = "pcie"
 
 SRC_URI_olympus-nuvoton = "git://github.com/Nuvoton-Israel/pmci.git;protocol=ssh"
-SRCREV_olympus-nuvoton = "d5cb01469d85f6cd8536f43140e321f8a565addc"
+SRCREV_olympus-nuvoton = "448498b926276521e2f82050e55790b6fd842c19"
 
 SRC_URI_append_olympus-nuvoton = " file://mctp_config.json"
 
