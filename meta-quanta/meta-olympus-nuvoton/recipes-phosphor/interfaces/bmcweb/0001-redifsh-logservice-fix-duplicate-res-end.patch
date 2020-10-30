@@ -1,0 +1,77 @@
+diff --git a/redfish-core/lib/log_services.hpp b/redfish-core/lib/log_services.hpp
+index ce5b2c8c..ae6b73a2 100644
+--- a/redfish-core/lib/log_services.hpp
++++ b/redfish-core/lib/log_services.hpp
+@@ -659,11 +659,9 @@ inline void getDumpEntryById(std::shared_ptr<AsyncResp>& asyncResp,
+         "org.freedesktop.DBus.ObjectManager", "GetManagedObjects");
+ }
+ 
+-inline void deleteDumpEntry(crow::Response& res, const std::string& entryID,
++inline void deleteDumpEntry(const std::shared_ptr<AsyncResp>& asyncResp, const std::string& entryID,
+                             const std::string& dumpType)
+ {
+-    std::shared_ptr<AsyncResp> asyncResp = std::make_shared<AsyncResp>(res);
+-
+     auto respHandler = [asyncResp](const boost::system::error_code ec) {
+         BMCWEB_LOG_DEBUG << "Dump Entry doDelete callback: Done";
+         if (ec)
+@@ -826,11 +824,10 @@ inline void createDump(crow::Response& res, const crow::Request& req,
+         "xyz.openbmc_project.Dump.Create", "CreateDump");
+ }
+ 
+-inline void clearDump(crow::Response& res, const std::string& dumpType)
++inline void clearDump(std::shared_ptr<AsyncResp>& asyncResp, const std::string& dumpType)
+ {
+     std::string dumpTypeLowerCopy =
+         std::string(boost::algorithm::to_lower_copy(dumpType));
+-    std::shared_ptr<AsyncResp> asyncResp = std::make_shared<AsyncResp>(res);
+     crow::connections::systemBus->async_method_call(
+         [asyncResp, dumpType](const boost::system::error_code ec,
+                               const std::vector<std::string>& subTreePaths) {
+@@ -847,7 +844,7 @@ inline void clearDump(crow::Response& res, const std::string& dumpType)
+                 if (pos != std::string::npos)
+                 {
+                     std::string logID = path.substr(pos + 1);
+-                    deleteDumpEntry(asyncResp->res, logID, dumpType);
++                    deleteDumpEntry(asyncResp, logID, dumpType);
+                 }
+             }
+         },
+@@ -2097,7 +2094,7 @@ class BMCDumpEntry : public Node
+             messages::internalError(asyncResp->res);
+             return;
+         }
+-        deleteDumpEntry(asyncResp->res, params[0], "bmc");
++        deleteDumpEntry(asyncResp, params[0], "bmc");
+     }
+ };
+ 
+@@ -2147,7 +2144,8 @@ class BMCDumpClear : public Node
+     void doPost(crow::Response& res, const crow::Request&,
+                 const std::vector<std::string>&) override
+     {
+-        clearDump(res, "BMC");
++        std::shared_ptr<AsyncResp> asyncResp = std::make_shared<AsyncResp>(res);
++        clearDump(asyncResp, "BMC");
+     }
+ };
+ 
+@@ -2267,7 +2265,7 @@ class SystemDumpEntry : public Node
+             messages::internalError(asyncResp->res);
+             return;
+         }
+-        deleteDumpEntry(asyncResp->res, params[0], "system");
++        deleteDumpEntry(asyncResp, params[0], "system");
+     }
+ };
+ 
+@@ -2317,7 +2315,8 @@ class SystemDumpClear : public Node
+     void doPost(crow::Response& res, const crow::Request&,
+                 const std::vector<std::string>&) override
+     {
+-        clearDump(res, "System");
++        std::shared_ptr<AsyncResp> asyncResp = std::make_shared<AsyncResp>(res);
++        clearDump(asyncResp, "System");
+     }
+ };
+ 
