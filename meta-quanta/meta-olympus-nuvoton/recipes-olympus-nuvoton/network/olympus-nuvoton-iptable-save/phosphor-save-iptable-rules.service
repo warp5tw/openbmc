@@ -1,7 +1,7 @@
 [Unit]
 Description=Save iptable rules
 DefaultDependencies=no
-After=shutdown.target
+Before=reboot.target
 
 [Service]
 Type=oneshot
@@ -9,4 +9,4 @@ RemainAfterExit=true
 ExecStart=/bin/sh -c "iptables-save > /etc/iptables/iptables.rules"
 
 [Install]
-WantedBy=shutdown.target
+WantedBy=reboot.target
