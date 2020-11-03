@@ -57,7 +57,6 @@ RDEPENDS_${PN}-system = " \
         loadsvf \
         asd \
         iptables \
-        olympus-nuvoton-iptable-save \
         bmc-time-sync \
         phosphor-post-code-manager \
         intel-dbus-interfaces \
