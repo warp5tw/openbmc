@@ -730,6 +730,7 @@ Management operations:
 * [https://github.com/Nuvoton-Israel/pldmsensors](https://github.com/Nuvoton-Israel/pldmsensors)
 * [https://github.com/Nuvoton-Israel/pmci](https://github.com/Nuvoton-Israel/pmci)
 * [https://github.com/Nuvoton-Israel/libmctp](https://github.com/Nuvoton-Israel/libmctp)
+* [i2c-nuvoton-npcm750-runbmc-integrate-the-slave-mqueu.patch](https://github.com/Nuvoton-Israel/openbmc/blob/runbmc/meta-nuvoton/recipes-kernel/linux/linux-nuvoton/0003-i2c-nuvoton-npcm750-runbmc-integrate-the-slave-mqueu.patch)
 
 **How to use**
 
