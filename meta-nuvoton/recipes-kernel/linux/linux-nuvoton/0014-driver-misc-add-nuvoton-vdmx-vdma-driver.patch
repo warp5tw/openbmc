@@ -1,4 +1,4 @@
-From 1dbac5b051d08bae59be277bdbe4e60858835b5e Mon Sep 17 00:00:00 2001
+From f8bcbdff49999e8aa714087e27f62317e63acad1 Mon Sep 17 00:00:00 2001
 From: Joseph Liu <kwliu@nuvoton.com>
 Date: Tue, 18 Feb 2020 15:42:31 +0800
 Subject: [PATCH] driver: misc: add nuvoton vdmx/vdma driver
@@ -81,7 +81,7 @@ index a2c3845acc37..bf6fe99a9502 100644
  
 diff --git a/drivers/misc/npcm7xx-pci-vdm.c b/drivers/misc/npcm7xx-pci-vdm.c
 new file mode 100644
-index 000000000000..f706e3014718
+index 000000000000..48dd099d59d5
 --- /dev/null
 +++ b/drivers/misc/npcm7xx-pci-vdm.c
 @@ -0,0 +1,738 @@
@@ -109,7 +109,7 @@ index 000000000000..f706e3014718
 +#define ENABLE_VDMA 1
 +
 +#define DEVICE_NAME	"npcm7xx-vdm"
-+#define TX_TIMEOUT			300
++#define TX_TIMEOUT			100
 +
 +/* GCR  Register */
 +#define MFSEL3 0x64
@@ -143,7 +143,7 @@ index 000000000000..f706e3014718
 +#define  VDMX_RXFILT_FEN    BIT(31)
 +#define  VDMX_VENDOR_ID     0xb4a1
 +
-+#define VDMX_RX_LEN	4
++#define VDMX_RX_LEN	1024
 +#define VDMX_TX_LEN	4
 +#define VDMA_BUFFER_SIZE SZ_16K
 +
@@ -264,8 +264,6 @@ index 000000000000..f706e3014718
 +
 +		rx_packet->size = size;
 +
-+		rdpnt += size;
-+
 +		ret = ptr_ring_produce(&priv->rx_queue, rx_packet);
 +		if (ret) {
 +			dev_warn(priv->dev, "Failed to produce RX packet: %d\n",
@@ -273,6 +271,8 @@ index 000000000000..f706e3014718
 +			packet_free(rx_packet);
 +			continue;
 +		}
++
++		rdpnt += size;
 +
 +		if (rdpnt == (priv->dma + VDMA_BUFFER_SIZE)) {
 +			int left = curdst - priv->dma;
@@ -306,8 +306,6 @@ index 000000000000..f706e3014718
 +
 +		rx_packet->size = size;
 +
-+		rdpnt += size;
-+
 +		ret = ptr_ring_produce(&priv->rx_queue, rx_packet);
 +		if (ret) {
 +			dev_warn(priv->dev, "Failed to produce RX packet: %d\n",
@@ -315,6 +313,8 @@ index 000000000000..f706e3014718
 +			packet_free(rx_packet);
 +			continue;
 +		}
++
++		rdpnt += size;
 +	}
 +
 +out_skip:

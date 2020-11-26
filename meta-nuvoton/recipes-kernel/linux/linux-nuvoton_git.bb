@@ -1,7 +1,7 @@
 KBRANCH ?= "Poleg-5.4-OpenBMC"
-LINUX_VERSION ?= "5.4.16"
+LINUX_VERSION ?= "5.4.80"
 
-SRCREV="65c6a4a24f37f5b6fe830e80bbe77fe4305cb1f5"
+SRCREV="4fe54047c4710d6b892ae9672a73928e1b73d32c"
 
 require linux-nuvoton.inc
 
@@ -13,5 +13,4 @@ SRC_URI_append_nuvoton = " file://0008-WAR-skip-clear-fault-for-flexpower.patch"
 SRC_URI_append_nuvoton = " file://0010-driver-misc-npcm7xx-mcu-flash-add-NPCM-MCU-driver.patch"
 SRC_URI_append_nuvoton = " file://0011-driver-misc-npcm7xx-mcu-flash-fix-mcu-reset-signal-a.patch"
 SRC_URI_append_nuvoton = " file://0012-driver-misc-npcm7xx-mcu-flash-add-npcm7xx_mcu_releas.patch"
-SRC_URI_append_nuvoton = " file://0013-net-ipv4-devinet-Fix-crash-when-add-del-multicast-IP.patch"
 SRC_URI_append_nuvoton = " file://0014-driver-misc-add-nuvoton-vdmx-vdma-driver.patch"
