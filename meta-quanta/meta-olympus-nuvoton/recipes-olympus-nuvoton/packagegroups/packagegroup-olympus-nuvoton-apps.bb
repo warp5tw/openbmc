@@ -69,4 +69,5 @@ RDEPENDS_${PN}-system = " \
         nuvoton-ipmi-oem \
         peci-pcie \
         olympus-nuvoton-iptable-restore \
+	mctpd \
         "
