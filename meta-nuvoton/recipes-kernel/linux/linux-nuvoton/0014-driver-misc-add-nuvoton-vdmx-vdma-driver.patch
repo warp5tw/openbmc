@@ -108,7 +108,7 @@ index 000000000000..48dd099d59d5
 +
 +#define ENABLE_VDMA 1
 +
-+#define DEVICE_NAME	"npcm7xx-vdm"
++#define DEVICE_NAME	"vdm"
 +#define TX_TIMEOUT			100
 +
 +/* GCR  Register */
