@@ -45,7 +45,6 @@ Please submit any patches against the meta-runbmc-nuvoton layer to the maintaine
     + [Certificate Management](#Certificate-Management)
   * [System](#system)
     + [Sensors](#sensors)
-    + [PLDM Sensors](#pldm-sensors)
     + [LED Manager](#led-manager)
     + [Fan PID Control](#fan-pid-control)
     + [Event Policy](#event-policy)
@@ -72,6 +71,11 @@ Please submit any patches against the meta-runbmc-nuvoton layer to the maintaine
     + [IPMI Library](#ipmi-library)
   * [LDAP for User Management](#ldap-for-user-management)
     + [LDAP Server Setup](#ldap-server-setup)
+  * [MCTP](#mctp)
+    + [MCTP over PCIe VDM](#mctp-over-pcie-vdm)
+    + [MCTP over SMBUS](#mctp-over-smbus)
+  * [PLDM](#pldm)
+    + [PLDM Sensors](#pldm-sensors)
 - [OpenBMC Test Automation](#openbmc-test-automation)
 - [Features In Progressing](#features-in-progressing)
 - [Features Planned](#features-planned)
@@ -722,90 +726,6 @@ Management operations:
 **Maintainer**
 
 * Stanley Chu
-
-### PLDM Sensors
-[pldmsensors](https://github.com/Nuvoton-Israel/pldmsensors) daemon will periodically check the sensor reading and update on corresponding dbus property. This daemon will send PLDM request via dbus method registed by [mctpd](https://github.com/Nuvoton-Israel/pmci/tree/master/mctpd) daemon, and mctpd will pack the PLDM request into a MCTP message and pass the request to PLDM device via I2C or PCI according to SMBUS_BINDING in [mctpd.bbappend](https://github.com/Nuvoton-Israel/openbmc/blob/runbmc/meta-quanta/meta-olympus-nuvoton/recipes-x86/pmci/mctpd.bbappend). There is also a config file [mctp_config.json](https://github.com/Nuvoton-Israel/openbmc/blob/runbmc/meta-quanta/meta-olympus-nuvoton/recipes-x86/pmci/mctpd/mctp_config.json) for mctpd you should modify according to your configuration.
-
-**Source URL**
-* [https://github.com/Nuvoton-Israel/pldmsensors](https://github.com/Nuvoton-Israel/pldmsensors)
-* [https://github.com/Nuvoton-Israel/pmci](https://github.com/Nuvoton-Israel/pmci)
-* [https://github.com/Nuvoton-Israel/libmctp](https://github.com/Nuvoton-Israel/libmctp)
-* [i2c-nuvoton-npcm750-runbmc-integrate-the-slave-mqueu.patch](https://github.com/Nuvoton-Israel/openbmc/blob/runbmc/meta-nuvoton/recipes-kernel/linux/linux-nuvoton/0003-i2c-nuvoton-npcm750-runbmc-integrate-the-slave-mqueu.patch)
-
-**How to use**
-
-* **Configure sensors**
-    
-  * Add Sensor Configuration File
-  
-    All the sensors **temperature**, **adc**, **fan**, **voltage** and **power** use the same [pldmsensors.json](https://github.com/Nuvoton-Israel/openbmc/blob/runbmc/meta-quanta/meta-olympus-nuvoton/recipes-phosphor/sensors/pldmsensors/pldmsensors.json) that defines the sensor name and its warning or critical thresholds ,etc. This file is located under **meta-quanta/meta-olympus-nuvoton/recipes-phosphor/sensors/pldmsensors/** .  
-
-    Below is sensor config for a temperature sensor on PLDM device. The sensor ID is **4** and its name is **PLDM_Temp0**. It has warning and critical thresholds and fatal for **upper** and **lower** bound and sensorUnit, sensorDataSize, sensorScale, rearmEventState, powerState, hysteresis, factor, etc.
-      ```
-      "sensorID":4,
-      "sensorTypeName":"temperature",
-      "objectType":"xyz.openbmc_project.Configuration.PLDMtemperature",
-      "sensorName":"PLDM_Temp0",
-      "sensorUnit":"DegreesC",
-      "sensorDataSize":"SINT8",
-      "sensorScale":0,
-      "factor":"1",
-      "rearmEventState":"false",
-      "powerState":"Standby",
-      "upperThresholdWarning":"60",
-      "upperThresholdCritical":"70",
-      "upperThresholdFatal":"80",
-      "lowerThresholdWarning":"15",
-      "lowerThresholdCritical":"10",
-      "lowerThresholdFatal":"5",
-      "hysteresis":3
-      ```
-    Below is sensor config for a voltage on PLDM device.
-      ```
-      "sensorID":31,
-      "sensorTypeName":"voltage",
-      "objectType":"xyz.openbmc_project.Configuration.PLDMvoltage",
-      "sensorName":"PLDM_3_3STDBY",
-      "sensorUnit":"Volts",
-      "sensorDataSize":"UINT16",
-      "sensorScale":0,
-      "factor":"0.016",
-      "rearmEventState":"false",
-      "powerState":"Standby",
-      "upperThresholdWarning":"210",
-      "upperThresholdCritical":"215",
-      "upperThresholdFatal":"220",
-      "lowerThresholdWarning":"190",
-      "lowerThresholdCritical":"180",
-      "lowerThresholdFatal":"170",
-      "hysteresis":5
-      ```
-
-* **Monitor sensor and events**
-
-  * Using WebUI  
-
-    In `Sensors` page of **WebUI**, the sensors reading will show as below.
-
-    <img align="bottomleft" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/pldmsensor_reading.png">  
-
-  * Using Dbus
-
-    Use **busctl** to send command for getting PLDM_Temp0 info.  
-    ```
-    $ busctl  introspect  xyz.openbmc_project.PLDMSensor /xyz/openbmc_project/sensors/temperature/PLDM_Temp0
-    ```
-    <img align="bottomleft" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/PLDM_Temp0.png">
-    
-    Use **busctl** to send command for getting PLDM_3_3STDBY info. 
-    ```
-    $ busctl  introspect  xyz.openbmc_project.PLDMSensor /xyz/openbmc_project/sensors/voltage/PLDM_3_3STDBY
-    ```
-     <img align="bottomleft" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/PLDM_3_3STDBY.png">
-
-**Maintainer**
-
-* Medad CChien
 
 ### LED Manager
 <img align="right" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/ServerLed.PNG">  
@@ -2192,6 +2112,220 @@ This is an OpenBMC IPMI Library (Handler) for In-Band Firmware Update.
 **Maintainer**
 * Medad CChien
 
+## MCTP
+
+### MCTP over PCIe VDM
+Nuvoton BMC contains a VDM module that can send and receive VDM messages. \
+It sends and receives MCTP messages over PCIe.
+
+**Source URL**
+* [mctpd](https://github.com/Nuvoton-Israel/pmci/tree/master/mctpd)
+* [libmctp](https://github.com/Nuvoton-Israel/libmctp)
+* [driver-misc-nuvoton-vdm-support-openbmc-libmctp.patch](https://github.com/Nuvoton-Israel/openbmc/blob/runbmc/meta-nuvoton/recipes-kernel/linux/linux-nuvoton/0015-driver-misc-nuvoton-vdm-support-openbmc-libmctp.patch)
+
+**How to use**
+
+* **Configuration** 
+  * Enable Intel ME MCTP infrastructure
+
+    In the Intel platform, the ME is the bus owner of MCTP topology. \
+    Therefore, please make sure that `MCTPInfrastructure` is enabled.\
+    In BIOS setup, on the `Platform Configuration` page, the `ME Firmware Features` should contain `MCTPInfrastructure`. \
+    Please contact your BIOS team if your `MCTPInfrastructure` is not enabled. \
+    <img align="bottomleft" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/MCTPinfra.png">
+
+  * [Config File for MCTPD](https://github.com/Nuvoton-Israel/openbmc/blob/runbmc/meta-quanta/meta-olympus-nuvoton/recipes-x86/pmci/mctpd/mctp_config.json)
+      ```
+        "pcie": {
+            "role": "endpoint",
+            "default-eid":0,
+            "PhysicalMediumID":"Pcie2",
+            "bdf":0,
+            "ReqToRespTimeMs":120,
+            "ReqRetryCount":2,
+            "GetRoutingInterval":5
+        }
+      ```
+  * Prepare antoher endpoint device
+
+    We use Intel i210 NIC card to verify the MCTP implementation. \
+    We recommend preparing an endpoint device, that you can practice endpoint to endpoint communication.
+
+* **Endpoint Device Enumeration**
+
+  * Start the mctp pcie service
+
+    ```
+    systemctl start xyz.openbmc_project.mctpd@pcie.service
+    ```
+
+  * Enumerate Endpoint via BMCWEB Server
+    
+    The eid 97 is BMC and eid 96 is Intel i210 NIC card.
+    ```
+      https://<BCM_IP>/xyz/openbmc_project/mctp/enumerate
+
+      "/xyz/openbmc_project/mctp": {
+              "BDF": 33024,
+              "BindingID": "xyz.openbmc_project.MCTP.Base.BindingTypes.MctpOverPcieVdm",
+              "BindingMediumID": "xyz.openbmc_project.MCTP.Base.MctpPhysicalMediumIdentifiers.Pcie2",
+              "BindingMode": "xyz.openbmc_project.MCTP.Base.BindingModeTypes.Endpoint",
+              "DiscoveredFlag": "xyz.openbmc_project.MCTP.Binding.PCIe.DiscoveryFlags.Discovered",
+              "Eid": 97,
+              "StaticEid": false,
+              "Uuid": []
+        },
+      "/xyz/openbmc_project/mctp/device/96": {
+              "Ethernet": true,
+              "MctpControl": true,
+              "Mode": "xyz.openbmc_project.MCTP.Base.BindingModeTypes.Endpoint",
+              "NCSI": true,
+              "NVMeMgmtMsg": false,
+              "NetworkId": 0,
+              "PLDM": false,
+              "SPDM": false,
+              "UUID": "bab74068-1ad4-e011-ed86-00a0c9000000",
+              "VDIANA": false,
+              "VDPCI": true
+        }
+
+    ```  
+  * Show interfaces, methods, properties and signals of the endpoint device via busctl
+
+    ```
+    busctl introspect xyz.openbmc_project.MCTP-pcie /xyz/openbmc_project/mctp
+    busctl introspect xyz.openbmc_project.MCTP-pcie /xyz/openbmc_project/mctp/device/96
+    ```
+
+* **Endpoint Device Communication**
+  * Send MCTP message via busctl
+
+    ```
+    busctl call xyz.openbmc_project.MCTP-pcie /xyz/openbmc_project/mctp xyz.openbmc_project.MCTP.Base SendMctpMessagePayload yybay 96 1 true 24 0x02 0x00 0x01 0x00 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+    ```
+
+  * A daemon to procress MCTP messages
+
+    All MCTP control messages are already being processed by MCTPD. \
+    Therefore, for the other message types, for example, NVME, NCSI, PLDM, etc. \
+    We should have a specific daemon to interact with each different device type.
+
+    <img align="bottomleft" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/openbmc-mctpd-vdm-arch.PNG">
+
+  * Test utility
+
+    When you encounter the configuration issue, there is a test utility that can help you to see the mctp infrastructure if works well. \
+    [mctp-nupcie-discovery](https://github.com/Nuvoton-Israel/libmctp/blob/master/utils/mctp-nupcie-discovery.c)
+
+### MCTP over SMBUS  
+Most user-space implementation is the same as MCTP over PCIe VDM, the only difference is the message over SMBUS. \
+Therefore, please go to [PLDM Sensors](#pldm-sensors), it is a MCTP over SMBUS implementation of OpenBMC.
+
+
+## PLDM
+
+### PLDM Sensors
+
+This is a PLDM over MCTP over SMBUS feature.
+
+[pldmsensors](https://github.com/Nuvoton-Israel/pldmsensors) daemon will periodically check the sensor reading and update on corresponding dbus property. This daemon will send PLDM request via dbus method registed by [mctpd](https://github.com/Nuvoton-Israel/pmci/tree/master/mctpd) daemon, and mctpd will pack the PLDM request into a MCTP message and pass the request to PLDM device via I2C or PCI according to SMBUS_BINDING in [mctpd.bbappend](https://github.com/Nuvoton-Israel/openbmc/blob/runbmc/meta-quanta/meta-olympus-nuvoton/recipes-x86/pmci/mctpd.bbappend). There is also a config file [mctp_config.json](https://github.com/Nuvoton-Israel/openbmc/blob/runbmc/meta-quanta/meta-olympus-nuvoton/recipes-x86/pmci/mctpd/mctp_config.json) for mctpd you should modify according to your configuration.
+
+**Source URL**
+* [pldmsensors](https://github.com/Nuvoton-Israel/pldmsensors)
+* [mctpd](https://github.com/Nuvoton-Israel/pmci/tree/master/mctpd)
+* [libpldm_intel](https://github.com/Nuvoton-Israel/pmci/tree/master/libpldm_intel)
+* [libmctp](https://github.com/Nuvoton-Israel/libmctp)
+* [i2c-nuvoton-npcm750-runbmc-integrate-the-slave-mqueu.patch](https://github.com/Nuvoton-Israel/openbmc/blob/runbmc/meta-nuvoton/recipes-kernel/linux/linux-nuvoton/0003-i2c-nuvoton-npcm750-runbmc-integrate-the-slave-mqueu.patch)
+
+**How to use**
+
+* **Configure sensors**
+
+  * [Config File for MCTPD](https://github.com/Nuvoton-Israel/openbmc/blob/runbmc/meta-quanta/meta-olympus-nuvoton/recipes-x86/pmci/mctpd/mctp_config.json)
+      ```
+        "smbus": {
+            "role": "endpoint",
+            "default-eid":8,
+            "eid-pool":[9,10,11,12,13,14,15,16,17,18,19,20],
+            "bus":"/dev/i2c-2",
+            "PhysicalMediumID":"Smbus3OrI2c400khzCompatible",
+            "ARPMasterSupport": false,
+            "BMCSlaveAddress":18,
+            "ReqToRespTimeMs":100,
+            "ReqRetryCount":2
+        },
+      ```
+
+  * Add Sensor Configuration File
+  
+    All the sensors **temperature**, **adc**, **fan**, **voltage** and **power** use the same [pldmsensors.json](https://github.com/Nuvoton-Israel/openbmc/blob/runbmc/meta-quanta/meta-olympus-nuvoton/recipes-phosphor/sensors/pldmsensors/pldmsensors.json) that defines the sensor name and its warning or critical thresholds ,etc. This file is located under **meta-quanta/meta-olympus-nuvoton/recipes-phosphor/sensors/pldmsensors/** .  
+
+    Below is sensor config for a temperature sensor on PLDM device. The sensor ID is **4** and its name is **PLDM_Temp0**. It has warning and critical thresholds and fatal for **upper** and **lower** bound and sensorUnit, sensorDataSize, sensorScale, rearmEventState, powerState, hysteresis, factor, etc.
+      ```
+      "sensorID":4,
+      "sensorTypeName":"temperature",
+      "objectType":"xyz.openbmc_project.Configuration.PLDMtemperature",
+      "sensorName":"PLDM_Temp0",
+      "sensorUnit":"DegreesC",
+      "sensorDataSize":"SINT8",
+      "sensorScale":0,
+      "factor":"1",
+      "rearmEventState":"false",
+      "powerState":"Standby",
+      "upperThresholdWarning":"60",
+      "upperThresholdCritical":"70",
+      "upperThresholdFatal":"80",
+      "lowerThresholdWarning":"15",
+      "lowerThresholdCritical":"10",
+      "lowerThresholdFatal":"5",
+      "hysteresis":3
+      ```
+    Below is sensor config for a voltage on PLDM device.
+      ```
+      "sensorID":31,
+      "sensorTypeName":"voltage",
+      "objectType":"xyz.openbmc_project.Configuration.PLDMvoltage",
+      "sensorName":"PLDM_3_3STDBY",
+      "sensorUnit":"Volts",
+      "sensorDataSize":"UINT16",
+      "sensorScale":0,
+      "factor":"0.016",
+      "rearmEventState":"false",
+      "powerState":"Standby",
+      "upperThresholdWarning":"210",
+      "upperThresholdCritical":"215",
+      "upperThresholdFatal":"220",
+      "lowerThresholdWarning":"190",
+      "lowerThresholdCritical":"180",
+      "lowerThresholdFatal":"170",
+      "hysteresis":5
+      ```
+
+* **Monitor sensor and events**
+
+  * Using WebUI  
+
+    In `Sensors` page of **WebUI**, the sensors reading will show as below.
+
+    <img align="bottomleft" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/pldmsensor_reading.png">  
+
+  * Using Dbus
+
+    Use **busctl** to send command for getting PLDM_Temp0 info.  
+    ```
+    $ busctl  introspect  xyz.openbmc_project.PLDMSensor /xyz/openbmc_project/sensors/temperature/PLDM_Temp0
+    ```
+    <img align="bottomleft" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/PLDM_Temp0.png">
+    
+    Use **busctl** to send command for getting PLDM_3_3STDBY info. 
+    ```
+    $ busctl  introspect  xyz.openbmc_project.PLDMSensor /xyz/openbmc_project/sensors/voltage/PLDM_3_3STDBY
+    ```
+     <img align="bottomleft" width="30%" src="https://raw.githubusercontent.com/NTC-CCBG/snapshots/master/openbmc/PLDM_3_3STDBY.png">
+
+**Maintainer**
+
+* Medad CChien
 
 ## OpenBMC Test Automation
 
@@ -2215,9 +2349,6 @@ Please download the test report in the link below
 * Intel Platform related features
 * Nuvoton IPMI OEM command
 
-## Features Planned
-* MCTP
-* PLDM
 
 # IPMI Commands
 [IPMI.md](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-quanta/meta-olympus-nuvoton/IPMI.md)
@@ -2263,3 +2394,4 @@ image-rwfs    |  0 MB  | middle layer of the overlayfs, rw files in this partiti
 * 2020.08.07 Add Virtual Media Performance
 * 2020.11.06 Add PLDM sensors
 * 2020.11.13 Add MCU Firmware Update
+* 2020.12.03 Add MCTP
