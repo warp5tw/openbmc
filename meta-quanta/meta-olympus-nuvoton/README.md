@@ -2119,8 +2119,10 @@ Nuvoton BMC contains a VDM module that can send and receive VDM messages. \
 It sends and receives MCTP messages over PCIe.
 
 **Source URL**
-* [mctpd](https://github.com/Nuvoton-Israel/pmci/tree/master/mctpd)
-* [libmctp](https://github.com/Nuvoton-Israel/libmctp)
+* [mctpd, forked from intel/opnbmc](https://github.com/Nuvoton-Israel/pmci/tree/master/mctpd)
+* [libmctp, forked from intel/opnbmc](https://github.com/Nuvoton-Israel/libmctp)
+* [recipes, bb](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-phosphor/recipes-x86/pmci)
+* [recipes, bbappend](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-quanta/meta-olympus-nuvoton/recipes-x86/pmci)
 * [driver-misc-nuvoton-vdm-support-openbmc-libmctp.patch](https://github.com/Nuvoton-Israel/openbmc/blob/runbmc/meta-nuvoton/recipes-kernel/linux/linux-nuvoton/0015-driver-misc-nuvoton-vdm-support-openbmc-libmctp.patch)
 
 **How to use**
@@ -2232,9 +2234,11 @@ This is a PLDM over MCTP over SMBUS feature.
 
 **Source URL**
 * [pldmsensors](https://github.com/Nuvoton-Israel/pldmsensors)
-* [mctpd](https://github.com/Nuvoton-Israel/pmci/tree/master/mctpd)
-* [libpldm_intel](https://github.com/Nuvoton-Israel/pmci/tree/master/libpldm_intel)
-* [libmctp](https://github.com/Nuvoton-Israel/libmctp)
+* [mctpd, forked from intel/opnbmc](https://github.com/Nuvoton-Israel/pmci/tree/master/mctpd)
+* [libpldm_intel, forked from intel/opnbmc](https://github.com/Nuvoton-Israel/pmci/tree/master/libpldm_intel)
+* [libmctp, forked from intel/opnbmc](https://github.com/Nuvoton-Israel/libmctp)
+* [recipes, bb](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-phosphor/recipes-x86/pmci)
+* [recipes, bbappend](https://github.com/Nuvoton-Israel/openbmc/tree/runbmc/meta-quanta/meta-olympus-nuvoton/recipes-x86/pmci)
 * [i2c-nuvoton-npcm750-runbmc-integrate-the-slave-mqueu.patch](https://github.com/Nuvoton-Israel/openbmc/blob/runbmc/meta-nuvoton/recipes-kernel/linux/linux-nuvoton/0003-i2c-nuvoton-npcm750-runbmc-integrate-the-slave-mqueu.patch)
 
 **How to use**
