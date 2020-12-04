@@ -4,7 +4,7 @@ HOMEPAGE = "https://github.com/Nuvoton-Israel/npcm7xx-bootblock"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-FILENAME = "Poleg_bootblock_${PV}.bin"
+FILENAME = "Poleg_bootblock_basic.bin"
 
 S = "${WORKDIR}"
 
@@ -15,7 +15,7 @@ SRC_URI = " \
 "
 
 SRC_URI[lic.md5sum] = "b234ee4d69f5fce4486a80fdaf4a4263"
-SRC_URI[bin.sha256sum] = "3926c8156cda1444cfa4e257984cb2679eb74603e1dae5f583f204872d274c86"
+SRC_URI[bin.sha256sum] = "b2df56cc8667227fa625f11c628bfc10c831d36d076bf28ff376902d06b63a54"
 
 inherit deploy
 
