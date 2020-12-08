@@ -4,7 +4,7 @@ SMBUS_BINDING = "pcie"
 
 SRC_URI_olympus-nuvoton = "git://github.com/Nuvoton-Israel/pmci.git;protocol=ssh"
 
-SRCREV_olympus-nuvoton = "e121745a6c311576b341e0481d8d37b8989cea0f"
+SRCREV_olympus-nuvoton = "6fe3d2677320c391aed5c6d61af38ed43b508e62"
 
 SRC_URI_append_olympus-nuvoton = " file://mctp_config.json"
 
