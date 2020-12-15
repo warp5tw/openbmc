@@ -1,12 +1,9 @@
 FILESEXTRAPATHS_prepend_olympus-nuvoton := "${THISDIR}/${PN}:"
 
-SRCREV := "5235d9640276f2421b5fcff1d5a356101fd301e6"
+SRCREV := "f16f62633a64f386fd0382703ff0949ea177f457"
 
 SRC_URI_append_olympus-nuvoton = " file://0003-Redfish-Add-power-metrics-support.patch"
 SRC_URI_append_olympus-nuvoton = " file://0005-bmcweb-chassis-add-indicatorLED-support.patch"
-SRC_URI_append_olympus-nuvoton = " file://0010-bmcweb-fix-segmentation-fault-in-update-service.patch"
-SRC_URI_append_olympus-nuvoton = " file://0001-redifsh-logservice-fix-duplicate-res-end.patch"
-SRC_URI_append_olympus-nuvoton = " file://0013-systems-fix-Members-odata.count-is-incorrect-even-Me.patch"
 
 # Enable CPU Log and Raw PECI support
 EXTRA_OEMESON_append = " -Dredfish-cpu-log=enabled"
