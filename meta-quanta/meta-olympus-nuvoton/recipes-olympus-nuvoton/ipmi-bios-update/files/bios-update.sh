@@ -15,7 +15,7 @@ IMAGE_FILE="/tmp/image-bios"
 
 FLASH_LOG="/tmp/bios_flash.log"
 
-POWER_CTRL_TIMEOUT=60
+POWER_CTRL_TIMEOUT=360
 ME_TIMEOUT=30
 
 # ME IPMB commands
