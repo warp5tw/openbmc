@@ -1,7 +1,7 @@
 KBRANCH ?= "Poleg-5.4-OpenBMC"
 LINUX_VERSION ?= "5.4.80"
 
-SRCREV="78e9762241564cffcdd2a1e8de8e3e307949ab27"
+SRCREV="034392545dcec41253866651af5e9e5bd4f85bd2"
 
 require linux-nuvoton.inc
 
@@ -14,5 +14,3 @@ SRC_URI_append_nuvoton = " file://0010-driver-misc-npcm7xx-mcu-flash-add-NPCM-MC
 SRC_URI_append_nuvoton = " file://0011-driver-misc-npcm7xx-mcu-flash-fix-mcu-reset-signal-a.patch"
 SRC_URI_append_nuvoton = " file://0012-driver-misc-npcm7xx-mcu-flash-add-npcm7xx_mcu_releas.patch"
 SRC_URI_append_nuvoton = " file://0015-driver-misc-nuvoton-vdm-support-openbmc-libmctp.patch"
-SRC_URI_append_nuvoton = " file://0016-driver-media-nuvoton-vcd-update-to-0.0.13.patch"
-SRC_URI_append_nuvoton = " file://0017-driver-media-nuvoton-ece-update-to-0.0.5.patch"
