@@ -1,7 +1,7 @@
 echo "set power state $1"
 
 powerOnRetry=3
-powerOffRetry=3
+powerOffRetry=1
 powerOnTimeOut=30
 powerOffTimeOut=90
 powerPluseTime=0.2
@@ -68,7 +68,7 @@ if [ ${state} = "1" ]; then
       powerPluse
       PGOOD=$(PowerOnTimerStart)
     done
-    echo "Power On done; pgood=${PGOOD}; Retry=${try}"
+    echo "Power On done; pgood=${PGOOD}; Tried=${try}"
 else
     echo "Power Off Start"
     until [ "${PGOOD}" == "0" -o "${try}" == "${powerOffRetry}" ]
@@ -77,7 +77,7 @@ else
       powerPluse
       PGOOD=$(PowerOffTimerStart)
     done
-    echo "Power Off done; pgood=${PGOOD}; Retry=${try}"
+    echo "Power Off done; pgood=${PGOOD}; Tried=${try}"
 
     if [ "${PGOOD}" == "1" ]; then
         ForcePowerOff
