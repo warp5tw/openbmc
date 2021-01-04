@@ -6,6 +6,7 @@ SRC_URI_append_buv-runbmc = " \
   file://0002-move-emc-debug-message-to-dev_dbg.patch \
   file://0005-misc-Character-device-driver.patch \
   file://0006-driver-SPI-add-w25q01jv-support.patch \
+  file://0002-Ampere-Altra-MAX-SSIF-IPMI-driver.patch \
   file://arch \
   "
 

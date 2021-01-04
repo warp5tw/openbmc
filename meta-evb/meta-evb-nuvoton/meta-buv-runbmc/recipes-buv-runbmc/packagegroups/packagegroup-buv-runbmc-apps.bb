@@ -28,6 +28,7 @@ RDEPENDS_${PN}-buv-common-utils = " \
     nmon \
     memtester \
     usb-emmc-storage \
+    phosphor-ipmi-ssif \
     "
 
 SUMMARY_${PN}-buv-system = "BUV NUVOTON System"
