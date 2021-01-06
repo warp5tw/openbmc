@@ -1,0 +1,28 @@
+From d8e2e7362c2410179ae6c7433297d72a44fba6f0 Mon Sep 17 00:00:00 2001
+From: kfting <kfting@nuvoton.com>
+Date: Wed, 6 Jan 2021 17:46:42 +0800
+Subject: [PATCH] add ssif device on i2c bus 6
+
+Signed-off-by: kfting <kfting@nuvoton.com>
+---
+ arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+index 94e34b3bce7f..7f7947c33cea 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
++++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+@@ -510,6 +510,10 @@
+ 					compatible = "ti,tps53622";
+ 					reg = <0x77>;
+ 				};
++        ipmi_ssif@10 {
++          compatible = "ipmi_ssif";
++          reg = <0x10>;
++        };
+ 			};
+ 
+ 			i2c7: i2c@87000 {
+-- 
+2.17.1
+

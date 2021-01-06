@@ -68,4 +68,5 @@ RDEPENDS_${PN}-system = " \
         usb-network \
         nuvoton-ipmi-oem \
         olympus-nuvoton-iptable-restore \
+        phosphor-ipmi-ssif \
         "
