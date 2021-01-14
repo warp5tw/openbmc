@@ -1,7 +1,7 @@
-From 932178f02bf0fb089623bda0b8593de99dabd00c Mon Sep 17 00:00:00 2001
+From 9b0fcfc02c9ba33c02e210b8d253fa64eeb69060 Mon Sep 17 00:00:00 2001
 From: AppaRao Puli <apparao.puli@linux.intel.com>
-Date: Wed, 5 Sep 2018 14:16:54 +0530
-Subject: [PATCH] Adding channel specific privilege to network
+Date: Thu, 2 Apr 2020 17:06:07 +0530
+Subject: [PATCH 1/2] Adding channel specific privilege to network
 
  - Adding the channel access information to the network
    interface object. This privilege will be used in
@@ -17,28 +17,31 @@ access command
 Change-Id: I3b592a19363eef684e31d5f7c34dad8f2f9211df
 Signed-off-by: AppaRao Puli <apparao.puli@linux.intel.com>
 Signed-off-by: Yong Li <yong.b.li@linux.intel.com>
+
+%% original patch: 0003-Adding-channel-specific-privilege-to-network.patch
 ---
- ethernet_interface.cpp | 116 +++++++++++++++++++++++++++++++++++++++++
- ethernet_interface.hpp |  39 +++++++++++++-
- network_manager.cpp    | 104 ++++++++++++++++++++++++++++++++++++
- network_manager.hpp    |   9 ++++
- 4 files changed, 267 insertions(+), 1 deletion(-)
+ ethernet_interface.cpp | 123 +++++++++++++++++++++++++++++++++++++++++
+ ethernet_interface.hpp |  38 ++++++++++++-
+ network_manager.cpp    | 104 ++++++++++++++++++++++++++++++++++
+ network_manager.hpp    |   9 +++
+ 4 files changed, 273 insertions(+), 1 deletion(-)
 
 diff --git a/ethernet_interface.cpp b/ethernet_interface.cpp
-index 648595c..8516f75 100644
+index 76d7f92..318b94b 100644
 --- a/ethernet_interface.cpp
 +++ b/ethernet_interface.cpp
-@@ -67,6 +67,9 @@ struct EthernetIntfSocket
-     int sock{-1};
- };
+@@ -44,6 +44,10 @@ constexpr auto PROPERTY_INTERFACE = "org.freedesktop.DBus.Properties";
+ constexpr auto RESOLVED_SERVICE_PATH = "/org/freedesktop/resolve1/link/";
+ constexpr auto METHOD_GET = "Get";
  
 +static constexpr const char* networkChannelCfgFile =
 +    "/var/channel_intf_data.json";
 +static constexpr const char* defaultChannelPriv = "priv-admin";
- EthernetInterface::EthernetInterface(sdbusplus::bus::bus& bus,
-                                      const std::string& objPath,
-                                      bool dhcpEnabled, Manager& parent,
-@@ -96,6 +99,7 @@ EthernetInterface::EthernetInterface(sdbusplus::bus::bus& bus,
++
+ struct EthernetIntfSocket
+ {
+     EthernetIntfSocket(int domain, int type, int protocol)
+@@ -101,6 +105,7 @@ EthernetInterface::EthernetInterface(sdbusplus::bus::bus& bus,
      EthernetInterfaceIntf::autoNeg(std::get<2>(ifInfo));
      EthernetInterfaceIntf::speed(std::get<0>(ifInfo));
  #endif
@@ -46,7 +49,7 @@ index 648595c..8516f75 100644
  
      // Emit deferred signal.
      if (emitSignal)
-@@ -1017,5 +1021,117 @@ void EthernetInterface::deleteAll()
+@@ -1076,5 +1081,123 @@ void EthernetInterface::deleteAll()
      manager.writeToConfigurationFile();
  }
  
@@ -133,6 +136,12 @@ index 648595c..8516f75 100644
 +{
 +    std::string intfName = interfaceName();
 +
++    if (manager.supportedPrivList.empty())
++    {
++        // Populate the supported privilege list
++        manager.initSupportedPrivilges();
++    }
++
 +    if (!priv.empty() && (std::find(manager.supportedPrivList.begin(),
 +                                    manager.supportedPrivList.end(),
 +                                    priv) == manager.supportedPrivList.end()))
@@ -165,7 +174,7 @@ index 648595c..8516f75 100644
  } // namespace network
  } // namespace phosphor
 diff --git a/ethernet_interface.hpp b/ethernet_interface.hpp
-index f8086a4..b66a70f 100644
+index abaf43e..fb538a7 100644
 --- a/ethernet_interface.hpp
 +++ b/ethernet_interface.hpp
 @@ -2,11 +2,14 @@
@@ -193,7 +202,7 @@ index f8086a4..b66a70f 100644
  
  using IP = sdbusplus::xyz::openbmc_project::Network::server::IP;
  
-@@ -31,10 +35,15 @@ using EthernetInterfaceIntf =
+@@ -31,11 +35,15 @@ using EthernetInterfaceIntf =
      sdbusplus::xyz::openbmc_project::Network::server::EthernetInterface;
  using MacAddressIntf =
      sdbusplus::xyz::openbmc_project::Network::server::MACAddress;
@@ -203,13 +212,13 @@ index f8086a4..b66a70f 100644
  using ServerList = std::vector<std::string>;
  using ObjectPath = sdbusplus::message::object_path;
  
+ namespace fs = std::filesystem;
 +using DbusVariant =
 +    std::variant<std::string, std::vector<std::string>>;
-+
- namespace fs = std::filesystem;
  
  class Manager; // forward declaration of network manager.
-@@ -217,6 +226,14 @@ class EthernetInterface : public Ifaces
+ 
+@@ -223,6 +231,14 @@ class EthernetInterface : public Ifaces
       */
      void deleteAll();
  
@@ -224,10 +233,10 @@ index f8086a4..b66a70f 100644
      using EthernetInterfaceIntf::dHCPEnabled;
      using EthernetInterfaceIntf::interfaceName;
      using EthernetInterfaceIntf::linkUp;
-@@ -316,6 +333,26 @@ class EthernetInterface : public Ifaces
-     std::string objPath;
- 
-     friend class TestEthernetInterface;
+@@ -344,6 +360,26 @@ class EthernetInterface : public Ifaces
+      *  @returns true/false value if the address is static
+      */
+     bool originIsManuallyAssigned(IP::AddressOrigin origin);
 +
 +    /** @brief gets the channel privilege.
 +     *  @param[in] interfaceName - Network interface name.
@@ -248,12 +257,11 @@ index f8086a4..b66a70f 100644
 +     */
 +    int writeJsonFile(const std::string& configFile,
 +                      const nlohmann::json& jsonData);
+ };
  
-  private:
-    /** @brief Determines if DHCP is active for the IP::Protocol supplied.
-     *  @param[in] protocol - Either IPv4 or IPv6
+ } // namespace network
 diff --git a/network_manager.cpp b/network_manager.cpp
-index c55c9bb..da76676 100644
+index c55c9bb..b5ff278 100644
 --- a/network_manager.cpp
 +++ b/network_manager.cpp
 @@ -36,6 +36,13 @@ extern std::unique_ptr<Timer> restartTimer;
@@ -375,32 +383,31 @@ index c55c9bb..da76676 100644
  
  bool Manager::createDefaultNetworkFiles(bool force)
 diff --git a/network_manager.hpp b/network_manager.hpp
-index c9f95b3..de74f72 100644
+index 6815d3f..96e20a6 100644
 --- a/network_manager.hpp
 +++ b/network_manager.hpp
-@@ -151,6 +151,9 @@ class Manager : public details::VLANCreateIface
+@@ -151,6 +151,12 @@ class Manager : public details::VLANCreateIface
          return (interfaces.find(intf) != interfaces.end());
      }
  
 +    /** supported privilege list **/
 +    std::vector<std::string> supportedPrivList;
 +
++    /** @brief initializes the supportedPrivilege List */
++    void initSupportedPrivilges();
++
    protected:
      /** @brief Persistent sdbusplus DBus bus connection. */
      sdbusplus::bus::bus& bus;
-@@ -173,6 +176,12 @@ class Manager : public details::VLANCreateIface
+@@ -173,6 +179,9 @@ class Manager : public details::VLANCreateIface
  
      /** @brief Network Configuration directory. */
      fs::path confDir;
 +
 +    /** Get the user management service name dynamically **/
 +    std::string getUserServiceName();
-+
-+    /** @brief initializes the supportedPrivilege List */
-+    void initSupportedPrivilges();
  };
  
  } // namespace network
 -- 
-2.17.1
-
+2.26.2
