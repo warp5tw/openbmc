@@ -1,11 +1,13 @@
 FILESEXTRAPATHS_prepend_olympus-nuvoton := "${THISDIR}/${PN}:"
 
-SRC_URI_append_olympus-nuvoton = " file://olympus-reload-sensor.service"
-SRC_URI_append_olympus-nuvoton = " file://xyz.openbmc_project.Hwmon_hostoff@.service"
-SRC_URI_append_olympus-nuvoton = " file://olympus-reload-sensor.sh"
+#SRC_URI_append_olympus-nuvoton = " file://olympus-reload-sensor.service"
+#SRC_URI_append_olympus-nuvoton = " file://xyz.openbmc_project.Hwmon_hostoff@.service"
+#SRC_URI_append_olympus-nuvoton = " file://olympus-reload-sensor.sh"
 
-SYSTEMD_SERVICE_${PN}_append_olympus-nuvoton = " olympus-reload-sensor.service"
-SYSTEMD_SERVICE_${PN}_append_olympus-nuvoton = " xyz.openbmc_project.Hwmon_hostoff@.service"
+SRC_URI_append_olympus-nuvoton  = " file://0001-lev-add-poweron-monitor-feature.patch"
+
+#SYSTEMD_SERVICE_${PN}_append_olympus-nuvoton = " olympus-reload-sensor.service"
+#SYSTEMD_SERVICE_${PN}_append_olympus-nuvoton = " xyz.openbmc_project.Hwmon_hostoff@.service"
 
 ITEMS = " \
         i2c@82000/tmp421@4c \
@@ -27,7 +29,6 @@ ITEMS = " \
         i2c@8d000/tmp75@4a  \
         pwm-fan-controller@103000 \
         adc@c000 \
-        adc@c000_hostoff \
         "
 
 ENVS = "obmc/hwmon/ahb/apb/{0}.conf"
@@ -47,7 +48,7 @@ SYSTEMD_ENVIRONMENT_FILE_${PN}_append_olympus-nuvoton = " ${@compose_list(d, 'PE
 
 EXTRA_OECONF_append_olympus-nuvoton  = " --enable-update-functional-on-fail"
 
-do_install_append_olympus-nuvoton() {
-    install -d ${D}/${bindir}
-    install -m 0755 ${WORKDIR}/olympus-reload-sensor.sh ${D}${bindir}/
-}
+#do_install_append_olympus-nuvoton() {
+#    install -d ${D}/${bindir}
+#    install -m 0755 ${WORKDIR}/olympus-reload-sensor.sh ${D}${bindir}/
+#}

@@ -4,7 +4,7 @@ SRC_URI_append_olympus-nuvoton = " file://config-olympus-nuvoton.json"
 SRC_URI_append_olympus-nuvoton = " file://fan-default-speed.sh"
 SRC_URI_append_olympus-nuvoton = " file://phosphor-pid-control.service"
 SRC_URI_append_olympus-nuvoton = " file://phosphor-pid-control-stop.service"
-SRC_URI_append_olympus-nuvoton = " file://phosphor-pid-control-bootcheck.service"
+#SRC_URI_append_olympus-nuvoton = " file://phosphor-pid-control-bootcheck.service"
 SRC_URI_append_olympus-nuvoton = " file://fan-reboot-control.service"
 SRC_URI_append_olympus-nuvoton = " file://fan-boot-control.service"
 
@@ -15,7 +15,7 @@ RDEPENDS_${PN} += "bash"
 
 SYSTEMD_SERVICE_${PN}_append_olympus-nuvoton = " phosphor-pid-control.service"
 SYSTEMD_SERVICE_${PN}_append_olympus-nuvoton = " phosphor-pid-control-stop.service"
-SYSTEMD_SERVICE_${PN}_append_olympus-nuvoton = " phosphor-pid-control-bootcheck.service"
+#SYSTEMD_SERVICE_${PN}_append_olympus-nuvoton = " phosphor-pid-control-bootcheck.service"
 SYSTEMD_SERVICE_${PN}_append_olympus-nuvoton = " fan-reboot-control.service"
 SYSTEMD_SERVICE_${PN}_append_olympus-nuvoton = " fan-boot-control.service"
 
@@ -44,8 +44,8 @@ do_install_append_olympus-nuvoton() {
         ${D}${systemd_unitdir}/system
     install -m 0644 ${WORKDIR}/phosphor-pid-control-stop.service \
         ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/phosphor-pid-control-bootcheck.service \
-        ${D}${systemd_unitdir}/system
+    #install -m 0644 ${WORKDIR}/phosphor-pid-control-bootcheck.service \
+    #    ${D}${systemd_unitdir}/system
     install -m 0644 ${WORKDIR}/fan-reboot-control.service \
         ${D}${systemd_unitdir}/system
     install -m 0644 ${WORKDIR}/fan-boot-control.service \
