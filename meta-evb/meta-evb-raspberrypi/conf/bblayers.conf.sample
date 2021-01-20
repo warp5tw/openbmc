@@ -14,6 +14,7 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-openembedded/meta-webserver \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-raspberrypi \
+  ##OEROOT##/meta-evb/meta-evb-raspberrypi/meta-rpi3-64 \
   "
 BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta \
@@ -24,4 +25,5 @@ BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta-openembedded/meta-webserver \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-raspberrypi \
+  ##OEROOT##/meta-evb/meta-evb-raspberrypi/meta-rpi3-64 \
   "
