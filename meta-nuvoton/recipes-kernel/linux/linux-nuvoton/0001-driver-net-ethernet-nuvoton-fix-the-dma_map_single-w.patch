@@ -1,0 +1,81 @@
+From ff1238b74c961a77b44429c5ad804a6d198c77a4 Mon Sep 17 00:00:00 2001
+From: kfting <kfting@nuvoton.com>
+Date: Fri, 5 Mar 2021 14:30:04 +0800
+Subject: [PATCH] driver: net: ethernet: nuvoton: fix the dma_map_single
+ warning message
+
+Signed-off-by: kfting <kfting@nuvoton.com>
+---
+ drivers/net/ethernet/nuvoton/npcm7xx_emc.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/nuvoton/npcm7xx_emc.c b/drivers/net/ethernet/nuvoton/npcm7xx_emc.c
+index a2fea45c2e73..88ddd90d3e0a 100644
+--- a/drivers/net/ethernet/nuvoton/npcm7xx_emc.c
++++ b/drivers/net/ethernet/nuvoton/npcm7xx_emc.c
+@@ -757,7 +757,7 @@ static void npcm7xx_free_desc(struct net_device *netdev,
+ 		skb = ether->tx_skb[i];
+ 		if (skb) {
+ 			addr = (dma_addr_t)le32_to_cpu(ether->tdesc[i].buffer);
+-			dma_unmap_single(&netdev->dev, addr, skb->len,
++			dma_unmap_single(&pdev->dev, addr, skb->len,
+ 					 DMA_TO_DEVICE);
+ 			dev_kfree_skb_any(skb);
+ 			ether->tx_skb[i] = NULL;
+@@ -768,7 +768,7 @@ static void npcm7xx_free_desc(struct net_device *netdev,
+ 		skb = ether->rx_skb[i];
+ 		if (skb) {
+ 			addr = (dma_addr_t)le32_to_cpu(ether->rdesc[i].buffer);
+-			dma_unmap_single(&netdev->dev, addr,
++			dma_unmap_single(&pdev->dev, addr,
+ 					 roundup(MAX_PACKET_SIZE_W_CRC, 4),
+ 					 DMA_FROM_DEVICE);
+ 			dev_kfree_skb_any(skb);
+@@ -1223,6 +1223,7 @@ static int npcm7xx_clean_tx(struct net_device *netdev, bool from_xmit)
+ 	struct sk_buff *s;
+ 	dma_addr_t cur_entry, entry;
+ 	u32 sl;
++	struct platform_device *pdev = ether->pdev;
+ 
+ 	if (ether->pending_tx == 0)
+ 		return (0);
+@@ -1241,7 +1242,7 @@ static int npcm7xx_clean_tx(struct net_device *netdev, bool from_xmit)
+ 
+ 		ether->count_finish++;
+ 
+-		dma_unmap_single(&netdev->dev,
++		dma_unmap_single(&pdev->dev,
+ 				 (dma_addr_t)le32_to_cpu(txbd->buffer), s->len,
+ 				 DMA_TO_DEVICE);
+ 		consume_skb(s);
+@@ -1281,6 +1282,9 @@ static int npcm7xx_ether_start_xmit(struct sk_buff *skb, struct net_device *netd
+ 	struct npcm7xx_ether *ether = netdev_priv(netdev);
+ 	struct npcm7xx_txbd *txbd;
+ 	unsigned long flags;
++	struct platform_device *pdev;
++
++	pdev = ether->pdev;
+ 
+ 	if (skb->len > MAX_PACKET_SIZE) {
+ 		if (net_ratelimit())
+@@ -1297,7 +1301,7 @@ static int npcm7xx_ether_start_xmit(struct sk_buff *skb, struct net_device *netd
+ 
+ 	/* Insert new buffer */
+ 	txbd = (ether->tdesc + ether->cur_tx);
+-	txbd->buffer = cpu_to_le32(dma_map_single(&netdev->dev, skb->data,
++	txbd->buffer = cpu_to_le32(dma_map_single(&pdev->dev, skb->data,
+ 						  skb->len, DMA_TO_DEVICE));
+ 	ether->tx_skb[ether->cur_tx]  = skb;
+ 
+@@ -1583,7 +1587,7 @@ static int npcm7xx_poll(struct napi_struct *napi, int budget)
+ 				      RXDS_RP | (IS_VLAN ? 0 : RXDS_PTLE))) ==
+ 			   RXDS_RXGD) && likely(length <= MAX_PACKET_SIZE)) {
+ 			if (s) {
+-				dma_unmap_single(&netdev->dev,
++				dma_unmap_single(&pdev->dev,
+ 						(dma_addr_t)le32_to_cpu(rxbd->buffer),
+ 						roundup(MAX_PACKET_SIZE_W_CRC, 4),
+ 						DMA_FROM_DEVICE);
+-- 
+2.17.1
+

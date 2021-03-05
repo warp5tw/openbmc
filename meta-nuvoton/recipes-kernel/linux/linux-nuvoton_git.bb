@@ -20,3 +20,4 @@ SRC_URI_append_nuvoton = " file://0015-driver-misc-nuvoton-vdm-support-openbmc-l
 #SRC_URI_append_nuvoton = " file://v4l2.cfg"
 #SRC_URI_append_nuvoton = " file://0001-driver-video-nuvoton-add-video-driver.patch"
 SRC_URI_append_nuvoton = " file://0001-dts-workaround-for-FIU-rofs-mounting-issue.patch"
+SRC_URI_append_nuvoton = " file://0001-driver-net-ethernet-nuvoton-fix-the-dma_map_single-w.patch"
