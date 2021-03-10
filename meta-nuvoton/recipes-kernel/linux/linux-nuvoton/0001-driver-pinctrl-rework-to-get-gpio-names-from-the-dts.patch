@@ -1,0 +1,186 @@
+From 4e9bc89dca69be1ec192330d79badd8c25158fa4 Mon Sep 17 00:00:00 2001
+From: kfting <kfting@nuvoton.com>
+Date: Wed, 10 Mar 2021 14:21:21 +0800
+Subject: [PATCH] driver: pinctrl: rework to get gpio names from the dts file
+
+1. This rework is due to that gpiolib changes the way to access "gpio-line-names" property.
+
+Signed-off-by: kfting <kfting@nuvoton.com>
+---
+ ...nuvoton-npcm750-runbmc-olympus-pincfg.dtsi | 14 +++---
+ .../dts/nuvoton-npcm750-runbmc-olympus.dts    | 50 +++++++++++++++++++
+ drivers/pinctrl/nuvoton/pinctrl-npcm7xx.c     | 40 +++++++++++++++
+ 3 files changed, 97 insertions(+), 7 deletions(-)
+
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus-pincfg.dtsi b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus-pincfg.dtsi
+index 230cb344b2e1..8b697681c7d9 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus-pincfg.dtsi
++++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus-pincfg.dtsi
+@@ -79,32 +79,32 @@
+ 			output-low;
+ 		};
+ 		gpio20_pins: gpio20-pins {
+-			pins = "GPIO20/SMB4CSDA/SMB15SDA";
++			pins = "GPIO20/HGPIO0/SMB4CSDA/SMB15SDA";
+ 			bias-disable;
+ 			input-enable;
+ 		};
+ 		gpio21_pins: gpio21-pins {
+-			pins = "GPIO21/SMB4CSCL/SMB15SCL";
++			pins = "GPIO21/HGPIO1/SMB4CSCL/SMB15SCL";
+ 			bias-disable;
+ 			input-enable;
+ 		};
+ 		gpio22o_pins: gpio22o-pins {
+-			pins = "GPIO22/SMB4DSDA/SMB14SDA";
++			pins = "GPIO22/HGPIO2/SMB4DSDA/SMB14SDA";
+ 			bias-disable;
+ 			output-high;
+ 		};
+ 		gpio23_pins: gpio23-pins {
+-			pins = "GPIO23/SMB4DSCL/SMB14SCL";
++			pins = "GPIO23/HGPIO3/SMB4DSCL/SMB14SCL";
+ 			bias-disable;
+ 			input-enable;
+ 		};
+ 		gpio24_pins: gpio24-pins {
+-			pins = "GPIO24/IOXHDO";
++			pins = "GPIO24/HGPIO4/IOXHDO";
+ 			bias-disable;
+ 			input-enable;
+ 		};
+ 		gpio25_pins: gpio25-pins {
+-			pins = "GPIO25/IOXHDI";
++			pins = "GPIO25/HGPIO5/IOXHDI";
+ 			bias-disable;
+ 			input-enable;
+ 		};
+@@ -139,7 +139,7 @@
+ 			output-high;
+ 		};
+ 		gpio59_pins: gpio59-pins {
+-			pins = "GPIO59/SMB3DSDA";
++			pins = "GPIO59/HGPIO6/SMB3DSDA";
+ 			bias-disable;
+ 			input-enable;
+ 		};
+diff --git a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+index fceb7750569c..d54958474cf4 100644
+--- a/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
++++ b/arch/arm/boot/dts/nuvoton-npcm750-runbmc-olympus.dts
+@@ -1161,4 +1161,54 @@
+ 			&wdog1_pins
+ 			&wdog2_pins
+ 			>;
++		gpio0: gpio@f0010000 {
++			/* TCK_MUX_SEL=gpio22 */
++			/*0-31*/
++			gpio-line-names="","","","","","","","",
++			"","","","","","","","",
++			"","","","","","","TCK_MUX_SEL","",
++			"","","","","","","","";
++		};
++		gpio1: gpio@f0011000 {
++			/* XDP_PRST_N=gpio59 */
++			/*32-63*/
++			gpio-line-names="","","","","","","","",
++			"","","","","","","","",
++			"","","","","","","","",
++			"","","","XDP_PRST_N","","","","";
++		};
++		gpio2: gpio@f0012000 {
++			/* PREQ_N=gpio78, PRDY_N=gpio79, PLTRST_N=gpio95 */
++			/*64-95*/
++			gpio-line-names="","","","","","","","",
++			"","","","","","","PREQ_N","PRDY_N",
++			"","","","POWER_BUTTON","","","","",
++			"","","","","","","","PLTRST_N";
++		};
++		gpio4: gpio@f0014000 {
++			/* PWR_DEBUG_N=gpio153, RSMRST_N=gpio155 */
++			/*128-159*/
++			gpio-line-names="","","","","","","","",
++			"","PS_PWROK","","","","","","",
++			"","RESET_BUTTON","","","","","","",
++			"","PWR_DEBUG_N","","RSMRST_N","","","","";
++		};
++		gpio5: gpio@f0015000 {
++			interrupt-controller;
++			#interrupt-cells = <2>;
++			gpio-line-names =
++				"","","","","","","","",
++				"","","","","","","","",
++				"","","","","","","","",
++				"","","","","","","","";
++		};
++		gpio7: gpio@f0017000 {
++			/* SYSPWROK=gpio229, DEBUG_EN_N=gpio231 */
++			gpio-line-names =
++				/*224-255*/
++				"","","","","","SYSPWROK","","DEBUG_EN_N",
++				"","","","","","","","",
++				"","","","","","","","",
++				"","","","","","","","";
++		};
+ };
+diff --git a/drivers/pinctrl/nuvoton/pinctrl-npcm7xx.c b/drivers/pinctrl/nuvoton/pinctrl-npcm7xx.c
+index d316733fd739..367a4cec9417 100644
+--- a/drivers/pinctrl/nuvoton/pinctrl-npcm7xx.c
++++ b/drivers/pinctrl/nuvoton/pinctrl-npcm7xx.c
+@@ -1957,6 +1957,10 @@ static int npcm7xx_gpio_of(struct npcm7xx_pinctrl *pctrl)
+ 	int id = 0, irq;
+ 	struct device_node *np;
+ 	struct of_phandle_args pinspec;
++  struct fwnode_handle *fwnode;
++  const char **names;
++  const char *name;
++  int count,i;
+ 
+ 	for_each_available_child_of_node(pctrl->dev->of_node, np)
+ 		if (of_find_property(np, "gpio-controller", NULL)) {
+@@ -2004,6 +2008,42 @@ static int npcm7xx_gpio_of(struct npcm7xx_pinctrl *pctrl)
+ 				return ret;
+ 			}
+ 
++      fwnode =  of_fwnode_handle(np);
++      count = fwnode_property_read_string_array(fwnode, "gpio-line-names",
++                            NULL, 0);
++      if(count > 0)
++      {
++          names = devm_kcalloc(pctrl->dev, count, sizeof(char *),
++			     GFP_KERNEL);
++
++          if (!names)
++            return -ENOMEM;
++
++          for (i = 0; i < count; i++) {
++
++            ret = of_property_read_string_index(np, "gpio-line-names",
++                        i, &name);
++            if (ret) {
++              if (ret != -ENODATA)
++                dev_err(pctrl->dev, "unable to name line %d: %d\n",
++                  i, ret);
++              break;
++            }
++
++            if (*name)
++              names[i] = name;
++          }
++
++
++          if (ret < 0) {
++            dev_warn(pctrl->dev, "failed to read GPIO line names\n");
++            kfree(names);
++            return ret;
++          }
++
++          pctrl->gpio_bank[id].gc.names = names;
++      }
++
+ 			pctrl->gpio_bank[id].irq = irq;
+ 			pctrl->gpio_bank[id].irq_chip = npcmgpio_irqchip;
+ 			pctrl->gpio_bank[id].gc.parent = pctrl->dev;
+-- 
+2.17.1
+
