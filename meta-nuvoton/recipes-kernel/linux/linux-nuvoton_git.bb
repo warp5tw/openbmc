@@ -1,7 +1,8 @@
 KBRANCH ?= "NPCM-5.10-OpenBMC"
 LINUX_VERSION ?= "5.10.14"
 
-SRCREV="a548264b9cf1492af7ad9cfe60da7775e6bc3eae"
+#SRCREV="029ec235190f4ded8e9a8f07eaf5eb6ad3cd40e0"
+SRCREV="35bf55522b116ff58486345491e9598e5237e93a"
 
 require linux-nuvoton.inc
 
@@ -19,6 +20,6 @@ SRC_URI_append_nuvoton = " file://0015-driver-misc-nuvoton-vdm-support-openbmc-l
 
 #SRC_URI_append_nuvoton = " file://v4l2.cfg"
 #SRC_URI_append_nuvoton = " file://0001-driver-video-nuvoton-add-video-driver.patch"
-SRC_URI_append_nuvoton = " file://0001-dts-workaround-for-FIU-rofs-mounting-issue.patch"
-SRC_URI_append_nuvoton = " file://0001-driver-net-ethernet-nuvoton-fix-the-dma_map_single-w.patch"
-SRC_URI_append_nuvoton = " file://0001-driver-pinctrl-rework-to-get-gpio-names-from-the-dts.patch"
+#SRC_URI_append_nuvoton = " file://0001-dts-workaround-for-FIU-rofs-mounting-issue.patch"
+#SRC_URI_append_nuvoton = " file://0001-driver-net-ethernet-nuvoton-fix-the-dma_map_single-w.patch"
+#SRC_URI_append_nuvoton = " file://0001-driver-pinctrl-rework-to-get-gpio-names-from-the-dts.patch"
