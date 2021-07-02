@@ -6,7 +6,7 @@ PROVIDES += "virtual/kernel"
 
 KCONFIG_MODE="--alldefconfig"
 
-KSRC ?= "git://github.com/Nuvoton-Israel/linux;protocol=git;branch=${KBRANCH}"
+KSRC ?= "git://github.com/warp5tw/linux;protocol=git;branch=${KBRANCH}"
 SRC_URI = "${KSRC}"
 SRC_URI_append_npcm7xx = " file://defconfig"
 SRC_URI_append_npcm8xx = " file://npcm8xx_defconfig"
