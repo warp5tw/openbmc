@@ -1,0 +1,559 @@
+From 34f0a813d0d4dfe21e29fca5f35fc9be832ff00b Mon Sep 17 00:00:00 2001
+From: Tyrone Ting <kfting@nuvoton.com>
+Date: Fri, 17 Jun 2022 14:09:07 +0800
+Subject: [PATCH] npcm8xx mailbox driver
+
+Signed-off-by: Tyrone Ting <kfting@nuvoton.com>
+---
+ .../dts/nuvoton/nuvoton-common-npcm8xx.dtsi   |   9 +
+ .../boot/dts/nuvoton/nuvoton-npcm845-evb.dts  |  35 +-
+ drivers/mailbox/Kconfig                       |   7 +
+ drivers/mailbox/Makefile                      |   2 +
+ drivers/mailbox/npcm8xx-mailbox.c             | 431 ++++++++++++++++++
+ 5 files changed, 483 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/mailbox/npcm8xx-mailbox.c
+
+diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi b/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi
+index 53d4c69c3ee0..047ec4170cd0 100644
+--- a/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi
++++ b/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi
+@@ -339,6 +339,15 @@
+ 			status = "disabled";
+ 		};
+ 
++		mailbox0: mailbox@f080c000 {
++			compatible = "nuvoton,npcm845-mailbox";
++			reg = <0x0 0xf080c000 0x0 0x10>;
++			interrupts = <GIC_SPI 1 IRQ_TYPE_LEVEL_HIGH>;
++			#mbox-cells = <1>;
++			mbox-name = "a9";
++			status = "disabled";
++		};
++
+ 		m4_rproc: m4@0 {
+ 			compatible = "nuvoton,npcm845-m4";
+ 			reg = <0x0 0x0 0x0 0x0>;
+diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
+index b1b15c3aea00..8505e84937f5 100644
+--- a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
++++ b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
+@@ -92,10 +92,35 @@
+ 		};
+ 
+ 		cp1_tag: cp1_tag@0x36000000  {
++			compatible = "shared-dma-pool";
+ 			reg = <0x0 0x36000000  0x0 0x100000>;
+ 			no-map;
+ 		};
+ 
++		vdev0vring0: vdev0vring0@0x36100000  {
++			compatible = "shared-dma-pool";
++			reg = <0x0 0x36100000  0x0 0x1000>;
++			no-map;
++		};
++
++		vdev0vring1: vdev0vring1@0x36101000  {
++			compatible = "shared-dma-pool";
++			reg = <0x0 0x36101000  0x0 0x1000>;
++			no-map;
++		};
++
++		vdev0buffer: vdev0buffer@0x36102000  {
++			compatible = "shared-dma-pool";
++			reg = <0x0 0x36102000  0x0 0x4000>;
++			no-map;
++		};
++
++		rtbuffer: rtbuffer@0x36106000  {
++			compatible = "shared-dma-pool";
++			reg = <0x0 0x36106000  0x0 0x1000>;
++			no-map;
++		};
++
+ 	};
+ 
+ 	regulators {
+@@ -712,8 +737,16 @@
+   status = "okay";
+ };
+ 
++&mailbox0 {
++  status = "okay";
++};
++
+ &m4_rproc {
+ 	status = "okay";
+-	memory-region = <&cp1_tag>;
++	memory-region = <&cp1_tag>, <&vdev0vring0>, <&vdev0vring1>,
++                        <&vdev0buffer>, <&rtbuffer>;
++	#mbox-cells = <1>;
++	mbox-names = "vq0", "vq1";
++	mboxes = <&mailbox0 0>, <&mailbox0 1>;
+ };
+ 
+diff --git a/drivers/mailbox/Kconfig b/drivers/mailbox/Kconfig
+index 05b1009e2820..b8acee24c246 100644
+--- a/drivers/mailbox/Kconfig
++++ b/drivers/mailbox/Kconfig
+@@ -254,4 +254,11 @@ config QCOM_IPCC
+ 	  acts as an interrupt controller for receiving interrupts from clients.
+ 	  Say Y here if you want to build this driver.
+ 
++config NPCM8XX_MBOX
++	tristate "NPCM8XX MAILBOX"
++	depends on ARCH_NPCM && OF
++	help
++	  Mailbox implementation for Nuvoton NPCM8XX family chips with
++	  hardware for interprocessor communication.
++
+ endif
+diff --git a/drivers/mailbox/Makefile b/drivers/mailbox/Makefile
+index 2e06e02b2e03..de7cf1b9bc34 100644
+--- a/drivers/mailbox/Makefile
++++ b/drivers/mailbox/Makefile
+@@ -54,3 +54,5 @@ obj-$(CONFIG_SUN6I_MSGBOX)	+= sun6i-msgbox.o
+ obj-$(CONFIG_SPRD_MBOX)		+= sprd-mailbox.o
+ 
+ obj-$(CONFIG_QCOM_IPCC)		+= qcom-ipcc.o
++
++obj-$(CONFIG_NPCM8XX_MBOX)	+= npcm8xx-mailbox.o
+diff --git a/drivers/mailbox/npcm8xx-mailbox.c b/drivers/mailbox/npcm8xx-mailbox.c
+new file mode 100644
+index 000000000000..71a85c57870d
+--- /dev/null
++++ b/drivers/mailbox/npcm8xx-mailbox.c
+@@ -0,0 +1,431 @@
++/* SPDX-License-Identifier: GPL-2.0
++ * Copyright (c) 2021 Nuvoton Technology corporation.
++ *
++ * Based on the original driver written by;
++ *   Alexandre Torgue, Olivier Lebreton and Loic Pallardy
++ */
++
++#include <linux/err.h>
++#include <linux/interrupt.h>
++#include <linux/io.h>
++#include <linux/kernel.h>
++#include <linux/mailbox_controller.h>
++#include <linux/module.h>
++#include <linux/of.h>
++#include <linux/of_device.h>
++#include <linux/platform_device.h>
++#include <linux/slab.h>
++
++//#include "mailbox.h"
++
++#define NPCM8XX_MBOX_INST_MAX	1      /* RAM saving: Max supported instances */
++#define NPCM8XX_MBOX_CHAN_MAX	32     /* RAM saving: Max supported channels  */
++
++#define NPCM8XX_CP2BST1_OFFSET  0x04   /* Coprocessor 1 to BMC Core Status Register */
++#define NPCM8XX_B2CPNT1_OFFSET  0x08   /* BMC Core to Coprocessor 1 Notification Register */
++
++/**
++ * NPCM8xx Mailbox device data
++ *
++ * An IP Mailbox is currently composed of 1 instances
++ * Each instance is currently composed of 32 channels
++ * This means that we have 32 channels per Mailbox
++ * A channel can be used for TX or RX
++ *
++ * @dev:	Device to which it is attached
++ * @mbox:	Representation of a communication channel controller
++ * @base:	Base address of the register mapping region
++ * @name:	Name of the mailbox
++ * @enabled:	Local copy of enabled channels
++ * @lock:	Mutex protecting enabled status
++ */
++struct npcm8xx_mbox_device {
++	struct device		*dev;
++	struct mbox_controller	*mbox;
++	void __iomem		*base;
++	const char		*name;
++	spinlock_t		lock;
++};
++
++/**
++ * NPCM8xx Mailbox platform specific configuration
++ *
++ * @num_chan:	Maximum number of channel per instance
++ */
++struct npcm8xx_mbox_pdata {
++	unsigned int		num_chan;
++};
++
++/**
++ * NPCM8xx Mailbox allocated channel information
++ *
++ * @mdev:	Pointer to parent Mailbox device
++ * @channel:	Channel number pertaining to this container
++ */
++struct npcm8xx_channel {
++	struct npcm8xx_mbox_device	*mdev;
++	unsigned int			channel;
++};
++
++static inline bool npcm8xx_mbox_channel_is_enabled(struct mbox_chan *chan)
++{
++	struct npcm8xx_channel *chan_info = chan->con_priv;
++	struct npcm8xx_mbox_device *mdev = chan_info->mdev;
++	unsigned int channel = chan_info->channel;
++
++	return BIT(channel);
++}
++
++static inline
++struct mbox_chan *npcm8xx_mbox_to_channel(struct mbox_controller *mbox,
++				      unsigned int channel)
++{
++	struct npcm8xx_channel *chan_info;
++	int i;
++
++	for (i = 0; i < mbox->num_chans; i++) {
++		chan_info = mbox->chans[i].con_priv;
++		if (chan_info &&
++		    chan_info->channel == channel)
++			return &mbox->chans[i];
++	}
++
++	dev_err(mbox->dev,
++		"Channel not registered: channel: %d\n",
++		channel);
++
++	return NULL;
++}
++
++static void npcm8xx_mbox_enable_channel(struct mbox_chan *chan)
++{
++	return;
++}
++
++static void npcm8xx_mbox_disable_channel(struct mbox_chan *chan)
++{
++	return;
++}
++
++static void npcm8xx_mbox_clear_irq(struct mbox_chan *chan)
++{
++	struct npcm8xx_channel *chan_info = chan->con_priv;
++	struct npcm8xx_mbox_device *mdev = chan_info->mdev;
++	unsigned int channel = chan_info->channel;
++	void __iomem *base = mdev->base;
++
++	iowrite32(BIT(channel), base + NPCM8XX_CP2BST1_OFFSET);
++}
++
++static struct mbox_chan *npcm8xx_mbox_irq_to_channel(struct npcm8xx_mbox_device *mdev)
++{
++	struct mbox_controller *mbox = mdev->mbox;
++	struct mbox_chan *chan = NULL;
++	unsigned int channel;
++	unsigned long bits;
++	void __iomem *base = mdev->base;
++
++	bits = ioread32(base + NPCM8XX_CP2BST1_OFFSET);
++	if (!bits)
++		/* No IRQs fired in specified instance */
++		return NULL;
++
++	/* An IRQ has fired, find the associated channel */
++	for (channel = 0; bits; channel++) {
++		if (!test_and_clear_bit(channel, &bits))
++			continue;
++
++		chan = npcm8xx_mbox_to_channel(mbox, channel);
++		if (chan) {
++			dev_dbg(mbox->dev,
++				"IRQ fired on channel: %d\n",
++				channel);
++		}
++		else {
++			// An interrupt happens but the coressponding
++			// channel is not registered.
++			iowrite32(BIT(channel), base + NPCM8XX_CP2BST1_OFFSET);
++		}
++		break;
++	}
++
++	return chan;
++}
++
++static irqreturn_t npcm8xx_mbox_thread_handler(int irq, void *data)
++{
++	struct npcm8xx_mbox_device *mdev = data;
++	struct npcm8xx_mbox_pdata *pdata = dev_get_platdata(mdev->dev);
++	struct mbox_chan *chan;
++
++keep_looking:
++	chan = npcm8xx_mbox_irq_to_channel(mdev);
++	if (!chan)
++		return IRQ_HANDLED;
++
++	mbox_chan_received_data(chan, NULL);
++	npcm8xx_mbox_clear_irq(chan);
++	//npcm8xx_mbox_enable_channel(chan);
++	goto keep_looking;
++
++	return IRQ_HANDLED;
++}
++
++static irqreturn_t npcm8xx_mbox_irq_handler(int irq, void *data)
++{
++	struct npcm8xx_mbox_device *mdev = data;
++	struct npcm8xx_mbox_pdata *pdata = dev_get_platdata(mdev->dev);
++	struct npcm8xx_channel *chan_info;
++	struct mbox_chan *chan;
++	int ret = IRQ_NONE;
++
++	chan = npcm8xx_mbox_irq_to_channel(mdev);
++	if (!chan) {
++		ret = IRQ_HANDLED;
++		goto no_chan;
++	}
++
++	//npcm8xx_mbox_disable_channel(chan);
++	ret = IRQ_WAKE_THREAD;
++
++no_chan:
++	if (ret != IRQ_WAKE_THREAD)
++		dev_err(mdev->dev, "Spurious IRQ - was a channel requested?\n");
++
++	return ret;
++}
++
++static bool npcm8xx_mbox_tx_is_ready(struct mbox_chan *chan)
++{
++	struct npcm8xx_channel *chan_info = chan->con_priv;
++	struct npcm8xx_mbox_device *mdev = chan_info->mdev;
++	unsigned int channel = chan_info->channel;
++	void __iomem *base = mdev->base;
++
++	if (ioread32(base + NPCM8XX_B2CPNT1_OFFSET) & BIT(channel)) {
++		dev_dbg(mdev->dev, "Mbox: %s: chan: %d not ready\n",
++			mdev->name, channel);
++		return false;
++	}
++
++	return true;
++}
++
++static int npcm8xx_mbox_send_data(struct mbox_chan *chan, void *data)
++{
++	struct npcm8xx_channel *chan_info = chan->con_priv;
++	struct npcm8xx_mbox_device *mdev = chan_info->mdev;
++	unsigned int channel = chan_info->channel;
++	void __iomem *base = mdev->base;
++
++	/* Send event to co-processor */
++	iowrite32(BIT(channel), base + NPCM8XX_B2CPNT1_OFFSET);
++
++	dev_dbg(mdev->dev,
++		"Sent via Mailbox %s: channel: %d\n",
++		mdev->name, channel);
++
++	return 0;
++}
++
++static int npcm8xx_mbox_startup_chan(struct mbox_chan *chan)
++{
++	npcm8xx_mbox_clear_irq(chan);
++	//npcm8xx_mbox_enable_channel(chan);
++
++	return 0;
++}
++
++static void npcm8xx_mbox_shutdown_chan(struct mbox_chan *chan)
++{
++	struct npcm8xx_channel *chan_info = chan->con_priv;
++	struct mbox_controller *mbox = chan_info->mdev->mbox;
++	int i;
++
++	for (i = 0; i < mbox->num_chans; i++)
++		if (chan == &mbox->chans[i])
++			break;
++
++	if (mbox->num_chans == i) {
++		dev_warn(mbox->dev, "Request to free non-existent channel\n");
++		return;
++	}
++
++	/* Reset channel */
++	//npcm8xx_mbox_disable_channel(chan);
++	npcm8xx_mbox_clear_irq(chan);
++	chan->con_priv = NULL;
++}
++
++static struct mbox_chan *npcm8xx_mbox_xlate(struct mbox_controller *mbox,
++					const struct of_phandle_args *spec)
++{
++	struct npcm8xx_mbox_device *mdev = dev_get_drvdata(mbox->dev);
++	struct npcm8xx_mbox_pdata *pdata = dev_get_platdata(mdev->dev);
++	struct npcm8xx_channel *chan_info;
++	struct mbox_chan *chan = NULL;
++	unsigned int channel   = spec->args[0];
++	int i;
++
++	/* Bounds checking */
++	if (channel  >= pdata->num_chan) {
++		dev_err(mbox->dev,
++			"Invalid channel requested channel: %d\n",
++			channel);
++		return ERR_PTR(-EINVAL);
++	}
++
++	for (i = 0; i < mbox->num_chans; i++) {
++		chan_info = mbox->chans[i].con_priv;
++
++		/* Is requested channel free? */
++		if (chan_info &&
++		    mbox->dev == chan_info->mdev->dev &&
++		    channel == chan_info->channel) {
++
++			dev_err(mbox->dev, "Channel in use\n");
++			return ERR_PTR(-EBUSY);
++		}
++
++		/*
++		 * Find the first free slot, then continue checking
++		 * to see if requested channel is in use
++		 */
++		if (!chan && !chan_info)
++			chan = &mbox->chans[i];
++	}
++
++	if (!chan) {
++		dev_err(mbox->dev, "No free channels left\n");
++		return ERR_PTR(-EBUSY);
++	}
++
++	chan_info = devm_kzalloc(mbox->dev, sizeof(*chan_info), GFP_KERNEL);
++	if (!chan_info)
++		return ERR_PTR(-ENOMEM);
++
++	chan_info->mdev		= mdev;
++	chan_info->channel	= channel;
++
++	chan->con_priv = chan_info;
++
++	dev_info(mbox->dev,
++		 "Mbox: %s: Created channel: channel: %d\n",
++		 mdev->name, channel);
++
++	return chan;
++}
++
++static const struct mbox_chan_ops npcm8xx_mbox_ops = {
++	.startup	= npcm8xx_mbox_startup_chan,
++	.shutdown	= npcm8xx_mbox_shutdown_chan,
++	.send_data	= npcm8xx_mbox_send_data,
++	.last_tx_done	= npcm8xx_mbox_tx_is_ready,
++};
++
++static const struct npcm8xx_mbox_pdata mbox_npcm845_pdata = {
++	.num_chan	= 32,
++};
++
++static const struct of_device_id npcm8xx_mailbox_match[] = {
++	{
++		.compatible = "nuvoton,npcm845-mailbox",
++		.data = (void *)&mbox_npcm845_pdata
++	},
++	{ }
++};
++MODULE_DEVICE_TABLE(of, npcm8xx_mailbox_match);
++
++static int npcm8xx_mbox_probe(struct platform_device *pdev)
++{
++	const struct of_device_id *match;
++	struct mbox_controller *mbox;
++	struct npcm8xx_mbox_device *mdev;
++	struct device_node *np = pdev->dev.of_node;
++	struct mbox_chan *chans;
++	struct resource *res;
++	int irq;
++	int ret;
++
++	match = of_match_device(npcm8xx_mailbox_match, &pdev->dev);
++	if (!match) {
++		dev_err(&pdev->dev, "No configuration found\n");
++		return -ENODEV;
++	}
++	pdev->dev.platform_data = (struct npcm8xx_mbox_pdata *) match->data;
++
++	mdev = devm_kzalloc(&pdev->dev, sizeof(*mdev), GFP_KERNEL);
++	if (!mdev)
++		return -ENOMEM;
++
++	platform_set_drvdata(pdev, mdev);
++
++	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++	mdev->base = devm_ioremap_resource(&pdev->dev, res);
++	if (IS_ERR(mdev->base))
++		return PTR_ERR(mdev->base);
++
++	ret = of_property_read_string(np, "mbox-name", &mdev->name);
++	if (ret)
++		mdev->name = np->full_name;
++
++	mbox = devm_kzalloc(&pdev->dev, sizeof(*mbox), GFP_KERNEL);
++	if (!mbox)
++		return -ENOMEM;
++
++	chans = devm_kcalloc(&pdev->dev,
++			     NPCM8XX_MBOX_CHAN_MAX, sizeof(*chans), GFP_KERNEL);
++	if (!chans)
++		return -ENOMEM;
++
++	mdev->dev		= &pdev->dev;
++	mdev->mbox		= mbox;
++
++	spin_lock_init(&mdev->lock);
++
++	/* NPCM8XX does not have a Tx-Done or Tx-Ready IRQ */
++	mbox->txdone_irq	= false;
++	mbox->txdone_poll	= true;
++	mbox->txpoll_period	= 100;
++	mbox->ops		= &npcm8xx_mbox_ops;
++	mbox->dev		= mdev->dev;
++	mbox->of_xlate		= npcm8xx_mbox_xlate;
++	mbox->chans		= chans;
++	mbox->num_chans		= NPCM8XX_MBOX_CHAN_MAX;
++
++	ret = devm_mbox_controller_register(&pdev->dev, mbox);
++	if (ret)
++		return ret;
++
++	/* It's okay for Tx Mailboxes to not supply IRQs */
++	irq = platform_get_irq(pdev, 0);
++	if (irq < 0) {
++		dev_info(&pdev->dev,
++			 "%s: Registered Tx only Mailbox\n", mdev->name);
++		return 0;
++	}
++
++	ret = devm_request_threaded_irq(&pdev->dev, irq,
++					npcm8xx_mbox_irq_handler,
++					npcm8xx_mbox_thread_handler,
++					IRQF_ONESHOT, mdev->name, mdev);
++	if (ret) {
++		dev_err(&pdev->dev, "Can't claim IRQ %d\n", irq);
++		return -EINVAL;
++	}
++
++	dev_info(&pdev->dev, "%s: Registered Tx/Rx Mailbox\n", mdev->name);
++
++	return 0;
++}
++
++static struct platform_driver npcm8xx_mbox_driver = {
++	.probe = npcm8xx_mbox_probe,
++	.driver = {
++		.name = "npcm8xx-mailbox",
++		.of_match_table = npcm8xx_mailbox_match,
++	},
++};
++module_platform_driver(npcm8xx_mbox_driver);
++
++MODULE_LICENSE("GPL");
+-- 
+2.17.1
+

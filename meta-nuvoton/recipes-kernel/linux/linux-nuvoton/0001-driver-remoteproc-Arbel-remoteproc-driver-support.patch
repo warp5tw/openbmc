@@ -1,4 +1,4 @@
-From 54798539989004948797e44acc0e84320346d0e7 Mon Sep 17 00:00:00 2001
+From eb57bc853ab6e68c744c0440661f149401b1fb5b Mon Sep 17 00:00:00 2001
 From: kfting <kfting@nuvoton.com>
 Date: Wed, 28 Jul 2021 17:29:20 +0800
 Subject: [PATCH] driver : remoteproc: Arbel remoteproc driver support
@@ -9,15 +9,15 @@ Signed-off-by: kfting <kfting@nuvoton.com>
  .../boot/dts/nuvoton/nuvoton-npcm845-evb.dts  |  16 +
  drivers/remoteproc/Kconfig                    |  18 +
  drivers/remoteproc/Makefile                   |   1 +
- drivers/remoteproc/npcm8xx_remoteproc.c       | 659 ++++++++++++++++++
- 5 files changed, 709 insertions(+)
+ drivers/remoteproc/npcm8xx_remoteproc.c       | 642 ++++++++++++++++++
+ 5 files changed, 692 insertions(+)
  create mode 100644 drivers/remoteproc/npcm8xx_remoteproc.c
 
 diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi b/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi
-index 195410002634..94c674bbcf88 100644
+index 70e3fbcb1f97..53d4c69c3ee0 100644
 --- a/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi
 +++ b/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi
-@@ -338,6 +338,21 @@ video: video@f0810000 {
+@@ -333,6 +333,21 @@
  			status = "disabled";
  		};
  
@@ -40,15 +40,15 @@ index 195410002634..94c674bbcf88 100644
  			#address-cells = <1>;
  			#size-cells = <1>;
 diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
-index 43228a738060..256ec2421eaf 100644
+index 43228a738060..b1b15c3aea00 100644
 --- a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
 +++ b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
-@@ -90,6 +90,12 @@ video_memory: framebuffer@0x33000000 {
+@@ -90,6 +90,12 @@
  			reusable;
  			linux,cma-default;
  		};
 +
-+		cp1_tag: tagbuffer@0x36000000  {
++		cp1_tag: cp1_tag@0x36000000  {
 +			reg = <0x0 0x36000000  0x0 0x100000>;
 +			no-map;
 +		};
@@ -56,7 +56,7 @@ index 43228a738060..256ec2421eaf 100644
  	};
  
  	regulators {
-@@ -701,3 +707,13 @@ &i2c25 {
+@@ -701,3 +707,13 @@
  &i2c26 {
  	status = "okay";
  };
@@ -110,10 +110,10 @@ index da2ace4ec86c..2645662c524e 100644
 +obj-$(CONFIG_NPCM8XX_REMOTEPROC)	+= npcm8xx_remoteproc.o
 diff --git a/drivers/remoteproc/npcm8xx_remoteproc.c b/drivers/remoteproc/npcm8xx_remoteproc.c
 new file mode 100644
-index 000000000000..03a95d5f7398
+index 000000000000..fa09506f7259
 --- /dev/null
 +++ b/drivers/remoteproc/npcm8xx_remoteproc.c
-@@ -0,0 +1,659 @@
+@@ -0,0 +1,642 @@
 +// SPDX-License-Identifier: GPL-2.0
 +// Copyright (c) 2016-2018 Nuvoton Technology corporation.
 +
@@ -140,13 +140,9 @@ index 000000000000..03a95d5f7398
 +#include "remoteproc_internal.h"
 +#include "remoteproc_elf_helpers.h"
 +
-+#define ST_RPROC_VQ0		0
-+#define ST_RPROC_VQ1		1
-+#define ST_RPROC_MAX_VRING	2
-+
-+#define MBOX_RX			0
-+#define MBOX_TX			1
-+#define MBOX_MAX		2
++#define NPCM8XX_RPROC_VQ0		0
++#define NPCM8XX_RPROC_VQ1		1
++#define NPCM8XX_RPROC_MAX_VRING		2
 +
 +#define CPBPNTR1    0x10
 +#define IPSRST2     0x24
@@ -167,7 +163,7 @@ index 000000000000..03a95d5f7398
 +	u32			clk_rate;
 +	struct regmap		*boot_base;
 +	u32			boot_offset;
-+	struct mbox_chan	*mbox_chan[ST_RPROC_MAX_VRING * MBOX_MAX];
++	struct mbox_chan	*mbox_chan[NPCM8XX_RPROC_MAX_VRING];
 +	struct mbox_client mbox_client_vq0;
 +	struct mbox_client mbox_client_vq1;
 +};
@@ -177,8 +173,7 @@ index 000000000000..03a95d5f7398
 +uint32_t CP1SourceSize = 0x20000; //TBD, not greater than CP1 ROM code stack address
 +uint32_t CP1_HEADER_OFS = 0x10;
 +
-+#if 0//todo
-+static void st_rproc_mbox_callback(struct device *dev, u32 msg)
++static void npcm8xx_rproc_mbox_callback(struct device *dev, u32 msg)
 +{
 +	struct rproc *rproc = dev_get_drvdata(dev);
 +
@@ -187,33 +182,17 @@ index 000000000000..03a95d5f7398
 +}
 +
 +static
-+void st_rproc_mbox_callback_vq0(struct mbox_client *mbox_client, void *data)
++void npcm8xx_rproc_mbox_callback_vq0(struct mbox_client *mbox_client, void *data)
 +{
-+	st_rproc_mbox_callback(mbox_client->dev, 0);
++	npcm8xx_rproc_mbox_callback(mbox_client->dev, 0);
 +}
 +
 +static
-+void st_rproc_mbox_callback_vq1(struct mbox_client *mbox_client, void *data)
++void npcm8xx_rproc_mbox_callback_vq1(struct mbox_client *mbox_client, void *data)
 +{
-+	st_rproc_mbox_callback(mbox_client->dev, 1);
++	npcm8xx_rproc_mbox_callback(mbox_client->dev, 1);
 +}
 +
-+static void npcm_rproc_kick(struct rproc *rproc, int vqid)
-+{
-+	struct npcm8xx_rproc *ddata = rproc->priv;
-+	struct device *dev = rproc->dev.parent;
-+	int ret;
-+
-+	/* send the index of the triggered virtqueue in the mailbox payload */
-+	if (WARN_ON(vqid >= ST_RPROC_MAX_VRING))
-+		return;
-+
-+	ret = mbox_send_message(ddata->mbox_chan[vqid * MBOX_MAX + MBOX_TX],
-+				(void *)&vqid);
-+	if (ret < 0)
-+		dev_err(dev, "failed to send message via mbox: %d\n", ret);
-+}
-+#endif
 +static int npcm_rproc_mem_alloc(struct rproc *rproc,
 +			      struct rproc_mem_entry *mem)
 +{
@@ -262,9 +241,7 @@ index 000000000000..03a95d5f7398
 +		}
 +
 +		/*  No need to map vdev buffer */
-+#if 0 //todo
 +		if (strcmp(it.node->name, "vdev0buffer")) {
-+#endif
 +			/* Register memory region */
 +			mem = rproc_mem_entry_init(dev, NULL,
 +						   (dma_addr_t)rmem->base,
@@ -272,7 +249,6 @@ index 000000000000..03a95d5f7398
 +						   npcm_rproc_mem_alloc,
 +						   npcm_rproc_mem_release,
 +						   it.node->name);
-+#if 0 //todo
 +		} else {
 +			/* Register reserved memory for vdev buffer allocation */
 +			mem = rproc_of_resm_mem_entry_init(dev, index,
@@ -280,7 +256,6 @@ index 000000000000..03a95d5f7398
 +							   rmem->base,
 +							   it.node->name);
 +		}
-+#endif
 +
 +		if (!mem)
 +			return -ENOMEM;
@@ -289,9 +264,8 @@ index 000000000000..03a95d5f7398
 +    //printk("rproc add carveout :%s\r\n", it.node->name);
 +		index++;
 +	}
-+//todo
-+	//return rproc_elf_load_rsc_table(rproc, fw);
-+  return 0;
++
++	return rproc_elf_load_rsc_table(rproc, fw);
 +}
 +
 +static void *npcm_rproc_da_to_va(struct rproc *rproc, u64 da, size_t len)
@@ -304,7 +278,6 @@ index 000000000000..03a95d5f7398
 +  uint32_t bootaddr = 0;
 +
 +	//printk("%s\r\n", __func__);
-+
 +	err = of_property_read_u32(np, "nu,boot", &bootaddr);
 +	if (err) {
 +		dev_err(dev, "failed to get boot addr\n");
@@ -312,13 +285,20 @@ index 000000000000..03a95d5f7398
 +	}
 +
 +	list_for_each_entry(carveout, &rproc->carveouts, node) {
-+   // printk("npcm8xx rproc len:%zu\r\n", len);
-+   // printk("rproc da:0x%llx\r\n", da);
-+   // printk("rproc carveout da:0x%x\r\n", carveout->da);
-+   // printk("rproc carveout va:0x%x\r\n", carveout->va);
-+   // printk("rproc carveout len:0x%lx\r\n", carveout->len);
++    //printk("npcm8xx rproc len:0x%x\r\n", len);
++    //printk("rproc da:0x%llx\r\n", da);
++    //printk("rproc carveout da:0x%x\r\n", carveout->da);
++    //printk("rproc carveout va:0x%x\r\n", carveout->va);
++    //printk("rproc carveout len:0x%lx\r\n", carveout->len);
 +		int offset = da - bootaddr;
-+   // printk("npcm8xx rproc offset:%d\r\n", offset);
++		//since rproc_elf_find_loaded_rsc_table also calls
++		//npcm_rproc_da_to_va, the value of da (resource table
++		//section address, e.g.: 0x36106000) is much greater
++		//than that of bootaddr (0x10000)
++		//if this is the case, calculate the offset again.
++		if ((offset + len + CP1_HEADER_OFS) > carveout->len)
++			offset = da - carveout->da;
++    //printk("npcm8xx rproc offset:0x%x\r\n", offset);
 +
 +		/*  Verify that carveout is allocated */
 +		if (!carveout->va)
@@ -335,7 +315,7 @@ index 000000000000..03a95d5f7398
 +    }
 +
 +		/* try next carveout if da is too large */
-+		if (offset + len > carveout->len)
++		if ((offset + len + CP1_HEADER_OFS) > carveout->len)
 +    {
 +      //printk("rproc offset too large\r\n");
 +			continue;
@@ -443,7 +423,10 @@ index 000000000000..03a95d5f7398
 +			dev_err(dev, "unable to acquire memory-region\n");
 +			return -EINVAL;
 +		}
-+  }
++
++		if (!strcmp(it.node->name, "cp1_tag"))
++			break;
++        }
 +
 +	cop = syscon_regmap_lookup_by_phandle(np, "nu,copcnt");
 +	if (IS_ERR(cop)) {
@@ -456,9 +439,9 @@ index 000000000000..03a95d5f7398
 +	list_for_each_entry(carveout, &rproc->carveouts, node) {
 +		/*  Verify that carveout is allocated */
 +		if (carveout->va)
-+    {
++                {
 +			break;
-+    }
++                }
 +	}
 +
 +  cp1_source_addr = rmem->base + CP1_HEADER_OFS;
@@ -502,13 +485,30 @@ index 000000000000..03a95d5f7398
 +	return sw_err ?: pwr_err;
 +}
 +
++static void npcm_rproc_kick(struct rproc *rproc, int vqid)
++{
++	struct npcm8xx_rproc *ddata = rproc->priv;
++	struct device *dev = rproc->dev.parent;
++	int ret;
++
++	/* send the index of the triggered virtqueue in the mailbox payload */
++	if (WARN_ON(vqid >= NPCM8XX_RPROC_MAX_VRING))
++		return;
++ 
++	ret = mbox_send_message(ddata->mbox_chan[vqid],
++				(void *)&vqid);
++	if (ret < 0)
++		dev_err(dev, "failed to send message via mbox: %d\n", ret);
++}
++
 +static const struct rproc_ops npcm8xx_rproc_ops = {
-+	//.kick			= npcm_rproc_kick,
 +	.start			= npcm_rproc_start,
 +	.stop			= npcm_rproc_stop,
++	.kick		        = npcm_rproc_kick,
 +	.parse_fw		= npcm_rproc_parse_fw,
 +	.load			= npcm_rproc_elf_load_segments,
-+  .da_to_va = npcm_rproc_da_to_va,
++	.find_loaded_rsc_table	= rproc_elf_find_loaded_rsc_table,
++	.da_to_va               = npcm_rproc_da_to_va,
 +  //todo
 +	//.find_loaded_rsc_table	= rproc_elf_find_loaded_rsc_table,
 +	//.sanity_check		= rproc_elf_sanity_check,
@@ -637,9 +637,9 @@ index 000000000000..03a95d5f7398
 +	struct npcm8xx_rproc *ddata;
 +	struct device_node *np = dev->of_node;
 +	struct rproc *rproc;
-+	//struct mbox_chan *chan;
++	struct mbox_chan *chan;
 +	//int enabled;
-+	int ret;//, i;
++	int ret, i;
 +	
 +	match = of_match_device(npcm8xx_rproc_match, dev);
 +	if (!match || !match->data) {
@@ -673,57 +673,42 @@ index 000000000000..03a95d5f7398
 +	} else {
 +		clk_set_rate(ddata->clk, ddata->clk_rate);
 +	}
++#endif
 +
 +	if (of_get_property(np, "mbox-names", NULL)) {
 +		ddata->mbox_client_vq0.dev		= dev;
 +		ddata->mbox_client_vq0.tx_done		= NULL;
-+		ddata->mbox_client_vq0.tx_block	= false;
++		ddata->mbox_client_vq0.tx_block	        = false;
 +		ddata->mbox_client_vq0.knows_txdone	= false;
-+		ddata->mbox_client_vq0.rx_callback	= st_rproc_mbox_callback_vq0;
++		ddata->mbox_client_vq0.rx_callback	= npcm8xx_rproc_mbox_callback_vq0;
 +
 +		ddata->mbox_client_vq1.dev		= dev;
 +		ddata->mbox_client_vq1.tx_done		= NULL;
-+		ddata->mbox_client_vq1.tx_block	= false;
++		ddata->mbox_client_vq1.tx_block	        = false;
 +		ddata->mbox_client_vq1.knows_txdone	= false;
-+		ddata->mbox_client_vq1.rx_callback	= st_rproc_mbox_callback_vq1;
++		ddata->mbox_client_vq1.rx_callback	= npcm8xx_rproc_mbox_callback_vq1;
 +
 +		/*
 +		 * To control a co-processor without IPC mechanism.
 +		 * This driver can be used without mbox and rpmsg.
 +		 */
-+		chan = mbox_request_channel_byname(&ddata->mbox_client_vq0, "vq0_rx");
++		chan = mbox_request_channel_byname(&ddata->mbox_client_vq0, "vq0");
 +		if (IS_ERR(chan)) {
 +			dev_err(&rproc->dev, "failed to request mbox chan 0\n");
 +			ret = PTR_ERR(chan);
 +			goto free_clk;
 +		}
-+		ddata->mbox_chan[ST_RPROC_VQ0 * MBOX_MAX + MBOX_RX] = chan;
++		ddata->mbox_chan[NPCM8XX_RPROC_VQ0] = chan;
 +
-+		chan = mbox_request_channel_byname(&ddata->mbox_client_vq0, "vq0_tx");
-+		if (IS_ERR(chan)) {
-+			dev_err(&rproc->dev, "failed to request mbox chan 0\n");
-+			ret = PTR_ERR(chan);
-+			goto free_mbox;
-+		}
-+		ddata->mbox_chan[ST_RPROC_VQ0 * MBOX_MAX + MBOX_TX] = chan;
-+
-+		chan = mbox_request_channel_byname(&ddata->mbox_client_vq1, "vq1_rx");
++		chan = mbox_request_channel_byname(&ddata->mbox_client_vq1, "vq1");
 +		if (IS_ERR(chan)) {
 +			dev_err(&rproc->dev, "failed to request mbox chan 1\n");
 +			ret = PTR_ERR(chan);
 +			goto free_mbox;
 +		}
-+		ddata->mbox_chan[ST_RPROC_VQ1 * MBOX_MAX + MBOX_RX] = chan;
-+
-+		chan = mbox_request_channel_byname(&ddata->mbox_client_vq1, "vq1_tx");
-+		if (IS_ERR(chan)) {
-+			dev_err(&rproc->dev, "failed to request mbox chan 1\n");
-+			ret = PTR_ERR(chan);
-+			goto free_mbox;
-+		}
-+		ddata->mbox_chan[ST_RPROC_VQ1 * MBOX_MAX + MBOX_TX] = chan;
++		ddata->mbox_chan[NPCM8XX_RPROC_VQ1] = chan;
 +	}
-+#endif
++
 +	ret = rproc_add(rproc);
 +	if (ret)
 +		goto free_mbox;
@@ -731,12 +716,10 @@ index 000000000000..03a95d5f7398
 +	return 0;
 +
 +free_mbox:
-+#if 0//todo
-+	for (i = 0; i < ST_RPROC_MAX_VRING * MBOX_MAX; i++)
++	for (i = 0; i < NPCM8XX_RPROC_MAX_VRING; i++)
 +		mbox_free_channel(ddata->mbox_chan[i]);
 +free_clk:
-+	clk_unprepare(ddata->clk);
-+#endif
++	//clk_unprepare(ddata->clk);
 +//todo
 +//free_rproc:
 +	rproc_free(rproc);
@@ -746,16 +729,16 @@ index 000000000000..03a95d5f7398
 +static int npcm_rproc_remove(struct platform_device *pdev)
 +{
 +	struct rproc *rproc = platform_get_drvdata(pdev);
-+	//struct npcm8xx_rproc *ddata = rproc->priv;
-+	//int i;
++	struct npcm8xx_rproc *ddata = rproc->priv;
++	int i;
 +
 +	rproc_del(rproc);
 +#if 0//todo
 +	clk_disable_unprepare(ddata->clk);
-+
-+	for (i = 0; i < ST_RPROC_MAX_VRING * MBOX_MAX; i++)
-+		mbox_free_channel(ddata->mbox_chan[i]);
 +#endif
++
++	for (i = 0; i < NPCM8XX_RPROC_MAX_VRING; i++)
++		mbox_free_channel(ddata->mbox_chan[i]);
 +
 +	rproc_free(rproc);
 +	return 0;
@@ -774,5 +757,5 @@ index 000000000000..03a95d5f7398
 +MODULE_DESCRIPTION("Nuvoton Remote Processor Control Driver");
 +MODULE_LICENSE("GPL v2");
 -- 
-2.34.1
+2.17.1
 
