@@ -1,0 +1,12 @@
+[Unit]
+Description=MCTP Daemon
+StartLimitBurst=5
+
+[Service]
+ExecStart=/usr/bin/mctpd -b %i
+SyslogIdentifier=mctpd-%i
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
