@@ -68,6 +68,7 @@ RDEPENDS:${PN}-system = " \
         olympus-nuvoton-iptable-restore \
         srvcfg-manager \
         iperf3 \
+        mctpd \
         "
 RDEPENDS:${PN}-system:append = " \
         ${@entity_enabled(d, '', 'first-boot-set-psu')} \
