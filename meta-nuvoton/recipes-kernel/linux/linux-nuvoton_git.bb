@@ -20,3 +20,4 @@ SRC_URI:append:nuvoton = " file://0017-drivers-i2c-workaround-for-i2c-slave-beha
 
 # New Arch VDMX/VDMA driver
 # SRC_URI:append:nuvoton = " file://2222-driver-misc-add-nuvoton-vdmx-vdma-driver.patch"
+SRC_URI:append:nuvoton = " file://0001-driver-misc-alternative-vdm-driver.patch"
