@@ -1,0 +1,47 @@
+From aa1f42c5bb7f7e3641f174ed7ce3b9653840d29f Mon Sep 17 00:00:00 2001
+From: Tyrone Ting <kfting@nuvoton.com>
+Date: Fri, 7 Oct 2022 18:15:49 +0800
+Subject: [PATCH] kernel dts support for MCTP verification
+
+1. Based on https://github.com/Nuvoton-Israel/
+    openbmc/commit/20d1990048bbea97ae9cd5f7139d7041ff732efa
+
+Signed-off-by: Tyrone Ting <kfting@nuvoton.com>
+---
+ arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi | 7 +++++++
+ arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts     | 4 ++++
+ 2 files changed, 11 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi b/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi
+index 9e3c5c4e8c9a..7e4045edc1bc 100644
+--- a/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi
++++ b/arch/arm64/boot/dts/nuvoton/nuvoton-common-npcm8xx.dtsi
+@@ -144,6 +144,13 @@ fiux: spi@fb001000 {
+ 			status = "disabled";
+ 		};
+ 
++		vdma: vdma@e0800000 {
++			compatible = "nuvoton,npcm845-vdm";
++			reg = <0x0 0xe0800000 0x0 0x1000
++				   0x0 0xf0822000 0x0 0x1000>;
++			interrupts = <GIC_SPI 29 IRQ_TYPE_LEVEL_HIGH>;
++		};
++
+ 		pcimbox: pcimbox@f0848000 {
+ 			compatible = "nuvoton,npcm845-pci-mbox", "nuvoton,npcm750-pci-mbox",
+ 					"simple-mfd", "syscon";
+diff --git a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
+index c44731458485..b9ca72cf367a 100644
+--- a/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
++++ b/arch/arm64/boot/dts/nuvoton/nuvoton-npcm845-evb.dts
+@@ -551,3 +551,7 @@ &video {
+ 	status = "okay";
+ 	memory-region = <&video_memory>;
+ };
++
++&vdma {
++	status = "okay";
++};
+-- 
+2.34.1
+
