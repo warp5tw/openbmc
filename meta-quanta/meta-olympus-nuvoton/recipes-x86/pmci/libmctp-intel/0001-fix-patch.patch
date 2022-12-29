@@ -1,0 +1,82 @@
+From 9948cafa5ee0590d587561c41eca3fc07be97df0 Mon Sep 17 00:00:00 2001
+From: kfting <kfting@nuvoton.com>
+Date: Thu, 26 Aug 2021 17:16:45 +0800
+Subject: [PATCH] fix patch
+
+Signed-off-by: kfting <kfting@nuvoton.com>
+---
+ libmctp-nupcie.h              |  1 -
+ nupcie.c                      | 10 +++++-----
+ utils/mctp-nupcie-discovery.c |  2 ++
+ 3 files changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/libmctp-nupcie.h b/libmctp-nupcie.h
+index e2bac38..4ec6c4e 100644
+--- a/libmctp-nupcie.h
++++ b/libmctp-nupcie.h
+@@ -35,7 +35,6 @@ void mctp_nupcie_free(struct mctp_binding_nupcie *b);
+ 
+ int mctp_nupcie_get_fd(struct mctp_binding_nupcie *nupcie);
+ 
+-/*
+ /*
+  * Routing types
+  */
+diff --git a/nupcie.c b/nupcie.c
+index ebc4503..bf04bb3 100644
+--- a/nupcie.c
++++ b/nupcie.c
+@@ -158,10 +158,10 @@ static int mctp_nupcie_tx(struct mctp_binding *b,
+ 		(struct mctp_nupcie_pkt_private *)pkt->msg_binding_private;
+ 	struct mctp_binding_nupcie *nupcie = binding_to_nupcie(b);
+ 	struct mctp_pcie_hdr *hdr = (struct mctp_pcie_hdr *)pkt->data;
+-	struct mctp_hdr *mctp_hdr = mctp_pktbuf_hdr(pkt);
++	//struct mctp_hdr *mctp_hdr = mctp_pktbuf_hdr(pkt);
+ 	uint16_t payload_len_dw = mctp_nupcie_tx_get_payload_size_dw(pkt);
+ 	uint8_t pad = mctp_nupcie_tx_get_pad_len(pkt);
+-	ssize_t write_len, len, i;
++	ssize_t write_len, len;//, i;
+ 
+ 	memcpy(hdr, &mctp_pcie_hdr_template_be, sizeof(*hdr));
+ 
+@@ -239,7 +239,7 @@ int mctp_nupcie_rx(struct mctp_binding_nupcie *nupcie)
+ 	struct mctp_nupcie_pkt_private pkt_prv;
+ 	struct mctp_pktbuf *pkt;
+ 	struct mctp_pcie_hdr *hdr;
+-	struct mctp_hdr *mctp_hdr;
++	//struct mctp_hdr *mctp_hdr;
+ 	size_t read_len, payload_len;
+ 	int rc;
+ 
+@@ -280,7 +280,7 @@ int mctp_nupcie_rx(struct mctp_binding_nupcie *nupcie)
+ 		return -1;
+ 	}
+ 
+-	mctp_hdr = mctp_pktbuf_hdr(pkt);
++	//mctp_hdr = mctp_pktbuf_hdr(pkt);
+ 	memcpy(pkt->msg_binding_private, &pkt_prv, sizeof(pkt_prv));
+ 	mctp_bus_rx(&nupcie->binding, pkt);
+ 
+@@ -339,4 +339,4 @@ mctp_nupcie_core(struct mctp_binding_nupcie *nupcie)
+ int mctp_nupcie_get_fd(struct mctp_binding_nupcie *nupcie)
+ {
+ 	return nupcie->fd;
+-}
+\ No newline at end of file
++}
+diff --git a/utils/mctp-nupcie-discovery.c b/utils/mctp-nupcie-discovery.c
+index cdb28e6..ef5ad32 100644
+--- a/utils/mctp-nupcie-discovery.c
++++ b/utils/mctp-nupcie-discovery.c
+@@ -190,6 +190,8 @@ static void discovery_with_notify_flow(struct mctp_binding_nupcie *nupcie,
+ 	struct mctp_ctrl_req req;
+ 	struct mctp_nupcie_pkt_private pkt_prv;
+ 	int rc;
++	//avoid compile warning as error
++	req.hdr.rq_dgram_inst = 0;
+ 
+ 	ctx->discovered = false;
+ 
+-- 
+2.17.1
+

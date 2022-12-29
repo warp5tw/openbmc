@@ -1,0 +1,94 @@
+From 03bca5104e10d7e33f2b3889dcfc409068135322 Mon Sep 17 00:00:00 2001
+From: kfting <kfting@nuvoton.com>
+Date: Tue, 31 Aug 2021 14:10:01 +0800
+Subject: [PATCH] libmctp upgrade fix
+
+Signed-off-by: kfting <kfting@nuvoton.com>
+---
+ include/SMBusBinding.hpp |  2 +-
+ src/SMBusBinding.cpp     | 24 ++++++++++++------------
+ 2 files changed, 13 insertions(+), 13 deletions(-)
+
+diff --git a/include/SMBusBinding.hpp b/include/SMBusBinding.hpp
+index ab19326..45df54d 100644
+--- a/include/SMBusBinding.hpp
++++ b/include/SMBusBinding.hpp
+@@ -34,7 +34,7 @@ class SMBusBinding : public MctpBinding
+     std::vector<std::pair<int, int>> muxFds;
+     boost::asio::posix::stream_descriptor smbusReceiverFd;
+     bool isMuxFd(const int fd);
+-    std::vector<std::pair<mctp_eid_t, struct mctp_smbus_extra_params>>
++    std::vector<std::pair<mctp_eid_t, struct mctp_smbus_pkt_private>>
+         smbusDeviceTable;
+     void scanAllPorts(void);
+     void scanPort(const int scanFd);
+diff --git a/src/SMBusBinding.cpp b/src/SMBusBinding.cpp
+index 19e5364..98cd6bb 100644
+--- a/src/SMBusBinding.cpp
++++ b/src/SMBusBinding.cpp
+@@ -176,23 +176,23 @@ int getSMBusOutputAddress(uint8_t /*dstEid*/, uint8_t* outAddr)
+ std::optional<std::vector<uint8_t>>
+     SMBusBinding::getBindingPrivateData(uint8_t dstEid)
+ {
+-    mctp_smbus_extra_params prvt = {};
++    mctp_smbus_pkt_private prvt = {};
+ 
+     for (auto& device : smbusDeviceTable)
+     {
+         if (device.first == dstEid)
+         {
+-            mctp_smbus_extra_params temp = device.second;
++            mctp_smbus_pkt_private temp = device.second;
+             prvt.fd = temp.fd;
+             if (isMuxFd(prvt.fd))
+             {
+-                prvt.muxHoldTimeOut = 1000;
+-                prvt.muxFlags = IS_MUX_PORT;
++                prvt.mux_hold_timeout = 1000;
++                prvt.mux_flags = IS_MUX_PORT;
+             }
+             else
+             {
+-                prvt.muxHoldTimeOut = 0;
+-                prvt.muxFlags = 0;
++                prvt.mux_hold_timeout = 0;
++                prvt.mux_flags = 0;
+             }
+             prvt.slave_addr = temp.slave_addr;
+             uint8_t* prvtPtr = reinterpret_cast<uint8_t*>(&prvt);
+@@ -372,7 +372,7 @@ void SMBusBinding::SMBusInit()
+     }
+ 
+     mctp_smbus_set_in_fd(smbus, inFd);
+-    mctp_smbus_set_out_fd(smbus, outFd);
++    //mctp_smbus_set_out_fd(smbus, outFd);
+ 
+     smbusReceiverFd.assign(inFd);
+     readResponse();
+@@ -444,18 +444,18 @@ void SMBusBinding::initEndpointDiscovery()
+                  " is MCTP Capable")
+                     .c_str());
+ 
+-            struct mctp_smbus_extra_params smbusBindingPvt;
++            struct mctp_smbus_pkt_private smbusBindingPvt;
+             smbusBindingPvt.fd = std::get<0>(device);
+ 
+             if (isMuxFd(smbusBindingPvt.fd))
+             {
+-                smbusBindingPvt.muxHoldTimeOut = ctrlTxRetryDelay;
+-                smbusBindingPvt.muxFlags = 0x80;
++                smbusBindingPvt.mux_hold_timeout = ctrlTxRetryDelay;
++                smbusBindingPvt.mux_flags = 0x80;
+             }
+             else
+             {
+-                smbusBindingPvt.muxHoldTimeOut = 0;
+-                smbusBindingPvt.muxFlags = 0;
++                smbusBindingPvt.mux_hold_timeout = 0;
++                smbusBindingPvt.mux_flags = 0;
+             }
+             /* Set 8 bit i2c slave address */
+             smbusBindingPvt.slave_addr =
+-- 
+2.17.1
+

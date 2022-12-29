@@ -2,11 +2,14 @@ FILESEXTRAPATHS_prepend_olympus-nuvoton := "${THISDIR}/${PN}:"
 
 SMBUS_BINDING = "pcie"
 
-SRC_URI_olympus-nuvoton = "git://github.com/Nuvoton-Israel/pmci.git;protocol=ssh"
+#SRC_URI_olympus-nuvoton = "git://github.com/Nuvoton-Israel/pmci.git;protocol=ssh"
+SRC_URI_olympus-nuvoton = "git://github.com/warp5tw/pmci.git;protocol=ssh;branch=update_8_31"
 
-SRCREV_olympus-nuvoton = "6fe3d2677320c391aed5c6d61af38ed43b508e62"
+#SRCREV_olympus-nuvoton = "6fe3d2677320c391aed5c6d61af38ed43b508e62"
+SRCREV_olympus-nuvoton = "e7163510da4957b3c6ef8fd4d95dc9139559ac09"
 
 SRC_URI_append_olympus-nuvoton = " file://mctp_config.json"
+#SRC_URI_append_olympus-nuvoton = " file://0001-libmctp-upgrade-fix.patch"
 
 do_install_append_olympus-nuvoton() {
     install -m 0644 -D ${WORKDIR}/mctp_config.json \
