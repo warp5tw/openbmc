@@ -1,0 +1,407 @@
+From c87d8bf8860dfbbd68990e58bef4fb5518b08f8a Mon Sep 17 00:00:00 2001
+From: Mia Lin <mimi05633@gmail.com>
+Date: Fri, 25 Aug 2023 12:01:05 +0800
+Subject: [PATCH 1/1] pldmd: use MCTP kernel socket
+
+Base on
+  Title: clang-format: copy latest and re-format
+  Commit id: 6da4f91b061aae1e7d918006e54ae5e8cd8a162e
+
+Signed-off-by: Mia Lin <mimi05633@gmail.com>
+---
+ pldmd/pldmd.cpp                               | 140 +++++++-----------
+ pldmtool/pldm_cmd_helper.cpp                  |  12 +-
+ pldmtool/pldm_cmd_helper.hpp                  |   6 +-
+ requester/mctp_endpoint_discovery.cpp         |   6 +-
+ softoff/softoff.cpp                           |   3 +-
+ utilities/requester/set_state_effecter.cpp    |   4 +-
+ .../requester/set_state_effecter_async.cpp    |   4 +-
+ 7 files changed, 79 insertions(+), 96 deletions(-)
+
+diff --git a/pldmd/pldmd.cpp b/pldmd/pldmd.cpp
+index 9f5bbaae0..d6dfb448a 100644
+--- a/pldmd/pldmd.cpp
++++ b/pldmd/pldmd.cpp
+@@ -13,6 +13,7 @@
+ #include <libpldm/bios.h>
+ #include <libpldm/pdr.h>
+ #include <libpldm/platform.h>
++#include <linux/mctp.h>
+ #include <poll.h>
+ #include <stdlib.h>
+ #include <sys/socket.h>
+@@ -79,15 +80,12 @@ void interruptFlightRecorderCallBack(Signal& /*signal*/,
+ }
+ 
+ static std::optional<Response>
+-    processRxMsg(const std::vector<uint8_t>& requestMsg, Invoker& invoker,
++    processRxMsg(uint8_t eid, const std::vector<uint8_t>& requestMsg, Invoker& invoker,
+                  requester::Handler<requester::Request>& handler,
+                  fw_update::Manager* fwManager)
+ {
+-    using type = uint8_t;
+-    uint8_t eid = requestMsg[0];
+     pldm_header_info hdrFields{};
+-    auto hdr = reinterpret_cast<const pldm_msg_hdr*>(
+-        requestMsg.data() + sizeof(eid) + sizeof(type));
++    auto hdr = reinterpret_cast<const pldm_msg_hdr*>(requestMsg.data());
+     if (PLDM_SUCCESS != unpack_pldm_header(hdr, &hdrFields))
+     {
+         error("Empty PLDM request header");
+@@ -98,8 +96,7 @@ static std::optional<Response>
+     {
+         Response response;
+         auto request = reinterpret_cast<const pldm_msg*>(hdr);
+-        size_t requestLen = requestMsg.size() - sizeof(struct pldm_msg_hdr) -
+-                            sizeof(eid) - sizeof(type);
++        size_t requestLen = requestMsg.size() - sizeof(struct pldm_msg_hdr);
+         try
+         {
+             if (hdrFields.pldm_type != PLDM_FWUP)
+@@ -136,8 +133,7 @@ static std::optional<Response>
+     else if (PLDM_RESPONSE == hdrFields.msg_type)
+     {
+         auto response = reinterpret_cast<const pldm_msg*>(hdr);
+-        size_t responseLen = requestMsg.size() - sizeof(struct pldm_msg_hdr) -
+-                             sizeof(eid) - sizeof(type);
++        size_t responseLen = requestMsg.size() - sizeof(struct pldm_msg_hdr);
+         handler.handleResponse(eid, hdrFields.instance, hdrFields.pldm_type,
+                                hdrFields.command, response, responseLen);
+     }
+@@ -172,7 +168,7 @@ int main(int argc, char** argv)
+ 
+     /* Create local socket. */
+     int returnCode = 0;
+-    int sockfd = socket(AF_UNIX, SOCK_SEQPACKET, 0);
++    int sockfd = socket(AF_MCTP, SOCK_DGRAM, 0);
+     if (-1 == sockfd)
+     {
+         returnCode = -errno;
+@@ -285,26 +281,18 @@ int main(int argc, char** argv)
+ 
+     pldm::utils::CustomFD socketFd(sockfd);
+ 
+-    struct sockaddr_un addr
+-    {};
+-    addr.sun_family = AF_UNIX;
+-    const char path[] = "\0mctp-mux";
+-    memcpy(addr.sun_path, path, sizeof(path) - 1);
+-    int result = connect(socketFd(), reinterpret_cast<struct sockaddr*>(&addr),
+-                         sizeof(path) + sizeof(addr.sun_family) - 1);
+-    if (-1 == result)
+-    {
+-        returnCode = -errno;
+-        error("Failed to connect to the socket, RC= {RC}", "RC", returnCode);
+-        exit(EXIT_FAILURE);
+-    }
++    struct sockaddr_mctp addr = {0, 0, 0, 0, 0, 0, 0};
++    addr.smctp_family = AF_MCTP;
++    addr.smctp_network = MCTP_NET_ANY;
++    addr.smctp_addr.s_addr = MCTP_ADDR_ANY; /* receive from any address */
++    addr.smctp_type = MCTP_MSG_TYPE_PLDM;
++    addr.smctp_tag = MCTP_TAG_OWNER;
+ 
+-    result = write(socketFd(), &MCTP_MSG_TYPE_PLDM, sizeof(MCTP_MSG_TYPE_PLDM));
++    int result = bind(socketFd(), (struct sockaddr *)&addr, sizeof(addr));
+     if (-1 == result)
+     {
+         returnCode = -errno;
+-        error("Failed to send message type as pldm to mctp, RC= {RC}", "RC",
+-              returnCode);
++        error("Failed to bind to the socket, RC= {RC}", "RC", returnCode);
+         exit(EXIT_FAILURE);
+     }
+ 
+@@ -320,16 +308,10 @@ int main(int argc, char** argv)
+             return;
+         }
+ 
+-        // Outgoing message.
+-        struct iovec iov[2]{};
+-
+-        // This structure contains the parameter information for the response
+-        // message.
+-        struct msghdr msg
+-        {};
+-
+         int returnCode = 0;
+-        ssize_t peekedLength = recv(fd, nullptr, 0, MSG_PEEK | MSG_TRUNC);
++        struct sockaddr_mctp recvaddr = {0, 0, 0, 0, 0, 0, 0};
++        socklen_t addrLength = sizeof(struct sockaddr_mctp);
++        ssize_t peekedLength = recvfrom(fd, nullptr, 0, MSG_PEEK | MSG_TRUNC, nullptr, 0);
+         if (0 == peekedLength)
+         {
+             // MCTP daemon has closed the socket this daemon is connected to.
+@@ -347,8 +329,9 @@ int main(int argc, char** argv)
+         else
+         {
+             std::vector<uint8_t> requestMsg(peekedLength);
+-            auto recvDataLength = recv(
+-                fd, static_cast<void*>(requestMsg.data()), peekedLength, 0);
++            auto recvDataLength = recvfrom(
++                fd, static_cast<void*>(requestMsg.data()), peekedLength,
++                0, (struct sockaddr *)&recvaddr, &addrLength);
+             if (recvDataLength == peekedLength)
+             {
+                 FlightRecorder::GetInstance().saveRecord(requestMsg, false);
+@@ -357,60 +340,47 @@ int main(int argc, char** argv)
+                     printBuffer(Rx, requestMsg);
+                 }
+ 
+-                if (MCTP_MSG_TYPE_PLDM != requestMsg[1])
+-                {
+-                    // Skip this message and continue.
+-                }
+-                else
++                // process message and send response
++                uint8_t eid = recvaddr.smctp_addr.s_addr;
++                auto response = processRxMsg(eid, requestMsg, invoker,
++                                             reqHandler, fwManager.get());
++                if (response.has_value())
+                 {
+-                    // process message and send response
+-                    auto response = processRxMsg(requestMsg, invoker,
+-                                                 reqHandler, fwManager.get());
+-                    if (response.has_value())
++                    FlightRecorder::GetInstance().saveRecord(*response, true);
++                    if (verbose)
+                     {
+-                        FlightRecorder::GetInstance().saveRecord(*response,
+-                                                                 true);
+-                        if (verbose)
+-                        {
+-                            printBuffer(Tx, *response);
+-                        }
+-
+-                        iov[0].iov_base = &requestMsg[0];
+-                        iov[0].iov_len = sizeof(requestMsg[0]) +
+-                                         sizeof(requestMsg[1]);
+-                        iov[1].iov_base = (*response).data();
+-                        iov[1].iov_len = (*response).size();
++                        printBuffer(Tx, *response);
++                    }
+ 
+-                        msg.msg_iov = iov;
+-                        msg.msg_iovlen = sizeof(iov) / sizeof(iov[0]);
+-                        if (currentSendbuffSize >= 0 &&
+-                            (size_t)currentSendbuffSize < (*response).size())
++                    if (currentSendbuffSize >= 0 &&
++                        (size_t)currentSendbuffSize < (*response).size())
++                    {
++                        int oldBuffSize = currentSendbuffSize;
++                        currentSendbuffSize = (*response).size();
++                        int res = setsockopt(fd, SOL_SOCKET, SO_SNDBUF,
++                                             &currentSendbuffSize,
++                                             sizeof(currentSendbuffSize));
++                        if (res == -1)
+                         {
+-                            int oldBuffSize = currentSendbuffSize;
+-                            currentSendbuffSize = (*response).size();
+-                            int res = setsockopt(fd, SOL_SOCKET, SO_SNDBUF,
+-                                                 &currentSendbuffSize,
+-                                                 sizeof(currentSendbuffSize));
+-                            if (res == -1)
+-                            {
+-                                error(
+-                                    "Responder : Failed to set the new send buffer size [bytes] : {CURR_SND_BUF_SIZE}",
+-                                    "CURR_SND_BUF_SIZE", currentSendbuffSize);
+-                                error(
+-                                    "from current size [bytes] : {OLD_BUF_SIZE}, Error : {ERR}",
+-                                    "OLD_BUF_SIZE", oldBuffSize, "ERR",
+-                                    strerror(errno));
+-                                return;
+-                            }
++                            error(
++                                "Responder : Failed to set the new send buffer size [bytes] : {CURR_SND_BUF_SIZE}",
++                                "CURR_SND_BUF_SIZE", currentSendbuffSize);
++                            error(
++                                "from current size [bytes] : {OLD_BUF_SIZE}, Error : {ERR}",
++                                "OLD_BUF_SIZE", oldBuffSize, "ERR",
++                                strerror(errno));
++                            return;
+                         }
++                    }
+ 
+-                        int result = sendmsg(fd, &msg, 0);
+-                        if (-1 == result)
+-                        {
+-                            returnCode = -errno;
+-                            error("sendto system call failed, RC= {RC}", "RC",
+-                                  returnCode);
+-                        }
++                    recvaddr.smctp_tag &= ~MCTP_TAG_OWNER;
++                    int result = sendto(fd, static_cast<void*>((*response).data()), (*response).size(),
++                                        0, (struct sockaddr *)&recvaddr, sizeof(recvaddr));
++                    if (-1 == result)
++                    {
++                        returnCode = -errno;
++                        error("sendto system call failed, RC= {RC}", "RC",
++                              returnCode);
+                     }
+                 }
+             }
+diff --git a/pldmtool/pldm_cmd_helper.cpp b/pldmtool/pldm_cmd_helper.cpp
+index cfbf5c015..7299d9d26 100644
+--- a/pldmtool/pldm_cmd_helper.cpp
++++ b/pldmtool/pldm_cmd_helper.cpp
+@@ -137,10 +137,10 @@ void CommandInterface::exec()
+     static constexpr auto pldmObjPath = "/xyz/openbmc_project/pldm";
+     static constexpr auto pldmRequester = "xyz.openbmc_project.PLDM.Requester";
+     auto& bus = pldm::utils::DBusHandler::getBus();
++    auto service = pldm::utils::DBusHandler().getService(pldmObjPath,
++                                                         pldmRequester);
+     try
+     {
+-        auto service = pldm::utils::DBusHandler().getService(pldmObjPath,
+-                                                             pldmRequester);
+         auto method = bus.new_method_call(service.c_str(), pldmObjPath,
+                                           pldmRequester, "GetInstanceId");
+         method.append(mctp_eid);
+@@ -168,6 +168,12 @@ void CommandInterface::exec()
+     {
+         std::cerr << "pldmSendRecv: Failed to receive RC = " << rc << "\n";
+         return;
++    } else {
++        auto freeMethod = bus.new_method_call(service.c_str(), pldmObjPath,
++                                          pldmRequester, "markFree");
++        freeMethod.append(mctp_eid);
++        freeMethod.append(instanceId);
++        bus.call(freeMethod);
+     }
+ 
+     auto responsePtr = reinterpret_cast<struct pldm_msg*>(responseMsg.data());
+@@ -198,7 +204,7 @@ int CommandInterface::pldmSendRecv(std::vector<uint8_t>& requestMsg,
+ 
+     if (mctp_eid != PLDM_ENTITY_ID)
+     {
+-        int fd = pldm_open();
++        int fd = pldm_open(mctp_netid);
+         if (-1 == fd)
+         {
+             std::cerr << "failed to init mctp "
+diff --git a/pldmtool/pldm_cmd_helper.hpp b/pldmtool/pldm_cmd_helper.hpp
+index 6f185dd03..e480d0482 100644
+--- a/pldmtool/pldm_cmd_helper.hpp
++++ b/pldmtool/pldm_cmd_helper.hpp
+@@ -78,11 +78,12 @@ class CommandInterface
+   public:
+     explicit CommandInterface(const char* type, const char* name,
+                               CLI::App* app) :
+-        pldmType(type),
+-        commandName(name), mctp_eid(PLDM_ENTITY_ID), pldmVerbose(false),
++        pldmType(type), commandName(name),
++        mctp_eid(PLDM_ENTITY_ID), mctp_netid(0), pldmVerbose(false),
+         instanceId(0)
+     {
+         app->add_option("-m,--mctp_eid", mctp_eid, "MCTP endpoint ID");
++        app->add_option("-n,--mctp_netid", mctp_netid, "MCTP endpoint net ID");
+         app->add_flag("-v, --verbose", pldmVerbose);
+         app->callback([&]() { exec(); });
+     }
+@@ -113,6 +114,7 @@ class CommandInterface
+     const std::string pldmType;
+     const std::string commandName;
+     uint8_t mctp_eid;
++    uint8_t mctp_netid;
+     bool pldmVerbose;
+ 
+   protected:
+diff --git a/requester/mctp_endpoint_discovery.cpp b/requester/mctp_endpoint_discovery.cpp
+index f94bea6f5..2c73439c9 100644
+--- a/requester/mctp_endpoint_discovery.cpp
++++ b/requester/mctp_endpoint_discovery.cpp
+@@ -28,7 +28,7 @@ MctpDiscovery::MctpDiscovery(sdbusplus::bus_t& bus,
+     try
+     {
+         auto method = bus.new_method_call(
+-            "xyz.openbmc_project.MCTP.Control", "/xyz/openbmc_project/mctp",
++            "xyz.openbmc_project.MCTP", "/xyz/openbmc_project/mctp",
+             "org.freedesktop.DBus.ObjectManager", "GetManagedObjects");
+         auto reply = bus.call(method);
+         reply.read(objects);
+@@ -49,7 +49,7 @@ MctpDiscovery::MctpDiscovery(sdbusplus::bus_t& bus,
+                 if (properties.contains("EID") &&
+                     properties.contains("SupportedMessageTypes"))
+                 {
+-                    auto eid = std::get<size_t>(properties.at("EID"));
++                    auto eid = std::get<uint8_t>(properties.at("EID"));
+                     auto types = std::get<std::vector<uint8_t>>(
+                         properties.at("SupportedMessageTypes"));
+                     if (std::find(types.begin(), types.end(), mctpTypePLDM) !=
+@@ -85,7 +85,7 @@ void MctpDiscovery::dicoverEndpoints(sdbusplus::message_t& msg)
+             if (properties.contains("EID") &&
+                 properties.contains("SupportedMessageTypes"))
+             {
+-                auto eid = std::get<size_t>(properties.at("EID"));
++                auto eid = std::get<uint8_t>(properties.at("EID"));
+                 auto types = std::get<std::vector<uint8_t>>(
+                     properties.at("SupportedMessageTypes"));
+                 if (std::find(types.begin(), types.end(), mctpTypePLDM) !=
+diff --git a/softoff/softoff.cpp b/softoff/softoff.cpp
+index a5c7a19a1..589775744 100644
+--- a/softoff/softoff.cpp
++++ b/softoff/softoff.cpp
+@@ -293,6 +293,7 @@ int SoftPowerOff::hostSoftOff(sdeventplus::Event& event)
+ {
+     constexpr uint8_t effecterCount = 1;
+     uint8_t mctpEID;
++    uint8_t mctpNetID = 0;
+     uint8_t instanceID;
+ 
+     mctpEID = pldm::utils::readHostEID();
+@@ -334,7 +335,7 @@ int SoftPowerOff::hostSoftOff(sdeventplus::Event& event)
+     }
+ 
+     // Open connection to MCTP socket
+-    int fd = pldm_open();
++    int fd = pldm_open(mctpNetID);
+     if (-1 == fd)
+     {
+         error("Failed to connect to mctp demux daemon");
+diff --git a/utilities/requester/set_state_effecter.cpp b/utilities/requester/set_state_effecter.cpp
+index c71f079f0..69fc8726b 100644
+--- a/utilities/requester/set_state_effecter.cpp
++++ b/utilities/requester/set_state_effecter.cpp
+@@ -14,6 +14,8 @@ int main(int argc, char** argv)
+     CLI::App app{"Send PLDM command SetStateEffecterStates"};
+     uint8_t mctpEid{};
+     app.add_option("-m,--mctp_eid", mctpEid, "MCTP EID")->required();
++    uint8_t mctpNetid{};
++    app.add_option("-n,--mctp_netid", mctpNetid, "MCTP Network ID")->required();
+     uint16_t effecterId{};
+     app.add_option("-e,--effecter", effecterId, "Effecter Id")->required();
+     uint8_t state{};
+@@ -38,7 +40,7 @@ int main(int argc, char** argv)
+     }
+ 
+     // Open connection to MCTP socket
+-    int fd = pldm_open();
++    int fd = pldm_open(mctpNetid);
+     if (-1 == fd)
+     {
+         error("Failed to init mctp");
+diff --git a/utilities/requester/set_state_effecter_async.cpp b/utilities/requester/set_state_effecter_async.cpp
+index 8a7a041e9..4307cf332 100644
+--- a/utilities/requester/set_state_effecter_async.cpp
++++ b/utilities/requester/set_state_effecter_async.cpp
+@@ -19,6 +19,8 @@ int main(int argc, char** argv)
+     CLI::App app{"Send PLDM command SetStateEffecterStates"};
+     uint8_t mctpEid{};
+     app.add_option("-m,--mctp_eid", mctpEid, "MCTP EID")->required();
++    uint8_t mctpNetid{};
++    app.add_option("-n,--mctp_netid", mctpNetid, "MCTP Network ID")->required();
+     uint16_t effecterId{};
+     app.add_option("-e,--effecter", effecterId, "Effecter Id")->required();
+     uint8_t state{};
+@@ -43,7 +45,7 @@ int main(int argc, char** argv)
+     }
+ 
+     // Get fd of MCTP socket
+-    int fd = pldm_open();
++    int fd = pldm_open(mctpNetid);
+     if (-1 == fd)
+     {
+         error("Failed to init mctp");
+-- 
+2.17.1
+
