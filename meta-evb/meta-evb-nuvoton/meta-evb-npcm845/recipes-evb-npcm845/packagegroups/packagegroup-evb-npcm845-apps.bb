@@ -74,4 +74,6 @@ RDEPENDS:${PN}-system = " \
         cryptsetup \
         systemd-analyze \
         libmctp \
+        mctp \
+        pldm \
         "
