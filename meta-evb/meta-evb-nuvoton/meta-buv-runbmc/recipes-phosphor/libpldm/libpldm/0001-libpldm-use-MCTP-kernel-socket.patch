@@ -1,0 +1,248 @@
+From 202324b7aca1d0a95e519644a71e98b3d38bd12e Mon Sep 17 00:00:00 2001
+From: Mia Lin <mimi05633@gmail.com>
+Date: Fri, 9 Jun 2023 13:21:30 +0800
+Subject: [PATCH 1/1] libpldm: use MCTP kernel socket
+
+Base on
+  Commit id: 6fd81a518d8a021009101038b0d80092f14a9028
+  Title: libpldm: Add a changelog
+
+Signed-off-by: Mia Lin <mimi05633@gmail.com>
+---
+ include/libpldm/requester/pldm.h    |  2 +-
+ include/libpldm/transport/af-mctp.h |  2 +-
+ src/requester/pldm.c                | 38 +++++++++++-----------
+ src/transport/af-mctp.c             | 50 +++++++++++++++++++++++++++--
+ 4 files changed, 68 insertions(+), 24 deletions(-)
+
+diff --git a/include/libpldm/requester/pldm.h b/include/libpldm/requester/pldm.h
+index 9e3b08d..a66e2c6 100644
+--- a/include/libpldm/requester/pldm.h
++++ b/include/libpldm/requester/pldm.h
+@@ -34,7 +34,7 @@ typedef enum pldm_requester_error_codes {
+  *
+  * @return fd on success, pldm_requester_rc_t on error (errno may be set)
+  */
+-pldm_requester_rc_t pldm_open(void);
++pldm_requester_rc_t pldm_open(uint8_t netid);
+ 
+ /**
+  * @brief Send a PLDM request message. Wait for corresponding response message,
+diff --git a/include/libpldm/transport/af-mctp.h b/include/libpldm/transport/af-mctp.h
+index 2b788f7..f4ffd5a 100644
+--- a/include/libpldm/transport/af-mctp.h
++++ b/include/libpldm/transport/af-mctp.h
+@@ -12,7 +12,7 @@ extern "C" {
+ struct pldm_transport_af_mctp;
+ 
+ /* Init the transport backend */
+-int pldm_transport_af_mctp_init(struct pldm_transport_af_mctp **ctx);
++int pldm_transport_af_mctp_init(struct pldm_transport_af_mctp **ctx, uint8_t netid);
+ 
+ /* Destroy the transport backend */
+ void pldm_transport_af_mctp_destroy(struct pldm_transport_af_mctp *ctx);
+diff --git a/src/requester/pldm.c b/src/requester/pldm.c
+index c78512f..9f71281 100644
+--- a/src/requester/pldm.c
++++ b/src/requester/pldm.c
+@@ -11,11 +11,11 @@
+ #include <unistd.h>
+ 
+ /* Temporary for old api */
+-#include "libpldm/transport/mctp-demux.h"
++#include "libpldm/transport/af-mctp.h"
+ extern int
+-pldm_transport_mctp_demux_get_socket_fd(struct pldm_transport_mctp_demux *ctx);
+-extern struct pldm_transport_mctp_demux *
+-pldm_transport_mctp_demux_init_with_fd(int mctp_fd);
++pldm_transport_af_mctp_get_socket_fd(struct pldm_transport_af_mctp *ctx);
++extern struct pldm_transport_af_mctp *
++pldm_transport_af_mctp_init_with_fd(int mctp_fd);
+ 
+ /* ---  old APIS written in terms of the new API -- */
+ /*
+@@ -23,9 +23,9 @@ pldm_transport_mctp_demux_init_with_fd(int mctp_fd);
+  * persist over api calls (so a consumer can poll it for incoming messages).
+  * So we need a global variable to store the transport struct
+  */
+-static struct pldm_transport_mctp_demux *open_transport;
++static struct pldm_transport_af_mctp *open_transport;
+ 
+-pldm_requester_rc_t pldm_open(void)
++pldm_requester_rc_t pldm_open(uint8_t netid)
+ {
+ 	int fd;
+ 	int rc;
+@@ -34,15 +34,15 @@ pldm_requester_rc_t pldm_open(void)
+ 		return -1;
+ 	}
+ 
+-	struct pldm_transport_mctp_demux *demux = NULL;
+-	rc = pldm_transport_mctp_demux_init(&demux);
++	struct pldm_transport_af_mctp *af_mctp = NULL;
++	rc = pldm_transport_af_mctp_init(&af_mctp, netid);
+ 	if (rc) {
+ 		return rc;
+ 	}
+ 
+-	fd = pldm_transport_mctp_demux_get_socket_fd(demux);
++	fd = pldm_transport_af_mctp_get_socket_fd(af_mctp);
+ 
+-	open_transport = demux;
++	open_transport = af_mctp;
+ 
+ 	return fd;
+ }
+@@ -52,7 +52,7 @@ pldm_requester_rc_t pldm_open(void)
+  * functions, it makes sense to only define it once. */
+ #define PLDM_REQ_FN(eid, fd, fn, ...)                                          \
+ 	do {                                                                   \
+-		struct pldm_transport_mctp_demux *demux;                       \
++		struct pldm_transport_af_mctp *af_mctp;                       \
+ 		bool using_open_transport = false;                             \
+ 		pldm_requester_rc_t rc;                                        \
+ 		pldm_tid_t tid = 1;                                            \
+@@ -60,19 +60,19 @@ pldm_requester_rc_t pldm_open(void)
+ 		/* The fd can be for a socket we opened or one the consumer    \
+ 		 * opened. */                                                  \
+ 		if (open_transport &&                                          \
+-		    mctp_fd == pldm_transport_mctp_demux_get_socket_fd(        \
++		    mctp_fd == pldm_transport_af_mctp_get_socket_fd(        \
+ 				   open_transport)) {                          \
+ 			using_open_transport = true;                           \
+-			demux = open_transport;                                \
++			af_mctp = open_transport;                                \
+ 		} else {                                                       \
+-			demux = pldm_transport_mctp_demux_init_with_fd(fd);    \
+-			if (!demux) {                                          \
++			af_mctp = pldm_transport_af_mctp_init_with_fd(fd);    \
++			if (!af_mctp) {                                          \
+ 				rc = PLDM_REQUESTER_OPEN_FAIL;                 \
+ 				goto transport_out;                            \
+ 			}                                                      \
+ 		}                                                              \
+-		ctx = pldm_transport_mctp_demux_core(demux);                   \
+-		rc = pldm_transport_mctp_demux_map_tid(demux, tid, eid);       \
++		ctx = pldm_transport_af_mctp_core(af_mctp);                   \
++		rc = pldm_transport_af_mctp_map_tid(af_mctp, tid, eid);       \
+ 		if (rc) {                                                      \
+ 			rc = PLDM_REQUESTER_OPEN_FAIL;                         \
+ 			goto transport_out;                                    \
+@@ -80,7 +80,7 @@ pldm_requester_rc_t pldm_open(void)
+ 		rc = fn(ctx, tid, __VA_ARGS__);                                \
+ 	transport_out:                                                         \
+ 		if (!using_open_transport) {                                   \
+-			pldm_transport_mctp_demux_destroy(demux);              \
++			pldm_transport_af_mctp_destroy(af_mctp);              \
+ 		}                                                              \
+ 		return rc;                                                     \
+ 	} while (0)
+@@ -128,7 +128,7 @@ pldm_requester_rc_t pldm_send(mctp_eid_t eid, int mctp_fd,
+ void pldm_close()
+ {
+ 	if (open_transport) {
+-		pldm_transport_mctp_demux_destroy(open_transport);
++		pldm_transport_af_mctp_destroy(open_transport);
+ 	}
+ 	open_transport = NULL;
+ }
+diff --git a/src/transport/af-mctp.c b/src/transport/af-mctp.c
+index 21d2c72..7ab296e 100644
+--- a/src/transport/af-mctp.c
++++ b/src/transport/af-mctp.c
+@@ -20,6 +20,7 @@ struct pldm_transport_af_mctp {
+ 	struct pldm_transport transport;
+ 	int socket;
+ 	pldm_tid_t tid_eid_map[MCTP_MAX_NUM_EID];
++	uint8_t netid;
+ };
+ 
+ #define transport_to_af_mctp(ptr)                                              \
+@@ -83,12 +84,18 @@ static pldm_requester_rc_t pldm_transport_af_mctp_recv(struct pldm_transport *t,
+ 		return PLDM_REQUESTER_RECV_FAIL;
+ 	}
+ 
+-	ssize_t length = recv(af_mctp->socket, NULL, 0, MSG_PEEK | MSG_TRUNC);
++	struct sockaddr_mctp recvaddr = {0};
++	recvaddr.smctp_family = AF_MCTP;
++	recvaddr.smctp_addr.s_addr = eid;
++	recvaddr.smctp_type = MCTP_MSG_TYPE_PLDM;
++	recvaddr.smctp_tag = MCTP_TAG_OWNER;
++	socklen_t addrlen = sizeof(recvaddr);
++	ssize_t length = recvfrom(af_mctp->socket, NULL, 0, MSG_PEEK | MSG_TRUNC, NULL, 0);
+ 	if (length <= 0) {
+ 		return PLDM_REQUESTER_RECV_FAIL;
+ 	}
+ 	*pldm_resp_msg = malloc(length);
+-	length = recv(af_mctp->socket, *pldm_resp_msg, length, MSG_TRUNC);
++	length = recvfrom(af_mctp->socket, *pldm_resp_msg, length, MSG_TRUNC, (struct sockaddr *)&recvaddr, &addrlen);
+ 	if (length < (ssize_t)sizeof(struct pldm_msg_hdr)) {
+ 		free(*pldm_resp_msg);
+ 		return PLDM_REQUESTER_INVALID_RECV_LEN;
+@@ -110,6 +117,7 @@ static pldm_requester_rc_t pldm_transport_af_mctp_send(struct pldm_transport *t,
+ 
+ 	struct sockaddr_mctp addr = {0};
+ 	addr.smctp_family = AF_MCTP;
++	addr.smctp_network = af_mctp->netid;
+ 	addr.smctp_addr.s_addr = eid;
+ 	addr.smctp_type = MCTP_MSG_TYPE_PLDM;
+ 	addr.smctp_tag = MCTP_TAG_OWNER;
+@@ -122,7 +130,7 @@ static pldm_requester_rc_t pldm_transport_af_mctp_send(struct pldm_transport *t,
+ 	return PLDM_REQUESTER_SUCCESS;
+ }
+ 
+-int pldm_transport_af_mctp_init(struct pldm_transport_af_mctp **ctx)
++int pldm_transport_af_mctp_init(struct pldm_transport_af_mctp **ctx, uint8_t netid)
+ {
+ 	if (!ctx || *ctx) {
+ 		return -EINVAL;
+@@ -138,6 +146,8 @@ int pldm_transport_af_mctp_init(struct pldm_transport_af_mctp **ctx)
+ 	af_mctp->transport.version = 1;
+ 	af_mctp->transport.recv = pldm_transport_af_mctp_recv;
+ 	af_mctp->transport.send = pldm_transport_af_mctp_send;
++	af_mctp->transport.init_pollfd = pldm_transport_af_mctp_init_pollfd;
++	af_mctp->netid = netid;
+ 	af_mctp->socket = socket(AF_MCTP, SOCK_DGRAM, 0);
+ 	if (af_mctp->socket == -1) {
+ 		free(af_mctp);
+@@ -155,3 +165,37 @@ void pldm_transport_af_mctp_destroy(struct pldm_transport_af_mctp *ctx)
+ 	close(ctx->socket);
+ 	free(ctx);
+ }
++
++struct pldm_transport_af_mctp *
++pldm_transport_af_mctp_init_with_fd(int mctp_fd)
++{
++	struct pldm_transport_af_mctp *af_mctp =
++	    calloc(1, sizeof(struct pldm_transport_af_mctp));
++	if (!af_mctp) {
++		return NULL;
++	}
++
++	af_mctp->transport.name = AF_MCTP_NAME;
++	af_mctp->transport.version = 1;
++	af_mctp->transport.recv = pldm_transport_af_mctp_recv;
++	af_mctp->transport.send = pldm_transport_af_mctp_send;
++	af_mctp->transport.init_pollfd = pldm_transport_af_mctp_init_pollfd;
++	/* dup is so we can call pldm_transport_mctp_demux_destroy which closes
++	 * the socket, without closing the fd that is being used by the consumer
++	 */
++	af_mctp->socket = dup(mctp_fd);
++	if (af_mctp->socket == -1) {
++		free(af_mctp);
++		return NULL;
++	}
++	return af_mctp;
++}
++
++int pldm_transport_af_mctp_get_socket_fd(
++    struct pldm_transport_af_mctp *ctx)
++{
++	if (ctx && ctx->socket) {
++		return ctx->socket;
++	}
++	return -1;
++}
+-- 
+2.17.1
+
