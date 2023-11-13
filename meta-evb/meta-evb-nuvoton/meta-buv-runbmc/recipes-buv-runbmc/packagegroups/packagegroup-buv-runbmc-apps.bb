@@ -52,6 +52,9 @@ RDEPENDS:${PN}-system = " \
     phosphor-power \
     phosphor-gpio-monitor \
     phosphor-gpio-monitor-monitor \
+    libmctp \
+    mctp \
+    pldm \
     "
 
 RDEPENDS:${PN}-system:append = " \
