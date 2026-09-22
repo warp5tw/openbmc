@@ -50,6 +50,7 @@ RDEPENDS:${PN}-system = " \
         phosphor-sel-logger \
         rsyslog \
         loadsvf \
+        usb-ocp-recovery \
         pciutils \
         dhrystone \
         phosphor-ecc \
